@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>EcommercePos.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EcommercePos.Domain\EcommercePos.Domain.csproj" />
+    <ProjectReference Include="..\EcommercePos.Application\EcommercePos.Application.csproj" />
+  </ItemGroup>
+
+</Project>

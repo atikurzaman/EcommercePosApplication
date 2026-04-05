@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "EcommercePos.Application/1.0.0": {
+        "dependencies": {
+          "EcommercePos.Domain": "1.0.0"
+        },
+        "runtime": {
+          "EcommercePos.Application.dll": {}
+        }
+      },
+      "EcommercePos.Domain/1.0.0": {
+        "runtime": {
+          "EcommercePos.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "EcommercePos.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "EcommercePos.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

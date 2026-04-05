@@ -1,7 +1,0 @@
-<Solution>
-  <Project Path="EcommercePosManagementSystem.Application/EcommercePosManagementSystem.Application.csproj" />
-  <Project Path="EcommercePosManagementSystem.Domain/EcommercePosManagementSystem.Domain.csproj" />
-  <Project Path="EcommercePosManagementSystem.Infrastructure/EcommercePosManagementSystem.Infrastructure.csproj" />
-  <Project Path="EcommercePosManagementSystem.Persistence/EcommercePosManagementSystem.Persistence.csproj" />
-  <Project Path="EcommercePosManagementSystem.Shared/EcommercePosManagementSystem.Shared.csproj" />
-</Solution>
