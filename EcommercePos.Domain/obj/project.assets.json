@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net10.0": {}
+    "net10.0": {
+      "EcommercePos.Shared/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "compile": {
+          "bin/placeholder/EcommercePos.Shared.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/EcommercePos.Shared.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "EcommercePos.Shared/1.0.0": {
+      "type": "project",
+      "path": "../EcommercePos.Shared/EcommercePos.Shared.csproj",
+      "msbuildProject": "../EcommercePos.Shared/EcommercePos.Shared.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net10.0": []
+    "net10.0": [
+      "EcommercePos.Shared >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\PC\\.nuget\\packages\\": {},
@@ -20,7 +39,6 @@
       "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
       "outputPath": "C:\\AI\\EcommercePosApp\\EcommercePos.Domain\\obj\\",
       "projectStyle": "PackageReference",
-      "centralPackageVersionsManagementEnabled": true,
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
@@ -39,7 +57,11 @@
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\AI\\EcommercePosApp\\EcommercePos.Shared\\EcommercePos.Shared.csproj": {
+              "projectPath": "C:\\AI\\EcommercePosApp\\EcommercePos.Shared\\EcommercePos.Shared.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -57,10 +79,6 @@
     "frameworks": {
       "net10.0": {
         "targetAlias": "net10.0",
-        "centralPackageVersions": {
-          "Microsoft.EntityFrameworkCore.Design": "10.0.0",
-          "Microsoft.EntityFrameworkCore.SqlServer": "10.0.0"
-        },
         "imports": [
           "net461",
           "net462",

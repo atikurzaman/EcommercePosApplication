@@ -9,12 +9,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EcommercePos.Domain\EcommercePos.Domain.csproj" />
-    <ProjectReference Include="..\EcommercePos.Application\EcommercePos.Application.csproj" />
+    <ProjectReference Include="..\EcommercePos.Shared\EcommercePos.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

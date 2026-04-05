@@ -10,3 +10,7 @@ C:\AI\EcommercePosApp\EcommercePos.Domain\obj\Debug\net10.0\EcommercePos.Domain.
 C:\AI\EcommercePosApp\EcommercePos.Domain\obj\Debug\net10.0\refint\EcommercePos.Domain.dll
 C:\AI\EcommercePosApp\EcommercePos.Domain\obj\Debug\net10.0\EcommercePos.Domain.pdb
 C:\AI\EcommercePosApp\EcommercePos.Domain\obj\Debug\net10.0\ref\EcommercePos.Domain.dll
+C:\AI\EcommercePosApp\EcommercePos.Domain\bin\Debug\net10.0\EcommercePos.Shared.dll
+C:\AI\EcommercePosApp\EcommercePos.Domain\bin\Debug\net10.0\EcommercePos.Shared.pdb
+C:\AI\EcommercePosApp\EcommercePos.Domain\obj\Debug\net10.0\EcommercePos.Domain.csproj.AssemblyReference.cache
+C:\AI\EcommercePosApp\EcommercePos.Domain\obj\Debug\net10.0\Ecommerc.594800A9.Up2Date

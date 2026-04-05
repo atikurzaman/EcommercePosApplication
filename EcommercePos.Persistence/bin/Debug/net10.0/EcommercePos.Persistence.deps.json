@@ -8,8 +8,8 @@
     ".NETCoreApp,Version=v10.0": {
       "EcommercePos.Persistence/1.0.0": {
         "dependencies": {
-          "EcommercePos.Application": "1.0.0",
           "EcommercePos.Domain": "1.0.0",
+          "EcommercePos.Shared": "1.0.0",
           "Microsoft.EntityFrameworkCore.Design": "10.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "10.0.0"
         },
@@ -1035,20 +1035,20 @@
           }
         }
       },
-      "EcommercePos.Application/1.0.0": {
+      "EcommercePos.Domain/1.0.0": {
         "dependencies": {
-          "EcommercePos.Domain": "1.0.0"
+          "EcommercePos.Shared": "1.0.0"
         },
         "runtime": {
-          "EcommercePos.Application.dll": {
+          "EcommercePos.Domain.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
       },
-      "EcommercePos.Domain/1.0.0": {
+      "EcommercePos.Shared/1.0.0": {
         "runtime": {
-          "EcommercePos.Domain.dll": {
+          "EcommercePos.Shared.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
@@ -1503,12 +1503,12 @@
       "path": "system.windows.extensions/9.0.0",
       "hashPath": "system.windows.extensions.9.0.0.nupkg.sha512"
     },
-    "EcommercePos.Application/1.0.0": {
+    "EcommercePos.Domain/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "EcommercePos.Domain/1.0.0": {
+    "EcommercePos.Shared/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

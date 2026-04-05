@@ -48,10 +48,8 @@ C:\AI\EcommercePosApp\EcommercePos.Persistence\bin\Debug\net10.0\EcommercePos.Pe
 C:\AI\EcommercePosApp\EcommercePos.Persistence\bin\Debug\net10.0\EcommercePos.Persistence.runtimeconfig.json
 C:\AI\EcommercePosApp\EcommercePos.Persistence\bin\Debug\net10.0\EcommercePos.Persistence.dll
 C:\AI\EcommercePosApp\EcommercePos.Persistence\bin\Debug\net10.0\EcommercePos.Persistence.pdb
-C:\AI\EcommercePosApp\EcommercePos.Persistence\bin\Debug\net10.0\EcommercePos.Application.dll
 C:\AI\EcommercePosApp\EcommercePos.Persistence\bin\Debug\net10.0\EcommercePos.Domain.dll
 C:\AI\EcommercePosApp\EcommercePos.Persistence\bin\Debug\net10.0\EcommercePos.Domain.pdb
-C:\AI\EcommercePosApp\EcommercePos.Persistence\bin\Debug\net10.0\EcommercePos.Application.pdb
 C:\AI\EcommercePosApp\EcommercePos.Persistence\obj\Debug\net10.0\EcommercePos.Persistence.csproj.AssemblyReference.cache
 C:\AI\EcommercePosApp\EcommercePos.Persistence\obj\Debug\net10.0\EcommercePos.Persistence.GeneratedMSBuildEditorConfig.editorconfig
 C:\AI\EcommercePosApp\EcommercePos.Persistence\obj\Debug\net10.0\EcommercePos.Persistence.AssemblyInfoInputs.cache
@@ -64,3 +62,5 @@ C:\AI\EcommercePosApp\EcommercePos.Persistence\obj\Debug\net10.0\refint\Ecommerc
 C:\AI\EcommercePosApp\EcommercePos.Persistence\obj\Debug\net10.0\EcommercePos.Persistence.pdb
 C:\AI\EcommercePosApp\EcommercePos.Persistence\obj\Debug\net10.0\EcommercePos.Persistence.genruntimeconfig.cache
 C:\AI\EcommercePosApp\EcommercePos.Persistence\obj\Debug\net10.0\ref\EcommercePos.Persistence.dll
+C:\AI\EcommercePosApp\EcommercePos.Persistence\bin\Debug\net10.0\EcommercePos.Shared.dll
+C:\AI\EcommercePosApp\EcommercePos.Persistence\bin\Debug\net10.0\EcommercePos.Shared.pdb

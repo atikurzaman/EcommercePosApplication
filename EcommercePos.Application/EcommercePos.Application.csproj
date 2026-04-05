@@ -8,7 +8,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.9.0" />
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EcommercePos.Domain\EcommercePos.Domain.csproj" />
+    <ProjectReference Include="..\EcommercePos.Shared\EcommercePos.Shared.csproj" />
+    <ProjectReference Include="..\EcommercePos.Persistence\EcommercePos.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
