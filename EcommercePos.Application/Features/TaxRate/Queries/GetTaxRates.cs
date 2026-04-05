@@ -3,18 +3,19 @@ using Mapster;
 using EcommercePos.Persistence.Data;
 using EcommercePos.Shared.Common;
 
-namespace EcommercePos.Application.Features.Category.Queries;
+namespace EcommercePos.Application.Features.TaxRate.Queries;
 
-public static class GetCategories
+public static class GetTaxRates
 {
     public sealed record Request(int PageIndex = 0, int PageSize = 10, string? Search = null);
 
     public sealed record Response
     {
         public Guid Id { get; init; }
-        public string Name { get; init; } = string.Empty;
+        public string TaxName { get; init; } = string.Empty;
+        public decimal TaxRate { get; init; }
+        public string? TaxCode { get; init; }
         public string? Description { get; init; }
-        public int DisplayOrder { get; init; }
         public bool IsActive { get; init; }
     }
 
@@ -31,18 +32,18 @@ public static class GetCategories
 
         public async Task<Result<PagedResult<Response>>> Handle(Query query, CancellationToken ct)
         {
-            var dbQuery = _context.Categories
-                .Where(c => !c.IsDeleted)
+            var dbQuery = _context.TaxRates
+                .Where(x => !x.IsDeleted)
                 .AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                dbQuery = dbQuery.Where(c => c.Name.Contains(query.Search));
+                dbQuery = dbQuery.Where(x => x.TaxName.Contains(query.Search) || x.TaxCode.Contains(query.Search));
             }
 
             var totalCount = await dbQuery.CountAsync(ct);
             var items = await dbQuery
-                .OrderBy(c => c.DisplayOrder)
+                .OrderBy(x => x.TaxName)
                 .Skip(query.PageIndex * query.PageSize)
                 .Take(query.PageSize)
                 .ProjectToType<Response>()

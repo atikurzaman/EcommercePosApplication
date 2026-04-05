@@ -4,36 +4,37 @@ using Microsoft.EntityFrameworkCore;
 using EcommercePos.Persistence.Data;
 using EcommercePos.Shared.Common;
 
-namespace EcommercePos.Application.Features.Category.Commands;
+namespace EcommercePos.Application.Features.Unit.Commands;
 
-public static class CreateCategory
+public static class CreateUnit
 {
     public sealed record Request
     {
+        public string ShortName { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public string? Description { get; init; }
-        public string? ImageUrl { get; init; }
-        public Guid? ParentCategoryId { get; init; }
-        public int DisplayOrder { get; init; }
+        public Guid? BaseUnitId { get; init; }
+        public decimal? ConversionFactor { get; init; }
         public bool IsActive { get; init; }
     }
 
     public sealed record Response
     {
         public Guid Id { get; init; }
+        public string ShortName { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public string? Description { get; init; }
-        public int DisplayOrder { get; init; }
         public bool IsActive { get; init; }
     }
 
     public sealed record Command(
-        string Name, string? Description, string? ImageUrl, 
-        Guid? ParentCategoryId, int DisplayOrder, bool IsActive);
+        string ShortName, string Name, string? Description, 
+        Guid? BaseUnitId, decimal? ConversionFactor, bool IsActive);
 
     public sealed class Validator : AbstractValidator<Request>
     {
         public Validator() {
+            RuleFor(x => x.ShortName).NotEmpty();
             RuleFor(x => x.Name).NotEmpty();
         }
     }
@@ -49,21 +50,28 @@ public static class CreateCategory
 
         public async Task<Result<Response>> Handle(Command command, CancellationToken ct)
         {
-            var item = new Categories
+            var exists = await _context.Units
+                .AnyAsync(x => x.ShortName == command.ShortName && !x.IsDeleted, ct);
+
+            if (exists)
+            {
+                return Result<Response>.Failure(Error.Conflict($"Unit with ShortName '{command.ShortName}' already exists."));
+            }
+
+            var item = new Units
             {
                 Id = Guid.NewGuid(),
+                ShortName = command.ShortName,
                 Name = command.Name,
                 Description = command.Description,
-                ImageUrl = command.ImageUrl,
-                ParentCategoryId = command.ParentCategoryId,
-                DisplayOrder = command.DisplayOrder,
+                BaseUnitId = command.BaseUnitId,
+                ConversionFactor = command.ConversionFactor,
                 IsActive = command.IsActive,
-                Slug = command.Name.ToLower().Replace(" ", "-"),
                 CreatedAt = DateTime.UtcNow,
                 IsDeleted = false
             };
 
-            _context.Categories.Add(item);
+            _context.Units.Add(item);
             await _context.SaveChangesAsync(ct);
 
             return Result<Response>.Success(item.Adapt<Response>());

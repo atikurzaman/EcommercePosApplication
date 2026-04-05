@@ -7,6 +7,8 @@ public partial class Brands
 {
     public Guid Id { get; set; }
 
+    public string BrandCode { get; set; } = null!;
+
     public string Name { get; set; } = null!;
 
     public string Slug { get; set; } = null!;

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Application.Features.Category.Queries;
+using EcommercePos.Application.Features.Category.Commands;
+using EcommercePos.Api.Extensions;
 using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Api.Endpoints;
@@ -12,116 +13,66 @@ public static class CategoryEndpoints
         var group = app.MapGroup("/api/categories").WithTags("Categories");
 
         group.MapGet("/", async (
-            [AsParameters] GetCategoriesRequest request, 
-            ApplicationDbContext context, 
+            [AsParameters] GetCategories.Request request,
+            [FromServices] GetCategories.Handler handler,
             CancellationToken ct) =>
         {
-            var query = context.Categories
-                .Where(c => !c.IsDeleted)
-                .AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                query = query.Where(c => c.Name.Contains(request.Search));
-            }
-
-            var totalCount = await query.CountAsync(ct);
-            var items = await query
-                .OrderBy(c => c.DisplayOrder)
-                .Skip(request.PageIndex * request.PageSize)
-                .Take(request.PageSize)
-                .Select(c => new CategoryResponse(
-                    c.Id, c.Name, c.Description, c.ParentCategoryId, 
-                    c.IsActive, c.DisplayOrder, c.ImageUrl))
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = items, totalCount });
+            var query = new GetCategories.Query(request.PageIndex, request.PageSize, request.Search);
+            var result = await handler.Handle(query, ct);
+            return result.ToHttpResult();
         })
         .WithName("GetCategories")
         .WithSummary("Get paginated categories");
 
-        group.MapGet("/{id:guid}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            [FromServices] GetCategoryById.Handler handler,
+            CancellationToken ct) =>
         {
-            var category = await context.Categories
-                .Where(c => c.Id == id && !c.IsDeleted)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(ct);
-
-            if (category == null)
-                return Results.NotFound(new { error = "Category not found" });
-
-            return Results.Ok(new { data = new CategoryResponse(
-                category.Id, category.Name, category.Description, 
-                category.ParentCategoryId, category.IsActive, 
-                category.DisplayOrder, category.ImageUrl) });
+            var result = await handler.Handle(new GetCategoryById.Query(id), ct);
+            return result.ToHttpResult();
         })
         .WithName("GetCategoryById")
         .WithSummary("Get category by id");
 
-        group.MapPost("/", async (CreateCategoryRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPost("/", async (
+            [FromBody] CreateCategory.Request request,
+            [FromServices] CreateCategory.Handler handler,
+            CancellationToken ct) =>
         {
-            var category = new Categories
-            {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                Description = request.Description,
-                ImageUrl = request.ImageUrl,
-                ParentCategoryId = request.ParentCategoryId,
-                DisplayOrder = request.DisplayOrder,
-                IsActive = request.IsActive,
-                IsFeatured = request.IsFeatured,
-                Slug = request.Name.ToLower().Replace(" ", "-"),
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
-            };
-
-            context.Categories.Add(category);
-            await context.SaveChangesAsync(ct);
-
-            return Results.Created($"/api/categories/{category.Id}", new { data = category });
+            var command = new CreateCategory.Command(
+                request.Name, request.Description, request.ImageUrl,
+                request.ParentCategoryId, request.DisplayOrder, request.IsActive);
+            var result = await handler.Handle(command, ct);
+            return result.ToCreatedResult($"/api/categories/{command.Name}");
         })
         .WithName("CreateCategory")
         .WithSummary("Create a new category");
 
-        group.MapPut("/{id:guid}", async (Guid id, UpdateCategoryRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPut("/{id:guid}", async (
+            Guid id,
+            [FromBody] UpdateCategory.Request request,
+            [FromServices] UpdateCategory.Handler handler,
+            CancellationToken ct) =>
         {
-            var category = await context.Categories.FindAsync(new object[] { id }, ct);
-            if (category == null || category.IsDeleted)
-                return Results.NotFound(new { error = "Category not found" });
-
-            category.Name = request.Name;
-            category.Description = request.Description;
-            category.ImageUrl = request.ImageUrl;
-            category.ParentCategoryId = request.ParentCategoryId;
-            category.DisplayOrder = request.DisplayOrder;
-            category.IsActive = request.IsActive;
-            category.IsFeatured = request.IsFeatured;
-            category.UpdatedAt = DateTime.UtcNow;
-
-            await context.SaveChangesAsync(ct);
-            return Results.Ok(new { data = category });
+            var command = new UpdateCategory.Command(
+                id, request.Name, request.Description, request.ImageUrl,
+                request.ParentCategoryId, request.DisplayOrder, request.IsActive);
+            var result = await handler.Handle(command, ct);
+            return result.ToHttpResult();
         })
         .WithName("UpdateCategory")
         .WithSummary("Update an existing category");
 
-        group.MapDelete("/{id:guid}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapDelete("/{id:guid}", async (
+            Guid id,
+            [FromServices] DeleteCategory.Handler handler,
+            CancellationToken ct) =>
         {
-            var category = await context.Categories.FindAsync(new object[] { id }, ct);
-            if (category == null || category.IsDeleted)
-                return Results.NotFound(new { error = "Category not found" });
-
-            category.IsDeleted = true;
-            category.UpdatedAt = DateTime.UtcNow;
-
-            await context.SaveChangesAsync(ct);
-            return Results.NoContent();
+            var result = await handler.Handle(new DeleteCategory.Command(id), ct);
+            return result.ToNoContentResult();
         })
         .WithName("DeleteCategory")
         .WithSummary("Soft delete a category");
     }
 }
-
-public record GetCategoriesRequest(int PageIndex = 0, int PageSize = 10, string? Search = null);
-public record CategoryResponse(Guid Id, string Name, string? Description, Guid? ParentCategoryId, bool IsActive, int DisplayOrder, string? ImageUrl);
-public record CreateCategoryRequest(string Name, string? Description, string? ImageUrl, Guid? ParentCategoryId, int DisplayOrder, bool IsActive, bool IsFeatured);
-public record UpdateCategoryRequest(string Name, string? Description, string? ImageUrl, Guid? ParentCategoryId, int DisplayOrder, bool IsActive, bool IsFeatured);

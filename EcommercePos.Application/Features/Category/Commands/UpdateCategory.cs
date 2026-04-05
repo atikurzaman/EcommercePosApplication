@@ -6,7 +6,7 @@ using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Application.Features.Category.Commands;
 
-public static class CreateCategory
+public static class UpdateCategory
 {
     public sealed record Request
     {
@@ -28,7 +28,7 @@ public static class CreateCategory
     }
 
     public sealed record Command(
-        string Name, string? Description, string? ImageUrl, 
+        Guid Id, string Name, string? Description, string? ImageUrl, 
         Guid? ParentCategoryId, int DisplayOrder, bool IsActive);
 
     public sealed class Validator : AbstractValidator<Request>
@@ -49,21 +49,24 @@ public static class CreateCategory
 
         public async Task<Result<Response>> Handle(Command command, CancellationToken ct)
         {
-            var item = new Categories
-            {
-                Id = Guid.NewGuid(),
-                Name = command.Name,
-                Description = command.Description,
-                ImageUrl = command.ImageUrl,
-                ParentCategoryId = command.ParentCategoryId,
-                DisplayOrder = command.DisplayOrder,
-                IsActive = command.IsActive,
-                Slug = command.Name.ToLower().Replace(" ", "-"),
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
-            };
+            var item = await _context.Categories
+                .Where(x => x.Id == command.Id && !x.IsDeleted)
+                .FirstOrDefaultAsync(ct);
 
-            _context.Categories.Add(item);
+            if (item == null)
+            {
+                return Result<Response>.Failure(Error.NotFound($"Category with id '{command.Id}' was not found."));
+            }
+
+            item.Name = command.Name;
+            item.Description = command.Description;
+            item.ImageUrl = command.ImageUrl;
+            item.ParentCategoryId = command.ParentCategoryId;
+            item.DisplayOrder = command.DisplayOrder;
+            item.IsActive = command.IsActive;
+            item.Slug = command.Name.ToLower().Replace(" ", "-");
+            item.UpdatedAt = DateTime.UtcNow;
+
             await _context.SaveChangesAsync(ct);
 
             return Result<Response>.Success(item.Adapt<Response>());

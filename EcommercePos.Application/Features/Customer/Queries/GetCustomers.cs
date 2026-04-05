@@ -1,20 +1,23 @@
-using Microsoft.EntityFrameworkCore;
-using Mapster;
 using EcommercePos.Persistence.Data;
 using EcommercePos.Shared.Common;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
 
-namespace EcommercePos.Application.Features.Category.Queries;
+namespace EcommercePos.Application.Features.Customer.Queries;
 
-public static class GetCategories
+public static class GetCustomers
 {
     public sealed record Request(int PageIndex = 0, int PageSize = 10, string? Search = null);
 
     public sealed record Response
     {
         public Guid Id { get; init; }
-        public string Name { get; init; } = string.Empty;
-        public string? Description { get; init; }
-        public int DisplayOrder { get; init; }
+        public string CustomerCode { get; init; } = string.Empty;
+        public string CompanyName { get; init; } = string.Empty;
+        public string? ContactPerson { get; init; }
+        public string? Phone { get; init; }
+        public string? Email { get; init; }
+        public string? CustomerGroup { get; init; }
         public bool IsActive { get; init; }
     }
 
@@ -31,18 +34,21 @@ public static class GetCategories
 
         public async Task<Result<PagedResult<Response>>> Handle(Query query, CancellationToken ct)
         {
-            var dbQuery = _context.Categories
-                .Where(c => !c.IsDeleted)
+            var dbQuery = _context.Customers
+                .Where(x => !x.IsDeleted)
                 .AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                dbQuery = dbQuery.Where(c => c.Name.Contains(query.Search));
+                dbQuery = dbQuery.Where(x =>
+                    x.CompanyName.Contains(query.Search) ||
+                    x.CustomerCode.Contains(query.Search) ||
+                    x.Email.Contains(query.Search) ||
+                    x.Phone.Contains(query.Search));
             }
 
             var totalCount = await dbQuery.CountAsync(ct);
             var items = await dbQuery
-                .OrderBy(c => c.DisplayOrder)
                 .Skip(query.PageIndex * query.PageSize)
                 .Take(query.PageSize)
                 .ProjectToType<Response>()

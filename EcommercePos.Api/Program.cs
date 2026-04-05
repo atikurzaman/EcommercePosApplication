@@ -36,6 +36,38 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseCors("AllowAll");
 
+// Core Entities
 app.MapCategoryEndpoints();
+app.MapBrandEndpoints();
+app.MapBranchEndpoints();
+app.MapProductEndpoints();
+app.MapCustomerEndpoints();
+app.MapSupplierEndpoints();
+app.MapEmployeeEndpoints();
+app.MapSaleEndpoints();
+app.MapPurchaseEndpoints();
+app.MapUnitEndpoints();
+app.MapTaxRateEndpoints();
+
+// Additional Entities
+app.MapDeliveryZoneEndpoints();
+app.MapColorEndpoints();
+app.MapTagEndpoints();
+app.MapPickupPointEndpoints();
+app.MapWarehouseEndpoints();
+app.MapRoleEndpoints();
+app.MapShippingMethodEndpoints();
+app.MapAttributeTypeEndpoints();
+app.MapProductCollectionEndpoints();
+app.MapExpenseCategoryEndpoints();
+app.MapProductConditionEndpoints();
+app.MapCustomerTierEndpoints();
+app.MapPaymentStatusEndpoints();
+app.MapOrderStatusEndpoints();
+app.MapDiscountTypeEndpoints();
+app.MapReturnStatusEndpoints();
+app.MapShipmentStatusEndpoints();
+app.MapPaymentMethodEndpoints();
+app.MapCurrencyEndpoints();
 
 app.Run();

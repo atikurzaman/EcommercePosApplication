@@ -4,36 +4,40 @@ using Microsoft.EntityFrameworkCore;
 using EcommercePos.Persistence.Data;
 using EcommercePos.Shared.Common;
 
-namespace EcommercePos.Application.Features.Category.Commands;
+namespace EcommercePos.Application.Features.Brand.Commands;
 
-public static class CreateCategory
+public static class CreateBrand
 {
     public sealed record Request
     {
+        public string BrandCode { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public string? Description { get; init; }
-        public string? ImageUrl { get; init; }
-        public Guid? ParentCategoryId { get; init; }
-        public int DisplayOrder { get; init; }
+        public string? LogoUrl { get; init; }
+        public string? Website { get; init; }
+        public string? CountryOfOrigin { get; init; }
+        public bool IsFeatured { get; init; }
         public bool IsActive { get; init; }
     }
 
     public sealed record Response
     {
         public Guid Id { get; init; }
+        public string BrandCode { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public string? Description { get; init; }
-        public int DisplayOrder { get; init; }
+        public string? LogoUrl { get; init; }
         public bool IsActive { get; init; }
     }
 
     public sealed record Command(
-        string Name, string? Description, string? ImageUrl, 
-        Guid? ParentCategoryId, int DisplayOrder, bool IsActive);
+        string BrandCode, string Name, string? Description, string? LogoUrl, 
+        string? Website, string? CountryOfOrigin, bool IsFeatured, bool IsActive);
 
     public sealed class Validator : AbstractValidator<Request>
     {
         public Validator() {
+            RuleFor(x => x.BrandCode).NotEmpty();
             RuleFor(x => x.Name).NotEmpty();
         }
     }
@@ -49,21 +53,31 @@ public static class CreateCategory
 
         public async Task<Result<Response>> Handle(Command command, CancellationToken ct)
         {
-            var item = new Categories
+            var exists = await _context.Brands
+                .AnyAsync(x => x.BrandCode == command.BrandCode && !x.IsDeleted, ct);
+
+            if (exists)
+            {
+                return Result<Response>.Failure(Error.Conflict($"Brand with BrandCode '{command.BrandCode}' already exists."));
+            }
+
+            var item = new Brands
             {
                 Id = Guid.NewGuid(),
+                BrandCode = command.BrandCode,
                 Name = command.Name,
                 Description = command.Description,
-                ImageUrl = command.ImageUrl,
-                ParentCategoryId = command.ParentCategoryId,
-                DisplayOrder = command.DisplayOrder,
+                LogoUrl = command.LogoUrl,
+                Website = command.Website,
+                CountryOfOrigin = command.CountryOfOrigin,
+                IsFeatured = command.IsFeatured,
                 IsActive = command.IsActive,
                 Slug = command.Name.ToLower().Replace(" ", "-"),
                 CreatedAt = DateTime.UtcNow,
                 IsDeleted = false
             };
 
-            _context.Categories.Add(item);
+            _context.Brands.Add(item);
             await _context.SaveChangesAsync(ct);
 
             return Result<Response>.Success(item.Adapt<Response>());

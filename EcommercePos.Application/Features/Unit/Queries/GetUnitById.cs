@@ -1,21 +1,21 @@
-using Microsoft.EntityFrameworkCore;
-using Mapster;
 using EcommercePos.Persistence.Data;
 using EcommercePos.Shared.Common;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
 
-namespace EcommercePos.Application.Features.Category.Queries;
+namespace EcommercePos.Application.Features.Unit.Queries;
 
-public static class GetCategoryById
+public static class GetUnitById
 {
     public sealed record Response
     {
         public Guid Id { get; init; }
+        public string ShortName { get; init; } = string.Empty;
         public string Name { get; init; } = string.Empty;
         public string? Description { get; init; }
-        public int DisplayOrder { get; init; }
+        public Guid? BaseUnitId { get; set; }
+        public decimal? ConversionFactor { get; set; }
         public bool IsActive { get; init; }
-        public Guid? ParentCategoryId { get; init; }
-        public string? ImageUrl { get; init; }
     }
 
     public sealed record Query(Guid Id);
@@ -31,15 +31,15 @@ public static class GetCategoryById
 
         public async Task<Result<Response>> Handle(Query query, CancellationToken ct)
         {
-            var item = await _context.Categories
-                .Where(c => c.Id == query.Id && !c.IsDeleted)
+            var item = await _context.Units
+                .Where(x => x.Id == query.Id && !x.IsDeleted)
                 .AsNoTracking()
                 .ProjectToType<Response>()
                 .FirstOrDefaultAsync(ct);
 
             if (item == null)
             {
-                return Result<Response>.Failure(Error.NotFound($"Category with id '{query.Id}' was not found."));
+                return Result<Response>.Failure(Error.NotFound($"Unit with id '{query.Id}' was not found."));
             }
 
             return Result<Response>.Success(item);
