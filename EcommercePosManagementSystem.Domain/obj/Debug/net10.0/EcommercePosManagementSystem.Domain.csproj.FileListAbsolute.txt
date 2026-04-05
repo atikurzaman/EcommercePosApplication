@@ -1,0 +1,12 @@
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\bin\Debug\net10.0\EcommercePosManagementSystem.Domain.deps.json
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\bin\Debug\net10.0\EcommercePosManagementSystem.Domain.dll
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\bin\Debug\net10.0\EcommercePosManagementSystem.Domain.pdb
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\obj\Debug\net10.0\EcommercePosManagementSystem.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\obj\Debug\net10.0\EcommercePosManagementSystem.Domain.AssemblyInfoInputs.cache
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\obj\Debug\net10.0\EcommercePosManagementSystem.Domain.AssemblyInfo.cs
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\obj\Debug\net10.0\EcommercePosManagementSystem.Domain.csproj.CoreCompileInputs.cache
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\obj\Debug\net10.0\EcommercePosManagementSystem.Domain.sourcelink.json
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\obj\Debug\net10.0\EcommercePosManagementSystem.Domain.dll
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\obj\Debug\net10.0\refint\EcommercePosManagementSystem.Domain.dll
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\obj\Debug\net10.0\EcommercePosManagementSystem.Domain.pdb
+C:\AI\EcommercePosApp\EcommercePosManagementSystem.Domain\obj\Debug\net10.0\ref\EcommercePosManagementSystem.Domain.dll

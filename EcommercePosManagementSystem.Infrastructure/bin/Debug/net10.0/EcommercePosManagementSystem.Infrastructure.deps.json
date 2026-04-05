@@ -1,0 +1,56 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "EcommercePosManagementSystem.Infrastructure/1.0.0": {
+        "dependencies": {
+          "EcommercePosManagementSystem.Application": "1.0.0",
+          "EcommercePosManagementSystem.Domain": "1.0.0"
+        },
+        "runtime": {
+          "EcommercePosManagementSystem.Infrastructure.dll": {}
+        }
+      },
+      "EcommercePosManagementSystem.Application/1.0.0": {
+        "dependencies": {
+          "EcommercePosManagementSystem.Domain": "1.0.0"
+        },
+        "runtime": {
+          "EcommercePosManagementSystem.Application.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "EcommercePosManagementSystem.Domain/1.0.0": {
+        "runtime": {
+          "EcommercePosManagementSystem.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "EcommercePosManagementSystem.Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "EcommercePosManagementSystem.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "EcommercePosManagementSystem.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
