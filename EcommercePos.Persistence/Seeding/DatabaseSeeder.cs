@@ -41,6 +41,9 @@ public static class DatabaseSeeder
             await SeedWarehouses(context);
             await SeedProducts(context);
             await SeedCustomers(context);
+            await SeedSuppliers(context);
+            await SeedEmployees(context);
+            await SeedProductCollections(context);
         }
         catch (Exception ex)
         {
@@ -335,6 +338,57 @@ public static class DatabaseSeeder
         };
 
         context.Customers.AddRange(customers);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedSuppliers(ApplicationDbContext context)
+    {
+        if (await context.Suppliers.AnyAsync()) return;
+
+        var suppliers = new List<Suppliers>
+        {
+            new() { Id = Guid.NewGuid(), SupplierCode = "SUP001", Name = "Tech Distributors Ltd", ContactPerson = "Mr. Ahmed", Phone = "+8801712345001", Email = "sales@techdist.com", City = "Dhaka", Country = "BD", IsActive = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), SupplierCode = "SUP002", Name = "Gadgets Wholesale", ContactPerson = "Mr. Karim", Phone = "+8801712345002", Email = "info@gadgetwhole.com", City = "Chittagong", Country = "BD", IsActive = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), SupplierCode = "SUP003", Name = "Mobile Source Asia", ContactPerson = "Ms. Rahman", Phone = "+8801712345003", Email = "contact@mobilesource.asia", City = "Dhaka", Country = "BD", IsActive = true, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), SupplierCode = "SUP004", Name = "Digital Solutions BD", ContactPerson = "Mr. Khan", Phone = "+8801712345004", Email = "sales@digitalsolbd.com", City = "Sylhet", Country = "BD", IsActive = true, CreatedAt = DateTime.UtcNow }
+        };
+
+        context.Suppliers.AddRange(suppliers);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedEmployees(ApplicationDbContext context)
+    {
+        if (await context.Employees.AnyAsync()) return;
+
+        var employees = new List<Employees>
+        {
+            new() { Id = Guid.NewGuid(), EmployeeCode = "EMP001", FirstName = "John", LastName = "Doe", Email = "john.doe@company.com", Phone = "+8801712345101", Designation = "Store Manager", Department = "Operations", IsActive = true, JoiningDate = DateTime.UtcNow, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), EmployeeCode = "EMP002", FirstName = "Jane", LastName = "Smith", Email = "jane.smith@company.com", Phone = "+8801712345102", Designation = "Cashier", Department = "Sales", IsActive = true, JoiningDate = DateTime.UtcNow, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), EmployeeCode = "EMP003", FirstName = "Mike", LastName = "Johnson", Email = "mike.johnson@company.com", Phone = "+8801712345103", Designation = "Sales Associate", Department = "Sales", IsActive = true, JoiningDate = DateTime.UtcNow, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), EmployeeCode = "EMP004", FirstName = "Sarah", LastName = "Williams", Email = "sarah.williams@company.com", Phone = "+8801712345104", Designation = "Inventory Manager", Department = "Warehouse", IsActive = true, JoiningDate = DateTime.UtcNow, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), EmployeeCode = "EMP005", FirstName = "David", LastName = "Brown", Email = "david.brown@company.com", Phone = "+8801712345105", Designation = "Customer Support", Department = "Support", IsActive = true, JoiningDate = DateTime.UtcNow, CreatedAt = DateTime.UtcNow }
+        };
+
+        context.Employees.AddRange(employees);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedProductCollections(ApplicationDbContext context)
+    {
+        if (await context.ProductCollections.AnyAsync()) return;
+
+        var collections = new List<ProductCollections>
+        {
+            new() { Id = Guid.NewGuid(), Name = "New Arrivals", Slug = "new-arrivals", Description = "Latest products", IsActive = true, DisplayOrder = 1, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), Name = "Best Sellers", Slug = "best-sellers", Description = "Top selling products", IsActive = true, DisplayOrder = 2, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), Name = "Featured", Slug = "featured", Description = "Featured products", IsActive = true, DisplayOrder = 3, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), Name = "Sale", Slug = "sale", Description = "On sale products", IsActive = true, DisplayOrder = 4, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), Name = "Back to School", Slug = "back-to-school", Description = "School essentials", IsActive = true, DisplayOrder = 5, CreatedAt = DateTime.UtcNow },
+            new() { Id = Guid.NewGuid(), Name = "Holiday Deals", Slug = "holiday-deals", Description = "Holiday season deals", IsActive = true, DisplayOrder = 6, CreatedAt = DateTime.UtcNow }
+        };
+
+        context.ProductCollections.AddRange(collections);
         await context.SaveChangesAsync();
     }
 }
