@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Application.Features.Catalog;
+using EcommercePos.Api.Extensions;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -11,116 +11,82 @@ public static class ProductCollectionEndpoints
         var group = app.MapGroup("/api/product-collections").WithTags("ProductCollections");
 
         group.MapGet("/", async (
-            [AsParameters] GetProductCollectionsRequest request,
-            ApplicationDbContext context,
+            [AsParameters] GetCollections.Request request,
+            [FromServices] GetCollections.Handler handler,
             CancellationToken ct) =>
         {
-            var query = context.ProductCollections
-                .Where(c => !c.IsDeleted)
-                .AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                query = query.Where(c => c.Name.Contains(request.Search));
-            }
-
-            var totalCount = await query.CountAsync(ct);
-            var items = await query
-                .OrderBy(c => c.Name)
-                .Skip(request.PageIndex * request.PageSize)
-                .Take(request.PageSize)
-                .Select(c => new ProductCollectionResponse(
-                    c.Id, c.Name, c.Slug, c.Description, c.DisplayOrder, c.IsActive))
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = items, totalCount });
+            var result = await handler.Handle(request, ct);
+            return result.ToPagedResult();
         })
         .WithName("GetProductCollections")
         .WithSummary("Get paginated product collections");
 
-        group.MapGet("/{id:guid}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            [FromServices] GetCollectionById.Handler handler,
+            CancellationToken ct) =>
         {
-            var collection = await context.ProductCollections
-                .Where(c => c.Id == id && !c.IsDeleted)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(ct);
-
-            if (collection == null)
-                return Results.NotFound(new { error = "Product collection not found" });
-
-            return Results.Ok(new { data = new ProductCollectionResponse(
-                collection.Id, collection.Name, collection.Slug, collection.Description, 
-                collection.DisplayOrder, collection.IsActive) });
+            var result = await handler.Handle(new GetCollectionById.Query(id), ct);
+            return result.ToHttpResult();
         })
         .WithName("GetProductCollectionById")
-        .WithSummary("Get product collection by id");
+        .WithSummary("Get product collection by id with products");
 
-        group.MapPost("/", async (CreateProductCollectionRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPost("/", async (
+            [FromBody] CreateCollection.Request request,
+            [FromServices] CreateCollection.Handler handler,
+            CancellationToken ct) =>
         {
-            var collection = new ProductCollections
-            {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                Slug = request.Slug ?? request.Name.ToLower().Replace(" ", "-"),
-                Description = request.Description,
-                DisplayOrder = request.DisplayOrder,
-                IsActive = request.IsActive,
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
-            };
-
-            context.ProductCollections.Add(collection);
-            await context.SaveChangesAsync(ct);
-
-            return Results.Created($"/api/product-collections/{collection.Id}", new { data = new ProductCollectionResponse(
-                collection.Id, collection.Name, collection.Slug, collection.Description, 
-                collection.DisplayOrder, collection.IsActive) });
+            var result = await handler.Handle(request, ct);
+            return result.ToCreatedResult("/api/product-collections");
         })
         .WithName("CreateProductCollection")
         .WithSummary("Create a new product collection");
 
-        group.MapPut("/{id:guid}", async (Guid id, UpdateProductCollectionRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPut("/{id:guid}", async (
+            Guid id,
+            [FromBody] UpdateCollectionBody body,
+            [FromServices] UpdateCollection.Handler handler,
+            CancellationToken ct) =>
         {
-            var collection = await context.ProductCollections.FindAsync(new object[] { id }, ct);
-            if (collection == null || collection.IsDeleted)
-                return Results.NotFound(new { error = "Product collection not found" });
-
-            collection.Name = request.Name;
-            collection.Slug = request.Slug ?? request.Name.ToLower().Replace(" ", "-");
-            collection.Description = request.Description;
-            collection.DisplayOrder = request.DisplayOrder;
-            collection.IsActive = request.IsActive;
-            collection.UpdatedAt = DateTime.UtcNow;
-
-            await context.SaveChangesAsync(ct);
-            return Results.Ok(new { data = new ProductCollectionResponse(
-                collection.Id, collection.Name, collection.Slug, collection.Description, 
-                collection.DisplayOrder, collection.IsActive) });
+            var command = new UpdateCollection.Command(
+                id, body.Name, body.Slug, body.Description, body.ImageUrl,
+                body.DisplayOrder, body.IsActive, body.ShowInHomePage);
+            var result = await handler.Handle(command, ct);
+            return result.ToHttpResult();
         })
         .WithName("UpdateProductCollection")
         .WithSummary("Update an existing product collection");
 
-        group.MapDelete("/{id:guid}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapDelete("/{id:guid}", async (
+            Guid id,
+            [FromServices] DeleteCollection.Handler handler,
+            CancellationToken ct) =>
         {
-            var collection = await context.ProductCollections.FindAsync(new object[] { id }, ct);
-            if (collection == null || collection.IsDeleted)
-                return Results.NotFound(new { error = "Product collection not found" });
-
-            collection.IsDeleted = true;
-            collection.UpdatedAt = DateTime.UtcNow;
-
-            await context.SaveChangesAsync(ct);
-            return Results.NoContent();
+            var result = await handler.Handle(new DeleteCollection.Command(id), ct);
+            return result.ToNoContentResult();
         })
         .WithName("DeleteProductCollection")
         .WithSummary("Soft delete a product collection");
+
+        group.MapPut("/{id:guid}/items", async (
+            Guid id,
+            [FromBody] ManageCollectionItemsBody body,
+            [FromServices] ManageCollectionItems.Handler handler,
+            CancellationToken ct) =>
+        {
+            var command = new ManageCollectionItems.Command(id, body.Items);
+            var result = await handler.Handle(command, ct);
+            return result.ToHttpResult();
+        })
+        .WithName("ManageCollectionItems")
+        .WithSummary("Manage collection items");
     }
 }
 
-public record GetProductCollectionsRequest(int PageIndex = 0, int PageSize = 10, string? Search = null);
-public record ProductCollectionResponse(
-    Guid Id, string Name, string Slug, string? Description, int DisplayOrder, bool IsActive);
-public record CreateProductCollectionRequest(
-    string Name, string? Description, int DisplayOrder, bool IsActive, string? Slug = null);
-public record UpdateProductCollectionRequest(
-    string Name, string? Description, int DisplayOrder, bool IsActive, string? Slug = null);
+record UpdateCollectionBody(
+    string Name, string? Slug, string? Description, string? ImageUrl,
+    int DisplayOrder, bool IsActive, bool ShowInHomePage);
+
+record ManageCollectionItemsBody(
+    List<ManageCollectionItems.CollectionItemInput> Items);

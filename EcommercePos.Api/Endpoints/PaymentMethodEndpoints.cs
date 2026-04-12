@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Application.Features.Lookup;
+using EcommercePos.Api.Extensions;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -11,116 +11,60 @@ public static class PaymentMethodEndpoints
         var group = app.MapGroup("/api/payment-methods").WithTags("PaymentMethods");
 
         group.MapGet("/", async (
-            [AsParameters] GetPaymentMethodsRequest request,
-            ApplicationDbContext context,
+            [AsParameters] GetPaymentMethods.Request request,
+            [FromServices] GetPaymentMethods.Handler handler,
             CancellationToken ct) =>
         {
-            var query = context.PaymentMethods.AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                query = query.Where(c => c.DisplayName.Contains(request.Search) || c.MethodCode.Contains(request.Search));
-            }
-
-            var totalCount = await query.CountAsync(ct);
-            var items = await query
-                .OrderBy(c => c.SortOrder)
-                .Skip(request.PageIndex * request.PageSize)
-                .Take(request.PageSize)
-                .Select(c => new PaymentMethodResponse(
-                    c.MethodCode, c.DisplayName, c.IsOnline, c.IsActive, c.SortOrder))
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = items, totalCount });
+            var result = await handler.Handle(request, ct);
+            return result.ToPagedResult();
         })
         .WithName("GetPaymentMethods")
         .WithSummary("Get paginated payment methods");
 
-        group.MapGet("/{code}", async (string code, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapGet("/{code}", async (
+            string code,
+            [FromServices] GetPaymentMethodByCode.Handler handler,
+            CancellationToken ct) =>
         {
-            var method = await context.PaymentMethods
-                .Where(c => c.MethodCode == code)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(ct);
-
-            if (method == null)
-                return Results.NotFound(new { error = "Payment method not found" });
-
-            return Results.Ok(new { data = new PaymentMethodResponse(
-                method.MethodCode, method.DisplayName, method.IsOnline, method.IsActive, method.SortOrder) });
+            var result = await handler.Handle(new GetPaymentMethodByCode.Query(code), ct);
+            return result.ToHttpResult();
         })
         .WithName("GetPaymentMethodByCode")
         .WithSummary("Get payment method by code");
 
-        group.MapPost("/", async (CreatePaymentMethodRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPost("/", async (
+            [FromBody] CreatePaymentMethod.Request request,
+            [FromServices] CreatePaymentMethod.Handler handler,
+            CancellationToken ct) =>
         {
-            var exists = await context.PaymentMethods.AnyAsync(c => c.MethodCode == request.MethodCode, ct);
-            if (exists)
-                return Results.Conflict(new { error = "Payment method code already exists" });
-
-            var method = new PaymentMethods
-            {
-                MethodCode = request.MethodCode,
-                DisplayName = request.DisplayName,
-                IsOnline = request.IsOnline,
-                IsActive = request.IsActive,
-                SortOrder = request.SortOrder
-            };
-
-            context.PaymentMethods.Add(method);
-            await context.SaveChangesAsync(ct);
-
-            return Results.Created($"/api/payment-methods/{method.MethodCode}", new { data = new PaymentMethodResponse(
-                method.MethodCode, method.DisplayName, method.IsOnline, method.IsActive, method.SortOrder) });
+            var result = await handler.Handle(request, ct);
+            return result.ToCreatedResult($"/api/payment-methods/{request.MethodCode}");
         })
         .WithName("CreatePaymentMethod")
         .WithSummary("Create a new payment method");
 
-        group.MapPut("/{code}", async (string code, UpdatePaymentMethodRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPut("/{code}", async (
+            string code,
+            [FromBody] UpdatePaymentMethod.Request request,
+            [FromServices] UpdatePaymentMethod.Handler handler,
+            CancellationToken ct) =>
         {
-            var method = await context.PaymentMethods.FirstOrDefaultAsync(c => c.MethodCode == code, ct);
-            if (method == null)
-                return Results.NotFound(new { error = "Payment method not found" });
-
-            if (method.MethodCode != request.MethodCode)
-            {
-                var exists = await context.PaymentMethods.AnyAsync(c => c.MethodCode == request.MethodCode, ct);
-                if (exists)
-                    return Results.Conflict(new { error = "Payment method code already exists" });
-            }
-
-            method.MethodCode = request.MethodCode;
-            method.DisplayName = request.DisplayName;
-            method.IsOnline = request.IsOnline;
-            method.IsActive = request.IsActive;
-            method.SortOrder = request.SortOrder;
-
-            await context.SaveChangesAsync(ct);
-            return Results.Ok(new { data = new PaymentMethodResponse(
-                method.MethodCode, method.DisplayName, method.IsOnline, method.IsActive, method.SortOrder) });
+            var command = new UpdatePaymentMethod.Command(code, request.MethodCode, request.DisplayName, request.IsOnline, request.IsActive, request.SortOrder);
+            var result = await handler.Handle(command, ct);
+            return result.ToHttpResult();
         })
         .WithName("UpdatePaymentMethod")
         .WithSummary("Update an existing payment method");
 
-        group.MapDelete("/{code}", async (string code, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapDelete("/{code}", async (
+            string code,
+            [FromServices] DeletePaymentMethod.Handler handler,
+            CancellationToken ct) =>
         {
-            var method = await context.PaymentMethods.FirstOrDefaultAsync(c => c.MethodCode == code, ct);
-            if (method == null)
-                return Results.NotFound(new { error = "Payment method not found" });
-
-            context.PaymentMethods.Remove(method);
-            await context.SaveChangesAsync(ct);
-            return Results.NoContent();
+            var result = await handler.Handle(new DeletePaymentMethod.Command(code), ct);
+            return result.ToNoContentResult();
         })
         .WithName("DeletePaymentMethod")
         .WithSummary("Delete a payment method");
     }
 }
-
-public record GetPaymentMethodsRequest(int PageIndex = 0, int PageSize = 10, string? Search = null);
-public record PaymentMethodResponse(
-    string MethodCode, string DisplayName, bool IsOnline, bool IsActive, byte SortOrder);
-public record CreatePaymentMethodRequest(
-    string MethodCode, string DisplayName, bool IsOnline, bool IsActive, byte SortOrder);
-public record UpdatePaymentMethodRequest(
-    string MethodCode, string DisplayName, bool IsOnline, bool IsActive, byte SortOrder);

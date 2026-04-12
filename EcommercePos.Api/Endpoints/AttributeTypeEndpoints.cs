@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Application.Features.Catalog;
+using EcommercePos.Api.Extensions;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -10,129 +10,140 @@ public static class AttributeTypeEndpoints
     {
         var group = app.MapGroup("/api/attribute-types").WithTags("AttributeTypes");
 
+        // ── Attribute Types CRUD ───────────────────────────────────────────
+
         group.MapGet("/", async (
-            [AsParameters] GetAttributeTypesRequest request,
-            ApplicationDbContext context,
+            [AsParameters] GetAttributeTypes.Request request,
+            [FromServices] GetAttributeTypes.Handler handler,
             CancellationToken ct) =>
         {
-            var query = context.AttributeTypes
-                .Where(a => !a.IsDeleted)
-                .AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                query = query.Where(a => a.Name.Contains(request.Search) || a.Slug.Contains(request.Search));
-            }
-
-            var totalCount = await query.CountAsync(ct);
-            var items = await query
-                .OrderBy(a => a.SortOrder)
-                .Skip(request.PageIndex * request.PageSize)
-                .Take(request.PageSize)
-                .Select(a => new AttributeTypeResponse(
-                    a.Id, a.Name, a.Slug, a.UiType, a.AffectsPrice,
-                    a.AffectsSku, a.AffectsImage, a.AffectsStock, a.IsFilterable, a.SortOrder))
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = items, totalCount });
+            var result = await handler.Handle(request, ct);
+            return result.ToPagedResult();
         })
         .WithName("GetAttributeTypes")
         .WithSummary("Get paginated attribute types");
 
-        group.MapGet("/{id:guid}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            [FromServices] GetAttributeTypeById.Handler handler,
+            CancellationToken ct) =>
         {
-            var type = await context.AttributeTypes
-                .Where(a => a.Id == id && !a.IsDeleted)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(ct);
-
-            if (type == null)
-                return Results.NotFound(new { error = "Attribute type not found" });
-
-            return Results.Ok(new { data = new AttributeTypeResponse(
-                type.Id, type.Name, type.Slug, type.UiType, type.AffectsPrice,
-                type.AffectsSku, type.AffectsImage, type.AffectsStock, type.IsFilterable, type.SortOrder) });
+            var result = await handler.Handle(new GetAttributeTypeById.Query(id), ct);
+            return result.ToHttpResult();
         })
         .WithName("GetAttributeTypeById")
-        .WithSummary("Get attribute type by id");
+        .WithSummary("Get attribute type by id with options");
 
-        group.MapPost("/", async (CreateAttributeTypeRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPost("/", async (
+            [FromBody] CreateAttributeType.Request request,
+            [FromServices] CreateAttributeType.Handler handler,
+            CancellationToken ct) =>
         {
-            var type = new AttributeTypes
-            {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                Slug = request.Slug ?? request.Name.ToLower().Replace(" ", "-"),
-                UiType = request.UiType,
-                AffectsPrice = request.AffectsPrice,
-                AffectsSku = request.AffectsSku,
-                AffectsImage = request.AffectsImage,
-                AffectsStock = request.AffectsStock,
-                IsFilterable = request.IsFilterable,
-                SortOrder = request.SortOrder,
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
-            };
-
-            context.AttributeTypes.Add(type);
-            await context.SaveChangesAsync(ct);
-
-            return Results.Created($"/api/attribute-types/{type.Id}", new { data = new AttributeTypeResponse(
-                type.Id, type.Name, type.Slug, type.UiType, type.AffectsPrice,
-                type.AffectsSku, type.AffectsImage, type.AffectsStock, type.IsFilterable, type.SortOrder) });
+            var result = await handler.Handle(request, ct);
+            return result.ToCreatedResult("/api/attribute-types");
         })
         .WithName("CreateAttributeType")
         .WithSummary("Create a new attribute type");
 
-        group.MapPut("/{id:guid}", async (Guid id, UpdateAttributeTypeRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPut("/{id:guid}", async (
+            Guid id,
+            [FromBody] UpdateAttributeType.Request body,
+            [FromServices] UpdateAttributeType.Handler handler,
+            CancellationToken ct) =>
         {
-            var type = await context.AttributeTypes.FindAsync(new object[] { id }, ct);
-            if (type == null || type.IsDeleted)
-                return Results.NotFound(new { error = "Attribute type not found" });
-
-            type.Name = request.Name;
-            type.Slug = request.Slug ?? request.Name.ToLower().Replace(" ", "-");
-            type.UiType = request.UiType;
-            type.AffectsPrice = request.AffectsPrice;
-            type.AffectsSku = request.AffectsSku;
-            type.AffectsImage = request.AffectsImage;
-            type.AffectsStock = request.AffectsStock;
-            type.IsFilterable = request.IsFilterable;
-            type.SortOrder = request.SortOrder;
-            type.UpdatedAt = DateTime.UtcNow;
-
-            await context.SaveChangesAsync(ct);
-            return Results.Ok(new { data = new AttributeTypeResponse(
-                type.Id, type.Name, type.Slug, type.UiType, type.AffectsPrice,
-                type.AffectsSku, type.AffectsImage, type.AffectsStock, type.IsFilterable, type.SortOrder) });
+            var command = new UpdateAttributeType.Command(
+                id, body.Name, body.Slug, body.UiType,
+                body.AffectsPrice, body.AffectsSku, body.AffectsImage, body.AffectsStock,
+                body.IsFilterable, body.SortOrder);
+            var result = await handler.Handle(command, ct);
+            return result.ToHttpResult();
         })
         .WithName("UpdateAttributeType")
         .WithSummary("Update an existing attribute type");
 
-        group.MapDelete("/{id:guid}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapDelete("/{id:guid}", async (
+            Guid id,
+            [FromServices] DeleteAttributeType.Handler handler,
+            CancellationToken ct) =>
         {
-            var type = await context.AttributeTypes.FindAsync(new object[] { id }, ct);
-            if (type == null || type.IsDeleted)
-                return Results.NotFound(new { error = "Attribute type not found" });
-
-            type.IsDeleted = true;
-            type.UpdatedAt = DateTime.UtcNow;
-
-            await context.SaveChangesAsync(ct);
-            return Results.NoContent();
+            var result = await handler.Handle(new DeleteAttributeType.Command(id), ct);
+            return result.ToNoContentResult();
         })
         .WithName("DeleteAttributeType")
         .WithSummary("Soft delete an attribute type");
+
+        // ── Attribute Options (sub-resource) ───────────────────────────────
+
+        group.MapGet("/{id:guid}/options", async (
+            Guid id,
+            [FromServices] GetAttributeOptions.Handler handler,
+            CancellationToken ct) =>
+        {
+            var result = await handler.Handle(new GetAttributeOptions.Request(id), ct);
+            return result.ToHttpResult();
+        })
+        .WithName("GetAttributeOptions")
+        .WithSummary("Get options for an attribute type");
+
+        group.MapPost("/{id:guid}/options", async (
+            Guid id,
+            [FromBody] CreateAttributeOptionBody body,
+            [FromServices] CreateAttributeOption.Handler handler,
+            CancellationToken ct) =>
+        {
+            var request = new CreateAttributeOption.Request(
+                id, body.Value, body.DisplayValue, body.ColorId, body.SortOrder, body.IsActive);
+            var result = await handler.Handle(request, ct);
+            return result.ToCreatedResult($"/api/attribute-types/{id}/options");
+        })
+        .WithName("CreateAttributeOption")
+        .WithSummary("Create an attribute option");
+
+        group.MapPost("/{id:guid}/options/bulk", async (
+            Guid id,
+            [FromBody] BulkCreateAttributeOptionsBody body,
+            [FromServices] BulkCreateAttributeOptions.Handler handler,
+            CancellationToken ct) =>
+        {
+            var request = new BulkCreateAttributeOptions.Request(id, body.Options);
+            var result = await handler.Handle(request, ct);
+            return result.ToCreatedResult($"/api/attribute-types/{id}/options");
+        })
+        .WithName("BulkCreateAttributeOptions")
+        .WithSummary("Bulk create attribute options");
+
+        group.MapPut("/{id:guid}/options/{optionId:guid}", async (
+            Guid id,
+            Guid optionId,
+            [FromBody] UpdateAttributeOption.Request body,
+            [FromServices] UpdateAttributeOption.Handler handler,
+            CancellationToken ct) =>
+        {
+            var command = new UpdateAttributeOption.Command(
+                optionId, body.Value, body.DisplayValue, body.ColorId, body.SortOrder, body.IsActive);
+            var result = await handler.Handle(command, ct);
+            return result.ToHttpResult();
+        })
+        .WithName("UpdateAttributeOption")
+        .WithSummary("Update an attribute option");
+
+        group.MapDelete("/{id:guid}/options/{optionId:guid}", async (
+            Guid id,
+            Guid optionId,
+            [FromServices] DeleteAttributeOption.Handler handler,
+            CancellationToken ct) =>
+        {
+            var result = await handler.Handle(new DeleteAttributeOption.Command(optionId), ct);
+            return result.ToNoContentResult();
+        })
+        .WithName("DeleteAttributeOption")
+        .WithSummary("Soft delete an attribute option");
     }
 }
 
-public record GetAttributeTypesRequest(int PageIndex = 0, int PageSize = 10, string? Search = null);
-public record AttributeTypeResponse(
-    Guid Id, string Name, string Slug, string UiType, bool AffectsPrice,
-    bool AffectsSku, bool AffectsImage, bool AffectsStock, bool IsFilterable, int SortOrder);
-public record CreateAttributeTypeRequest(
-    string Name, string UiType, bool AffectsPrice, bool AffectsSku,
-    bool AffectsImage, bool AffectsStock, bool IsFilterable, int SortOrder, string? Slug = null);
-public record UpdateAttributeTypeRequest(
-    string Name, string UiType, bool AffectsPrice, bool AffectsSku,
-    bool AffectsImage, bool AffectsStock, bool IsFilterable, int SortOrder, string? Slug = null);
+// ── Request body DTOs (avoid conflict with handler Request types) ──────────
+record CreateAttributeOptionBody(
+    string Value, string? DisplayValue, Guid? ColorId, int SortOrder, bool IsActive);
+
+record BulkCreateAttributeOptionsBody(
+    List<BulkCreateAttributeOptions.OptionInput> Options);

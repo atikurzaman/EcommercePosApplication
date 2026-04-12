@@ -7,7 +7,7 @@ public partial class Roles
 {
     public Guid Id { get; set; }
 
-    public string? Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public string? NormalizedName { get; set; }
 

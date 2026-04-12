@@ -7,17 +7,17 @@ public partial class Users
 {
     public Guid Id { get; set; }
 
-    public string? UserName { get; set; }
+    public string UserName { get; set; } = string.Empty;
 
     public string? NormalizedUserName { get; set; }
 
-    public string? Email { get; set; }
+    public string Email { get; set; } = string.Empty;
 
     public string? NormalizedEmail { get; set; }
 
     public bool EmailConfirmed { get; set; }
 
-    public string? PasswordHash { get; set; }
+    public string PasswordHash { get; set; } = string.Empty;
 
     public string? SecurityStamp { get; set; }
 
@@ -43,9 +43,9 @@ public partial class Users
 
     public bool IsActive { get; set; }
 
-    public string PreferredLanguage { get; set; } = null!;
+    public string PreferredLanguage { get; set; } = "en";
 
-    public string TimeZone { get; set; } = null!;
+    public string TimeZone { get; set; } = "UTC";
 
     public DateTime? LastLoginAt { get; set; }
 

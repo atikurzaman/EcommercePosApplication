@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Brand.Queries;
 using EcommercePos.Application.Features.Brand.Commands;
 using EcommercePos.Api.Extensions;
+using Microsoft.EntityFrameworkCore;
+using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -22,6 +24,31 @@ public static class BrandEndpoints
         })
         .WithName("GetBrands")
         .WithSummary("Get paginated brands");
+
+        group.MapGet("/with-count", async (ApplicationDbContext context, CancellationToken ct) =>
+        {
+            var brands = await context.Brands
+                .Where(b => !b.IsDeleted)
+                .OrderBy(b => b.Name)
+                .Select(b => new
+                {
+                    b.Id,
+                    b.BrandCode,
+                    b.Name,
+                    b.Slug,
+                    b.Description,
+                    b.LogoUrl,
+                    b.Website,
+                    b.IsFeatured,
+                    b.IsActive,
+                    ProductCount = context.Products.Count(p => p.BrandId == b.Id && !p.IsDeleted)
+                })
+                .ToListAsync(ct);
+
+            return Results.Ok(new { data = brands });
+        })
+        .WithName("GetBrandsWithCount")
+        .WithSummary("Get brands with product count");
 
         group.MapGet("/{id:guid}", async (
             Guid id,
@@ -75,6 +102,21 @@ public static class BrandEndpoints
         })
         .WithName("DeleteBrand")
         .WithSummary("Soft delete a brand");
+
+        group.MapPatch("/{id:guid}/toggle", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
+        {
+            var brand = await context.Brands.FindAsync(new object[] { id }, ct);
+            if (brand == null || brand.IsDeleted)
+                return Results.NotFound(new { error = "Brand not found" });
+
+            brand.IsActive = !brand.IsActive;
+            brand.UpdatedAt = DateTime.UtcNow;
+            await context.SaveChangesAsync(ct);
+
+            return Results.Ok(new { data = new { brand.Id, brand.IsActive } });
+        })
+        .WithName("ToggleBrand")
+        .WithSummary("Toggle brand active status");
     }
 }
 

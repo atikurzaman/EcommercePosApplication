@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Application.Features.Pos;
+using EcommercePos.Api.Extensions;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -11,153 +11,89 @@ public static class WarehouseEndpoints
         var group = app.MapGroup("/api/warehouses").WithTags("Warehouses");
 
         group.MapGet("/", async (
-            [AsParameters] GetWarehousesRequest request,
-            ApplicationDbContext context,
+            [AsParameters] GetWarehouses.Request request,
+            [FromServices] GetWarehouses.Handler handler,
             CancellationToken ct) =>
         {
-            var query = context.Warehouses
-                .Where(w => !w.IsDeleted)
-                .AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                query = query.Where(w => w.Name.Contains(request.Search) || w.Code.Contains(request.Search));
-            }
-
-            var totalCount = await query.CountAsync(ct);
-            var items = await query
-                .OrderBy(w => w.Name)
-                .Skip(request.PageIndex * request.PageSize)
-                .Take(request.PageSize)
-                .Select(w => new WarehouseResponse(
-                    w.Id, w.Code, w.Name, w.SiteType, w.ManagerName,
-                    w.AddressLine1, w.City, w.Phone, w.Email, w.IsActive))
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = items, totalCount });
+            var result = await handler.Handle(request, ct);
+            return result.ToPagedResult();
         })
         .WithName("GetWarehouses")
         .WithSummary("Get paginated warehouses");
 
-        group.MapGet("/{code}", async (string code, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            [FromServices] GetWarehouseById.Handler handler,
+            CancellationToken ct) =>
         {
-            var warehouse = await context.Warehouses
-                .Where(w => w.Code == code && !w.IsDeleted)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(ct);
-
-            if (warehouse == null)
-                return Results.NotFound(new { error = "Warehouse not found" });
-
-            return Results.Ok(new { data = new WarehouseResponse(
-                warehouse.Id, warehouse.Code, warehouse.Name, warehouse.SiteType, warehouse.ManagerName,
-                warehouse.AddressLine1, warehouse.City, warehouse.Phone, warehouse.Email, warehouse.IsActive) });
+            var result = await handler.Handle(new GetWarehouseById.Query(id), ct);
+            return result.ToHttpResult();
         })
-        .WithName("GetWarehouseByCode")
-        .WithSummary("Get warehouse by code");
+        .WithName("GetWarehouseById")
+        .WithSummary("Get warehouse by id with counters");
 
-        group.MapPost("/", async (CreateWarehouseRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPost("/", async (
+            [FromBody] CreateWarehouse.Request request,
+            [FromServices] CreateWarehouse.Handler handler,
+            CancellationToken ct) =>
         {
-            var exists = await context.Warehouses.AnyAsync(w => w.Code == request.Code, ct);
-            if (exists)
-                return Results.Conflict(new { error = "Warehouse code already exists" });
-
-            var warehouse = new Warehouses
-            {
-                Id = Guid.NewGuid(),
-                Code = request.Code,
-                Name = request.Name,
-                SiteType = request.SiteType,
-                ContactPerson = request.ContactPerson,
-                ManagerName = request.ManagerName,
-                AddressLine1 = request.AddressLine1,
-                AddressLine2 = request.AddressLine2,
-                City = request.City,
-                Area = request.Area,
-                State = request.State,
-                PostalCode = request.PostalCode,
-                Country = request.Country,
-                Phone = request.Phone,
-                Email = request.Email,
-                IsActive = request.IsActive,
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
-            };
-
-            context.Warehouses.Add(warehouse);
-            await context.SaveChangesAsync(ct);
-
-            return Results.Created($"/api/warehouses/{warehouse.Code}", new { data = new WarehouseResponse(
-                warehouse.Id, warehouse.Code, warehouse.Name, warehouse.SiteType, warehouse.ManagerName,
-                warehouse.AddressLine1, warehouse.City, warehouse.Phone, warehouse.Email, warehouse.IsActive) });
+            var result = await handler.Handle(request, ct);
+            return result.ToCreatedResult($"/api/warehouses/{result.Value?.Id}");
         })
         .WithName("CreateWarehouse")
         .WithSummary("Create a new warehouse");
 
-        group.MapPut("/{code}", async (string code, UpdateWarehouseRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPut("/{id:guid}", async (
+            Guid id,
+            [FromBody] UpdateWarehouse.Request request,
+            [FromServices] UpdateWarehouse.Handler handler,
+            CancellationToken ct) =>
         {
-            var warehouse = await context.Warehouses.FirstOrDefaultAsync(w => w.Code == code, ct);
-            if (warehouse == null || warehouse.IsDeleted)
-                return Results.NotFound(new { error = "Warehouse not found" });
-
-            if (warehouse.Code != request.Code)
-            {
-                var exists = await context.Warehouses.AnyAsync(w => w.Code == request.Code, ct);
-                if (exists)
-                    return Results.Conflict(new { error = "Warehouse code already exists" });
-            }
-
-            warehouse.Code = request.Code;
-            warehouse.Name = request.Name;
-            warehouse.SiteType = request.SiteType;
-            warehouse.ContactPerson = request.ContactPerson;
-            warehouse.ManagerName = request.ManagerName;
-            warehouse.AddressLine1 = request.AddressLine1;
-            warehouse.AddressLine2 = request.AddressLine2;
-            warehouse.City = request.City;
-            warehouse.Area = request.Area;
-            warehouse.State = request.State;
-            warehouse.PostalCode = request.PostalCode;
-            warehouse.Country = request.Country;
-            warehouse.Phone = request.Phone;
-            warehouse.Email = request.Email;
-            warehouse.IsActive = request.IsActive;
-            warehouse.UpdatedAt = DateTime.UtcNow;
-
-            await context.SaveChangesAsync(ct);
-            return Results.Ok(new { data = new WarehouseResponse(
-                warehouse.Id, warehouse.Code, warehouse.Name, warehouse.SiteType, warehouse.ManagerName,
-                warehouse.AddressLine1, warehouse.City, warehouse.Phone, warehouse.Email, warehouse.IsActive) });
+            var command = new UpdateWarehouse.Command(
+                id, request.Code, request.Name, request.SiteType,
+                request.ParentId, request.ContactPerson, request.ManagerName,
+                request.AddressLine1, request.AddressLine2, request.City, request.Area,
+                request.State, request.PostalCode, request.Country,
+                request.Phone, request.Email,
+                request.Latitude, request.Longitude,
+                request.OpeningTime, request.ClosingTime,
+                request.TaxNumber, request.IsDefault, request.IsActive);
+            var result = await handler.Handle(command, ct);
+            return result.ToHttpResult();
         })
         .WithName("UpdateWarehouse")
         .WithSummary("Update an existing warehouse");
 
-        group.MapDelete("/{code}", async (string code, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapDelete("/{id:guid}", async (
+            Guid id,
+            [FromServices] DeleteWarehouse.Handler handler,
+            CancellationToken ct) =>
         {
-            var warehouse = await context.Warehouses.FirstOrDefaultAsync(w => w.Code == code, ct);
-            if (warehouse == null || warehouse.IsDeleted)
-                return Results.NotFound(new { error = "Warehouse not found" });
-
-            warehouse.IsDeleted = true;
-            warehouse.UpdatedAt = DateTime.UtcNow;
-
-            await context.SaveChangesAsync(ct);
-            return Results.NoContent();
+            var result = await handler.Handle(new DeleteWarehouse.Command(id), ct);
+            return result.ToNoContentResult();
         })
         .WithName("DeleteWarehouse")
         .WithSummary("Soft delete a warehouse");
+
+        group.MapPost("/{id:guid}/toggle-active", async (
+            Guid id,
+            [FromServices] ToggleWarehouseActive.Handler handler,
+            CancellationToken ct) =>
+        {
+            var result = await handler.Handle(new ToggleWarehouseActive.Command(id), ct);
+            return result.ToHttpResult();
+        })
+        .WithName("ToggleWarehouseActive")
+        .WithSummary("Toggle warehouse active status");
+
+        group.MapGet("/stats", async (
+            [FromServices] GetWarehouseStats.Handler handler,
+            CancellationToken ct) =>
+        {
+            var result = await handler.Handle(new GetWarehouseStats.Query(), ct);
+            return result.ToHttpResult();
+        })
+        .WithName("GetWarehouseStats")
+        .WithSummary("Get warehouse statistics");
     }
 }
-
-public record GetWarehousesRequest(int PageIndex = 0, int PageSize = 10, string? Search = null);
-public record WarehouseResponse(
-    Guid Id, string Code, string Name, string SiteType, string? ManagerName,
-    string? AddressLine1, string? City, string? Phone, string? Email, bool IsActive);
-public record CreateWarehouseRequest(
-    string Code, string Name, string SiteType, string? ContactPerson, string? ManagerName,
-    string? AddressLine1, string? AddressLine2, string? City, string? Area, string? State,
-    string? PostalCode, string Country, string? Phone, string? Email, bool IsActive);
-public record UpdateWarehouseRequest(
-    string Code, string Name, string SiteType, string? ContactPerson, string? ManagerName,
-    string? AddressLine1, string? AddressLine2, string? City, string? Area, string? State,
-    string? PostalCode, string Country, string? Phone, string? Email, bool IsActive);

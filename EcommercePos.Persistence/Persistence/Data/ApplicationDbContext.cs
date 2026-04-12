@@ -267,6 +267,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<UserRefreshTokens> UserRefreshTokens { get; set; }
 
+    public virtual DbSet<UserRoles> UserRoles { get; set; }
+
     public virtual DbSet<UserTokens> UserTokens { get; set; }
 
     public virtual DbSet<Users> Users { get; set; }
@@ -4281,6 +4283,21 @@ public partial class ApplicationDbContext : DbContext
                 .HasConstraintName("FK__UserToken__UserI__0A9D95DB");
         });
 
+        modelBuilder.Entity<UserRoles>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.RoleId });
+
+            entity.HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK__UserRoles__UserI__787EE5A0");
+
+            entity.HasOne(d => d.Role)
+                .WithMany()
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("FK__UserRoles__RoleI__797309D9");
+        });
+
         modelBuilder.Entity<Users>(entity =>
         {
             entity.HasIndex(e => e.NormalizedEmail, "UX_Users_Email")
@@ -4310,20 +4327,6 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(60)
                 .HasDefaultValue("Asia/Dhaka");
             entity.Property(e => e.UserName).HasMaxLength(256);
-
-            entity.HasMany(d => d.Role).WithMany(p => p.User)
-                .UsingEntity<Dictionary<string, object>>(
-                    "UserRoles",
-                    r => r.HasOne<Roles>().WithMany()
-                        .HasForeignKey("RoleId")
-                        .HasConstraintName("FK__UserRoles__RoleI__797309D9"),
-                    l => l.HasOne<Users>().WithMany()
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("FK__UserRoles__UserI__787EE5A0"),
-                    j =>
-                    {
-                        j.HasKey("UserId", "RoleId");
-                    });
         });
 
         modelBuilder.Entity<VariantAttributeMatrix>(entity =>

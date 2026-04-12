@@ -8,43 +8,25 @@ public static class EndpointExtensions
     public static IResult ToHttpResult<T>(this Result<T> result)
     {
         if (result.IsSuccess)
-            return Results.Ok(new { data = result.Value });
+            return Results.Ok(ApiResponse<T>.Ok(result.Value!));
 
-        return result.Error?.Code switch
-        {
-            "validation" => Results.BadRequest(new { result.Error, result.ValidationErrors }),
-            "not_found" => Results.NotFound(new { result.Error }),
-            "conflict" => Results.Conflict(new { result.Error }),
-            _ => Results.Problem(result.Error?.Message)
-        };
+        return MapErrorToResult<T>(result.Error, result.ValidationErrors);
     }
 
     public static IResult ToHttpResult(this Result result)
     {
         if (result.IsSuccess)
-            return Results.Ok();
+            return Results.Ok(ApiResponse<object>.Ok(null!, "Operation completed successfully"));
 
-        return result.Error?.Code switch
-        {
-            "validation" => Results.BadRequest(new { result.Error }),
-            "not_found" => Results.NotFound(new { result.Error }),
-            "conflict" => Results.Conflict(new { result.Error }),
-            _ => Results.Problem(result.Error?.Message)
-        };
+        return MapErrorToResult<object>(result.Error);
     }
 
     public static IResult ToCreatedResult<T>(this Result<T> result, string location)
     {
         if (result.IsSuccess)
-            return Results.Created(location, new { data = result.Value });
+            return Results.Created(location, ApiResponse<T>.Created(result.Value!));
 
-        return result.Error?.Code switch
-        {
-            "validation" => Results.BadRequest(new { result.Error }),
-            "not_found" => Results.NotFound(new { result.Error }),
-            "conflict" => Results.Conflict(new { result.Error }),
-            _ => Results.Problem(result.Error?.Message)
-        };
+        return MapErrorToResult<T>(result.Error, result.ValidationErrors);
     }
 
     public static IResult ToNoContentResult(this Result result)
@@ -52,12 +34,47 @@ public static class EndpointExtensions
         if (result.IsSuccess)
             return Results.NoContent();
 
-        return result.Error?.Code switch
+        return MapErrorToResult<object>(result.Error);
+    }
+
+    public static IResult ToPagedResult<T>(this Result<PagedResult<T>> result)
+    {
+        if (result.IsSuccess)
         {
-            "validation" => Results.BadRequest(new { result.Error }),
-            "not_found" => Results.NotFound(new { result.Error }),
-            "conflict" => Results.Conflict(new { result.Error }),
-            _ => Results.Problem(result.Error?.Message)
+            var paged = result.Value!;
+            return Results.Ok(ApiResponse<List<T>>.Ok(paged.Items, "Data retrieved successfully") with
+            {
+                Pagination = new PaginationInfo
+                {
+                    PageNumber = paged.PageIndex + 1,
+                    PageSize = paged.PageSize,
+                    TotalCount = paged.TotalCount,
+                    TotalPages = paged.TotalPages
+                }
+            });
+        }
+
+        return MapErrorToResult<List<T>>(result.Error, result.ValidationErrors);
+    }
+
+    private static IResult MapErrorToResult<T>(Error? error, Dictionary<string, string[]>? validationErrors = null)
+    {
+        var errorMessages = validationErrors?
+            .SelectMany(e => e.Value)
+            .ToList() ?? new List<string>();
+
+        if (error == null)
+            return Results.Problem("An unknown error occurred.");
+
+        return error.Code switch
+        {
+            "validation" => Results.BadRequest(ApiResponse<T>.Fail(
+                error.Message, errorMessages.Count > 0 ? errorMessages : new List<string> { error.Message })),
+            "not_found" => Results.NotFound(ApiResponse<T>.Fail(error.Message)),
+            "conflict" => Results.Conflict(ApiResponse<T>.Fail(error.Message)),
+            "unauthorized" => Results.Json(ApiResponse<T>.Fail(error.Message), statusCode: 401),
+            "forbidden" => Results.Json(ApiResponse<T>.Fail(error.Message), statusCode: 403),
+            _ => Results.Problem(error.Message)
         };
     }
 

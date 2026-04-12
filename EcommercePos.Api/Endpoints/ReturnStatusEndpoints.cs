@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Application.Features.Lookup;
+using EcommercePos.Api.Extensions;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -11,107 +11,60 @@ public static class ReturnStatusEndpoints
         var group = app.MapGroup("/api/return-statuses").WithTags("ReturnStatuses");
 
         group.MapGet("/", async (
-            [AsParameters] GetReturnStatusesRequest request,
-            ApplicationDbContext context,
+            [AsParameters] GetReturnStatuses.Request request,
+            [FromServices] GetReturnStatuses.Handler handler,
             CancellationToken ct) =>
         {
-            var query = context.ReturnStatuses.AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                query = query.Where(c => c.DisplayName.Contains(request.Search) || c.StatusCode.Contains(request.Search));
-            }
-
-            var totalCount = await query.CountAsync(ct);
-            var items = await query
-                .OrderBy(c => c.SortOrder)
-                .Skip(request.PageIndex * request.PageSize)
-                .Take(request.PageSize)
-                .Select(c => new ReturnStatusResponse(c.StatusCode, c.DisplayName, c.SortOrder))
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = items, totalCount });
+            var result = await handler.Handle(request, ct);
+            return result.ToPagedResult();
         })
         .WithName("GetReturnStatuses")
         .WithSummary("Get paginated return statuses");
 
-        group.MapGet("/{code}", async (string code, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapGet("/{code}", async (
+            string code,
+            [FromServices] GetReturnStatusByCode.Handler handler,
+            CancellationToken ct) =>
         {
-            var status = await context.ReturnStatuses
-                .Where(c => c.StatusCode == code)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(ct);
-
-            if (status == null)
-                return Results.NotFound(new { error = "Return status not found" });
-
-            return Results.Ok(new { data = new ReturnStatusResponse(status.StatusCode, status.DisplayName, status.SortOrder) });
+            var result = await handler.Handle(new GetReturnStatusByCode.Query(code), ct);
+            return result.ToHttpResult();
         })
         .WithName("GetReturnStatusByCode")
         .WithSummary("Get return status by code");
 
-        group.MapPost("/", async (CreateReturnStatusRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPost("/", async (
+            [FromBody] CreateReturnStatus.Request request,
+            [FromServices] CreateReturnStatus.Handler handler,
+            CancellationToken ct) =>
         {
-            var exists = await context.ReturnStatuses.AnyAsync(c => c.StatusCode == request.StatusCode, ct);
-            if (exists)
-                return Results.Conflict(new { error = "Return status code already exists" });
-
-            var status = new ReturnStatuses
-            {
-                StatusCode = request.StatusCode,
-                DisplayName = request.DisplayName,
-                SortOrder = request.SortOrder
-            };
-
-            context.ReturnStatuses.Add(status);
-            await context.SaveChangesAsync(ct);
-
-            return Results.Created($"/api/return-statuses/{status.StatusCode}", new { data = new ReturnStatusResponse(
-                status.StatusCode, status.DisplayName, status.SortOrder) });
+            var result = await handler.Handle(request, ct);
+            return result.ToCreatedResult($"/api/return-statuses/{request.StatusCode}");
         })
         .WithName("CreateReturnStatus")
         .WithSummary("Create a new return status");
 
-        group.MapPut("/{code}", async (string code, UpdateReturnStatusRequest request, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapPut("/{code}", async (
+            string code,
+            [FromBody] UpdateReturnStatus.Request request,
+            [FromServices] UpdateReturnStatus.Handler handler,
+            CancellationToken ct) =>
         {
-            var status = await context.ReturnStatuses.FirstOrDefaultAsync(c => c.StatusCode == code, ct);
-            if (status == null)
-                return Results.NotFound(new { error = "Return status not found" });
-
-            if (status.StatusCode != request.StatusCode)
-            {
-                var exists = await context.ReturnStatuses.AnyAsync(c => c.StatusCode == request.StatusCode, ct);
-                if (exists)
-                    return Results.Conflict(new { error = "Return status code already exists" });
-            }
-
-            status.StatusCode = request.StatusCode;
-            status.DisplayName = request.DisplayName;
-            status.SortOrder = request.SortOrder;
-
-            await context.SaveChangesAsync(ct);
-            return Results.Ok(new { data = new ReturnStatusResponse(
-                status.StatusCode, status.DisplayName, status.SortOrder) });
+            var command = new UpdateReturnStatus.Command(code, request.StatusCode, request.DisplayName, request.SortOrder);
+            var result = await handler.Handle(command, ct);
+            return result.ToHttpResult();
         })
         .WithName("UpdateReturnStatus")
         .WithSummary("Update an existing return status");
 
-        group.MapDelete("/{code}", async (string code, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapDelete("/{code}", async (
+            string code,
+            [FromServices] DeleteReturnStatus.Handler handler,
+            CancellationToken ct) =>
         {
-            var status = await context.ReturnStatuses.FirstOrDefaultAsync(c => c.StatusCode == code, ct);
-            if (status == null)
-                return Results.NotFound(new { error = "Return status not found" });
-
-            context.ReturnStatuses.Remove(status);
-            await context.SaveChangesAsync(ct);
-            return Results.NoContent();
+            var result = await handler.Handle(new DeleteReturnStatus.Command(code), ct);
+            return result.ToNoContentResult();
         })
         .WithName("DeleteReturnStatus")
         .WithSummary("Delete a return status");
     }
 }
-
-public record GetReturnStatusesRequest(int PageIndex = 0, int PageSize = 10, string? Search = null);
-public record ReturnStatusResponse(string StatusCode, string DisplayName, byte SortOrder);
-public record CreateReturnStatusRequest(string StatusCode, string DisplayName, byte SortOrder);
-public record UpdateReturnStatusRequest(string StatusCode, string DisplayName, byte SortOrder);
