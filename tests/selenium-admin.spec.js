@@ -83,7 +83,7 @@ async function runAllTests() {
     await login();
     
     console.log('\n--- Testing Pages ---');
-    await testPage(`${BASE_URL}/dashboard`, 'Dashboard');
+    await testPage(`${BASE_URL}/`, 'Dashboard');
     await testPage(`${BASE_URL}/products`, 'Products');
     await testPage(`${BASE_URL}/categories`, 'Categories', 'Product Test Cat');
     await testPage(`${BASE_URL}/brands`, 'Brands');
@@ -91,18 +91,16 @@ async function runAllTests() {
     await testPage(`${BASE_URL}/orders`, 'Orders');
     await testPage(`${BASE_URL}/suppliers`, 'Suppliers');
     await testPage(`${BASE_URL}/employees`, 'Employees');
-    await testPage(`${BASE_URL}/inventory`, 'Inventory');
+    await testPage(`${BASE_URL}/inventory/stock`, 'Stock Items');
     await testPage(`${BASE_URL}/tags`, 'Tags');
     await testPage(`${BASE_URL}/units`, 'Units');
     await testPage(`${BASE_URL}/attributes`, 'Attributes');
-    await testPage(`${BASE_URL}/stock-items`, 'Stock Items');
     await testPage(`${BASE_URL}/pos`, 'POS Terminal');
-    await testPage(`${BASE_URL}/settings`, 'Settings');
     await testPage(`${BASE_URL}/settings/order-statuses`, 'Order Statuses');
     await testPage(`${BASE_URL}/settings/payment-statuses`, 'Payment Statuses');
-    await testPage(`${BASE_URL}/stock-movements`, 'Stock Movements');
-    await testPage(`${BASE_URL}/stock-transfers`, 'Stock Transfers');
-    await testPage(`${BASE_URL}/inventory-adjustments`, 'Inventory Adjustments');
+    await testPage(`${BASE_URL}/inventory/movements`, 'Stock Movements');
+    await testPage(`${BASE_URL}/inventory/transfers`, 'Stock Transfers');
+    await testPage(`${BASE_URL}/inventory/adjustments`, 'Inventory Adjustments');
     
     console.log('\n' + '='.repeat(50));
     console.log('All tests completed!');
