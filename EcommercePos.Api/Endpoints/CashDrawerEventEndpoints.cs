@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Pos;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -11,11 +12,13 @@ public static class CashDrawerEventEndpoints
         var group = app.MapGroup("/api/cash-drawer-events").WithTags("Cash Drawer Events");
 
         group.MapGet("/", async (
-            [FromQuery] Guid cashShiftId,
+            [FromQuery] Guid? cashShiftId,
             [FromServices] GetCashDrawerEvents.Handler handler,
             CancellationToken ct) =>
         {
-            var result = await handler.Handle(new GetCashDrawerEvents.Request(cashShiftId), ct);
+            if (cashShiftId == null || cashShiftId == Guid.Empty)
+                return Results.BadRequest(ApiResponse<object>.Fail("cashShiftId is required"));
+            var result = await handler.Handle(new GetCashDrawerEvents.Request(cashShiftId.Value), ct);
             return result.ToHttpResult();
         })
         .WithName("GetCashDrawerEvents")

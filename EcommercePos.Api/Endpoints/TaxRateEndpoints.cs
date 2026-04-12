@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using EcommercePos.Application.Features.TaxRate.Queries;
-using EcommercePos.Application.Features.TaxRate.Commands;
+using EcommercePos.Application.Features.TaxRate;
 using EcommercePos.Api.Extensions;
 
 namespace EcommercePos.Api.Endpoints;
@@ -12,70 +11,54 @@ public static class TaxRateEndpoints
         var group = app.MapGroup("/api/tax-rates").WithTags("TaxRates");
 
         group.MapGet("/", async (
-            [AsParameters] GetTaxRates.Request request,
-            [FromServices] GetTaxRates.Handler handler,
+            [AsParameters] GetTaxRates.Query query,
+            GetTaxRates.Handler handler,
             CancellationToken ct) =>
-        {
-            var query = new GetTaxRates.Query(request.PageIndex, request.PageSize, request.Search);
-            var result = await handler.Handle(query, ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetTaxRates")
-        .WithSummary("Get paginated tax rates");
+            (await handler.Handle(query, ct)).ToPagedResult())
+            .WithName("GetTaxRates")
+            .WithSummary("Get paginated tax rates");
 
         group.MapGet("/{id:guid}", async (
             Guid id,
-            [FromServices] GetTaxRateById.Handler handler,
+            GetTaxRateById.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new GetTaxRateById.Query(id), ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetTaxRateById")
-        .WithSummary("Get tax rate by id");
+            (await handler.Handle(new GetTaxRateById.Query(id), ct)).ToHttpResult())
+            .WithName("GetTaxRateById")
+            .WithSummary("Get tax rate by id");
 
         group.MapPost("/", async (
-            [FromBody] CreateTaxRate.Request request,
-            [FromServices] CreateTaxRate.Handler handler,
+            [FromBody] CreateTaxRate.Command command,
+            CreateTaxRate.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new CreateTaxRate.Command(
-                request.TaxName, request.TaxRate, request.TaxCode, request.Description,
-                request.IsActive, request.TaxType, request.IsPercentage, request.IsInclusive,
-                request.IsDefault, request.Country, request.ApplyToShipping, request.Priority,
-                request.EffectiveFrom, request.EffectiveTo);
-            var result = await handler.Handle(command, ct);
-            return result.ToCreatedResult($"/api/tax-rates/{request.TaxName}");
-        })
-        .WithName("CreateTaxRate")
-        .WithSummary("Create a new tax rate");
+            (await handler.Handle(command, ct)).ToCreatedResult("/api/tax-rates"))
+            .WithName("CreateTaxRate")
+            .WithSummary("Create a new tax rate");
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateTaxRate.Request request,
-            [FromServices] UpdateTaxRate.Handler handler,
+            [FromBody] UpdateTaxRateBody body,
+            UpdateTaxRate.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new UpdateTaxRate.Command(
-                id, request.TaxName, request.TaxRate, request.TaxCode, request.Description,
-                request.IsActive, request.TaxType, request.IsPercentage, request.IsInclusive,
-                request.IsDefault, request.Country, request.ApplyToShipping, request.Priority,
-                request.EffectiveFrom, request.EffectiveTo);
-            var result = await handler.Handle(command, ct);
-            return result.ToHttpResult();
-        })
-        .WithName("UpdateTaxRate")
-        .WithSummary("Update an existing tax rate");
+            (await handler.Handle(new UpdateTaxRate.Command(
+                id, body.TaxName, body.TaxRate, body.TaxCode, body.Description,
+                body.IsActive, body.TaxType, body.IsPercentage, body.IsInclusive,
+                body.IsDefault, body.Country, body.ApplyToShipping, body.Priority,
+                body.EffectiveFrom, body.EffectiveTo), ct)).ToHttpResult())
+            .WithName("UpdateTaxRate")
+            .WithSummary("Update an existing tax rate");
 
         group.MapDelete("/{id:guid}", async (
             Guid id,
-            [FromServices] DeleteTaxRate.Handler handler,
+            DeleteTaxRate.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new DeleteTaxRate.Command(id), ct);
-            return result.ToNoContentResult();
-        })
-        .WithName("DeleteTaxRate")
-        .WithSummary("Soft delete a tax rate");
+            (await handler.Handle(new DeleteTaxRate.Command(id), ct)).ToNoContentResult())
+            .WithName("DeleteTaxRate")
+            .WithSummary("Soft delete a tax rate");
     }
 }
+
+public record UpdateTaxRateBody(
+    string TaxName, decimal TaxRate, string? TaxCode, string? Description,
+    bool IsActive, string? TaxType, bool IsPercentage, bool IsInclusive,
+    bool IsDefault, string? Country, bool ApplyToShipping, int Priority,
+    DateTime? EffectiveFrom, DateTime? EffectiveTo);

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Application.Features.Product.Queries;
-using EcommercePos.Application.Features.Product.Commands;
+using EcommercePos.Application.Features.Product;
 using EcommercePos.Application.Features.Catalog;
 using EcommercePos.Api.Extensions;
 using EcommercePos.Persistence.Data;
@@ -17,73 +16,49 @@ public static class ProductEndpoints
         // ── Core CRUD ──────────────────────────────────────────────────────
 
         group.MapGet("/", async (
-            [AsParameters] GetProducts.Request request,
-            [FromServices] GetProducts.Handler handler,
+            [AsParameters] GetProducts.Query query,
+            GetProducts.Handler handler,
             CancellationToken ct) =>
-        {
-            var query = new GetProducts.Query(
-                request.PageIndex, request.PageSize, request.Search,
-                request.CategoryId, request.BrandId);
-            var result = await handler.Handle(query, ct);
-            return result.ToPagedResult();
-        })
-        .WithName("GetProducts")
-        .WithSummary("Get paginated products");
+            (await handler.Handle(query, ct)).ToPagedResult())
+            .WithName("GetProducts")
+            .WithSummary("Get paginated products");
 
         group.MapGet("/{id:guid}", async (
             Guid id,
-            [FromServices] GetProductById.Handler handler,
+            GetProductById.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new GetProductById.Query(id), ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetProductById")
-        .WithSummary("Get product by id");
+            (await handler.Handle(new GetProductById.Query(id), ct)).ToHttpResult())
+            .WithName("GetProductById")
+            .WithSummary("Get product by id");
 
         group.MapPost("/", async (
-            [FromBody] CreateProduct.Request request,
-            [FromServices] CreateProduct.Handler handler,
+            [FromBody] CreateProduct.Command command,
+            CreateProduct.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new CreateProduct.Command(
-                request.ProductCode, request.Name, request.ShortDescription, request.Description,
-                request.ProductType, request.CostPrice, request.SalePrice, request.OriginalPrice,
-                request.IsTaxInclusive, request.IsFeatured, request.IsActive, request.CategoryId,
-                request.BrandId, request.UnitId, request.Sku, request.Barcode);
-            var result = await handler.Handle(command, ct);
-            return result.ToCreatedResult($"/api/products");
-        })
-        .WithName("CreateProduct")
-        .WithSummary("Create a new product");
+            (await handler.Handle(command, ct)).ToCreatedResult("/api/products"))
+            .WithName("CreateProduct")
+            .WithSummary("Create a new product");
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateProduct.Request request,
-            [FromServices] UpdateProduct.Handler handler,
+            [FromBody] UpdateProductBody body,
+            UpdateProduct.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new UpdateProduct.Command(
-                id, request.ProductCode, request.Name, request.ShortDescription, request.Description,
-                request.ProductType, request.CostPrice, request.SalePrice, request.OriginalPrice,
-                request.IsTaxInclusive, request.IsFeatured, request.IsActive, request.CategoryId,
-                request.BrandId, request.UnitId, request.Sku, request.Barcode);
-            var result = await handler.Handle(command, ct);
-            return result.ToHttpResult();
-        })
-        .WithName("UpdateProduct")
-        .WithSummary("Update product");
+            (await handler.Handle(new UpdateProduct.Command(
+                id, body.ProductCode, body.Name, body.ShortDescription, body.Description,
+                body.ProductType, body.CostPrice, body.SalePrice, body.OriginalPrice,
+                body.IsTaxInclusive, body.IsFeatured, body.IsActive,
+                body.CategoryId, body.BrandId, body.UnitId, body.Sku, body.Barcode), ct)).ToHttpResult())
+            .WithName("UpdateProduct")
+            .WithSummary("Update product");
 
         group.MapDelete("/{id:guid}", async (
             Guid id,
-            [FromServices] DeleteProduct.Handler handler,
+            DeleteProduct.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new DeleteProduct.Command(id), ct);
-            return result.ToNoContentResult();
-        })
-        .WithName("DeleteProduct")
-        .WithSummary("Soft delete product");
+            (await handler.Handle(new DeleteProduct.Command(id), ct)).ToNoContentResult())
+            .WithName("DeleteProduct")
+            .WithSummary("Soft delete product");
 
         // ── Simple utility endpoints (kept as direct DB) ───────────────────
 
@@ -95,7 +70,6 @@ public static class ProductEndpoints
 
             product.IsFeatured = !product.IsFeatured;
             product.UpdatedAt = DateTime.UtcNow;
-
             await context.SaveChangesAsync(ct);
             return Results.Ok(new { data = new { product.Id, product.IsFeatured } });
         })
@@ -103,12 +77,9 @@ public static class ProductEndpoints
         .WithSummary("Toggle product featured status");
 
         group.MapGet("/types", (CancellationToken ct) =>
-        {
-            var types = new[] { "STANDARD", "VARIANT", "BUNDLE", "DIGITAL", "SERVICE" };
-            return Results.Ok(new { data = types });
-        })
-        .WithName("GetProductTypes")
-        .WithSummary("Get product types");
+            Results.Ok(new { data = new[] { "STANDARD", "VARIANT", "BUNDLE", "DIGITAL", "SERVICE" } }))
+            .WithName("GetProductTypes")
+            .WithSummary("Get product types");
 
         group.MapGet("/stats", async (ApplicationDbContext context, CancellationToken ct) =>
         {
@@ -122,7 +93,6 @@ public static class ProductEndpoints
                     .Where(p => !p.IsDeleted && p.StockItems.Any(s => s.QuantityOnHand <= p.ReorderLevel))
                     .CountAsync(ct)
             };
-
             return Results.Ok(new { data = stats });
         })
         .WithName("GetProductStats")
@@ -132,234 +102,174 @@ public static class ProductEndpoints
 
         group.MapGet("/{id:guid}/variants", async (
             Guid id,
-            [FromServices] GetProductVariants.Handler handler,
+            GetProductVariants.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new GetProductVariants.Request(id), ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetProductVariants")
-        .WithSummary("Get product variants");
+            (await handler.Handle(new GetProductVariants.Request(id), ct)).ToHttpResult())
+            .WithName("GetProductVariants")
+            .WithSummary("Get product variants");
 
         group.MapPost("/{id:guid}/variants", async (
             Guid id,
             [FromBody] CreateProductVariant.Request body,
-            [FromServices] CreateProductVariant.Handler handler,
+            CreateProductVariant.Handler handler,
             CancellationToken ct) =>
-        {
-            var request = body with { ProductId = id };
-            var result = await handler.Handle(request, ct);
-            return result.ToCreatedResult($"/api/products/{id}/variants");
-        })
-        .WithName("CreateProductVariant")
-        .WithSummary("Create a product variant");
+            (await handler.Handle(body with { ProductId = id }, ct)).ToCreatedResult($"/api/products/{id}/variants"))
+            .WithName("CreateProductVariant")
+            .WithSummary("Create a product variant");
 
         group.MapPut("/{id:guid}/variants/{variantId:guid}", async (
             Guid id,
             Guid variantId,
             [FromBody] UpdateProductVariant.Request body,
-            [FromServices] UpdateProductVariant.Handler handler,
+            UpdateProductVariant.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new UpdateProductVariant.Command(
+            (await handler.Handle(new UpdateProductVariant.Command(
                 variantId, body.Name, body.Sku, body.Barcode,
                 body.CostPrice, body.PriceModifier, body.OverridePrice,
                 body.WeightKg, body.IsDefault, body.IsActive, body.SortOrder,
-                body.ImageUrl, body.AttributeOptionIds);
-            var result = await handler.Handle(command, ct);
-            return result.ToHttpResult();
-        })
-        .WithName("UpdateProductVariant")
-        .WithSummary("Update a product variant");
+                body.ImageUrl, body.AttributeOptionIds), ct)).ToHttpResult())
+            .WithName("UpdateProductVariant")
+            .WithSummary("Update a product variant");
 
         group.MapDelete("/{id:guid}/variants/{variantId:guid}", async (
             Guid id,
             Guid variantId,
-            [FromServices] DeleteProductVariant.Handler handler,
+            DeleteProductVariant.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new DeleteProductVariant.Command(variantId), ct);
-            return result.ToNoContentResult();
-        })
-        .WithName("DeleteProductVariant")
-        .WithSummary("Delete a product variant");
+            (await handler.Handle(new DeleteProductVariant.Command(variantId), ct)).ToNoContentResult())
+            .WithName("DeleteProductVariant")
+            .WithSummary("Delete a product variant");
 
         // ── Images ─────────────────────────────────────────────────────────
 
         group.MapGet("/{id:guid}/images", async (
             Guid id,
             Guid? variantId,
-            [FromServices] GetProductImages.Handler handler,
+            GetProductImages.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new GetProductImages.Query(id, variantId), ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetProductImages")
-        .WithSummary("Get product images");
+            (await handler.Handle(new GetProductImages.Query(id, variantId), ct)).ToHttpResult())
+            .WithName("GetProductImages")
+            .WithSummary("Get product images");
 
         group.MapPost("/{id:guid}/images", async (
             Guid id,
             [FromBody] AddProductImage.Request body,
-            [FromServices] AddProductImage.Handler handler,
+            AddProductImage.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new AddProductImage.Command(
+            (await handler.Handle(new AddProductImage.Command(
                 id, body.VariantId, body.ImageUrl, body.AltText,
-                body.SortOrder, body.IsPrimary);
-            var result = await handler.Handle(command, ct);
-            return result.ToCreatedResult($"/api/products/{id}/images");
-        })
-        .WithName("AddProductImage")
-        .WithSummary("Add a product image");
+                body.SortOrder, body.IsPrimary), ct)).ToCreatedResult($"/api/products/{id}/images"))
+            .WithName("AddProductImage")
+            .WithSummary("Add a product image");
 
         group.MapPut("/{id:guid}/images/{imageId:guid}", async (
             Guid id,
             Guid imageId,
             [FromBody] UpdateProductImage.Request body,
-            [FromServices] UpdateProductImage.Handler handler,
+            UpdateProductImage.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new UpdateProductImage.Command(
-                imageId, body.AltText, body.SortOrder, body.IsPrimary);
-            var result = await handler.Handle(command, ct);
-            return result.ToHttpResult();
-        })
-        .WithName("UpdateProductImage")
-        .WithSummary("Update a product image");
+            (await handler.Handle(new UpdateProductImage.Command(
+                imageId, body.AltText, body.SortOrder, body.IsPrimary), ct)).ToHttpResult())
+            .WithName("UpdateProductImage")
+            .WithSummary("Update a product image");
 
         group.MapDelete("/{id:guid}/images/{imageId:guid}", async (
             Guid id,
             Guid imageId,
-            [FromServices] DeleteProductImage.Handler handler,
+            DeleteProductImage.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new DeleteProductImage.Command(imageId), ct);
-            return result.ToNoContentResult();
-        })
-        .WithName("DeleteProductImage")
-        .WithSummary("Delete a product image");
+            (await handler.Handle(new DeleteProductImage.Command(imageId), ct)).ToNoContentResult())
+            .WithName("DeleteProductImage")
+            .WithSummary("Delete a product image");
 
         group.MapPut("/{id:guid}/images/reorder", async (
             Guid id,
             [FromBody] ReorderProductImages.Request body,
-            [FromServices] ReorderProductImages.Handler handler,
+            ReorderProductImages.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new ReorderProductImages.Command(id, body.Orders);
-            var result = await handler.Handle(command, ct);
-            return result.ToNoContentResult();
-        })
-        .WithName("ReorderProductImages")
-        .WithSummary("Reorder product images");
+            (await handler.Handle(new ReorderProductImages.Command(id, body.Orders), ct)).ToNoContentResult())
+            .WithName("ReorderProductImages")
+            .WithSummary("Reorder product images");
 
         // ── Tags ───────────────────────────────────────────────────────────
 
         group.MapGet("/{id:guid}/tags", async (
             Guid id,
-            [FromServices] GetProductTags.Handler handler,
+            GetProductTags.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new GetProductTags.Query(id), ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetProductTags")
-        .WithSummary("Get product tags");
+            (await handler.Handle(new GetProductTags.Query(id), ct)).ToHttpResult())
+            .WithName("GetProductTags")
+            .WithSummary("Get product tags");
 
         group.MapPut("/{id:guid}/tags", async (
             Guid id,
             [FromBody] ManageProductTagsRequest body,
-            [FromServices] ManageProductTags.Handler handler,
+            ManageProductTags.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new ManageProductTags.Command(id, body.TagIds);
-            var result = await handler.Handle(command, ct);
-            return result.ToNoContentResult();
-        })
-        .WithName("ManageProductTags")
-        .WithSummary("Manage product tags");
+            (await handler.Handle(new ManageProductTags.Command(id, body.TagIds), ct)).ToNoContentResult())
+            .WithName("ManageProductTags")
+            .WithSummary("Manage product tags");
 
         // ── Specifications ─────────────────────────────────────────────────
 
         group.MapGet("/{id:guid}/specifications", async (
             Guid id,
-            [FromServices] GetProductSpecValues.Handler handler,
+            GetProductSpecValues.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new GetProductSpecValues.Query(id), ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetProductSpecValues")
-        .WithSummary("Get product specification values");
+            (await handler.Handle(new GetProductSpecValues.Query(id), ct)).ToHttpResult())
+            .WithName("GetProductSpecValues")
+            .WithSummary("Get product specification values");
 
         group.MapPut("/{id:guid}/specifications", async (
             Guid id,
             [FromBody] ManageProductSpecsRequest body,
-            [FromServices] ManageProductSpecValues.Handler handler,
+            ManageProductSpecValues.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new ManageProductSpecValues.Command(id, body.Values);
-            var result = await handler.Handle(command, ct);
-            return result.ToNoContentResult();
-        })
-        .WithName("ManageProductSpecValues")
-        .WithSummary("Manage product specification values");
+            (await handler.Handle(new ManageProductSpecValues.Command(id, body.Values), ct)).ToNoContentResult())
+            .WithName("ManageProductSpecValues")
+            .WithSummary("Manage product specification values");
 
         // ── Suppliers ──────────────────────────────────────────────────────
 
         group.MapGet("/{id:guid}/suppliers", async (
             Guid id,
-            [FromServices] GetProductSupplierLinks.Handler handler,
+            GetProductSupplierLinks.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new GetProductSupplierLinks.Query(id), ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetProductSupplierLinks")
-        .WithSummary("Get product supplier links");
+            (await handler.Handle(new GetProductSupplierLinks.Query(id), ct)).ToHttpResult())
+            .WithName("GetProductSupplierLinks")
+            .WithSummary("Get product supplier links");
 
         group.MapPost("/{id:guid}/suppliers", async (
             Guid id,
             [FromBody] AddProductSupplierLink.Request body,
-            [FromServices] AddProductSupplierLink.Handler handler,
+            AddProductSupplierLink.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new AddProductSupplierLink.Command(
+            (await handler.Handle(new AddProductSupplierLink.Command(
                 id, body.SupplierId, body.SupplierSku, body.UnitCost,
-                body.LeadTimeDays, body.IsPreferred, body.IsActive);
-            var result = await handler.Handle(command, ct);
-            return result.ToCreatedResult($"/api/products/{id}/suppliers");
-        })
-        .WithName("AddProductSupplierLink")
-        .WithSummary("Add a product supplier link");
+                body.LeadTimeDays, body.IsPreferred, body.IsActive), ct)).ToCreatedResult($"/api/products/{id}/suppliers"))
+            .WithName("AddProductSupplierLink")
+            .WithSummary("Add a product supplier link");
 
         group.MapPut("/{id:guid}/suppliers/{linkId:guid}", async (
             Guid id,
             Guid linkId,
             [FromBody] UpdateProductSupplierLink.Request body,
-            [FromServices] UpdateProductSupplierLink.Handler handler,
+            UpdateProductSupplierLink.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new UpdateProductSupplierLink.Command(
+            (await handler.Handle(new UpdateProductSupplierLink.Command(
                 linkId, body.SupplierSku, body.UnitCost,
-                body.LeadTimeDays, body.IsPreferred, body.IsActive);
-            var result = await handler.Handle(command, ct);
-            return result.ToHttpResult();
-        })
-        .WithName("UpdateProductSupplierLink")
-        .WithSummary("Update a product supplier link");
+                body.LeadTimeDays, body.IsPreferred, body.IsActive), ct)).ToHttpResult())
+            .WithName("UpdateProductSupplierLink")
+            .WithSummary("Update a product supplier link");
 
         group.MapDelete("/{id:guid}/suppliers/{linkId:guid}", async (
             Guid id,
             Guid linkId,
-            [FromServices] DeleteProductSupplierLink.Handler handler,
+            DeleteProductSupplierLink.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new DeleteProductSupplierLink.Command(linkId), ct);
-            return result.ToNoContentResult();
-        })
-        .WithName("DeleteProductSupplierLink")
-        .WithSummary("Delete a product supplier link");
+            (await handler.Handle(new DeleteProductSupplierLink.Command(linkId), ct)).ToNoContentResult())
+            .WithName("DeleteProductSupplierLink")
+            .WithSummary("Delete a product supplier link");
 
         // ── Price History ──────────────────────────────────────────────────
 
@@ -367,123 +277,97 @@ public static class ProductEndpoints
             Guid id,
             int pageIndex,
             int pageSize,
-            [FromServices] GetProductPriceHistory.Handler handler,
+            GetProductPriceHistory.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(
-                new GetProductPriceHistory.Query(id, pageIndex, pageSize), ct);
-            return result.ToPagedResult();
-        })
-        .WithName("GetProductPriceHistory")
-        .WithSummary("Get product price history");
+            (await handler.Handle(new GetProductPriceHistory.Query(id, pageIndex, pageSize), ct)).ToPagedResult())
+            .WithName("GetProductPriceHistory")
+            .WithSummary("Get product price history");
 
         // ── Attributes ─────────────────────────────────────────────────────
 
         group.MapGet("/{id:guid}/attributes", async (
             Guid id,
-            [FromServices] GetProductAttributeLinks.Handler handler,
+            GetProductAttributeLinks.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new GetProductAttributeLinks.Request(id), ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetProductAttributeLinks")
-        .WithSummary("Get product attribute links");
+            (await handler.Handle(new GetProductAttributeLinks.Request(id), ct)).ToHttpResult())
+            .WithName("GetProductAttributeLinks")
+            .WithSummary("Get product attribute links");
 
         group.MapPut("/{id:guid}/attributes", async (
             Guid id,
             [FromBody] ManageProductAttributesRequest body,
-            [FromServices] ManageProductAttributeLinks.Handler handler,
+            ManageProductAttributeLinks.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new ManageProductAttributeLinks.Command(id, body.Links);
-            var result = await handler.Handle(command, ct);
-            return result.ToHttpResult();
-        })
-        .WithName("ManageProductAttributeLinks")
-        .WithSummary("Manage product attribute links");
+            (await handler.Handle(new ManageProductAttributeLinks.Command(id, body.Links), ct)).ToHttpResult())
+            .WithName("ManageProductAttributeLinks")
+            .WithSummary("Manage product attribute links");
 
         // ── Bundle Components ──────────────────────────────────────────────
 
         group.MapGet("/{id:guid}/bundle/components", async (
             Guid id,
-            [FromServices] GetBundleComponents.Handler handler,
+            GetBundleComponents.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new GetBundleComponents.Query(id), ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetBundleComponents")
-        .WithSummary("Get bundle components");
+            (await handler.Handle(new GetBundleComponents.Query(id), ct)).ToHttpResult())
+            .WithName("GetBundleComponents")
+            .WithSummary("Get bundle components");
 
         group.MapPut("/{id:guid}/bundle/components", async (
             Guid id,
             [FromBody] ManageBundleComponentsRequest body,
-            [FromServices] ManageBundleComponents.Handler handler,
+            ManageBundleComponents.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = new ManageBundleComponents.Command(id, body.Components);
-            var result = await handler.Handle(command, ct);
-            return result.ToHttpResult();
-        })
-        .WithName("ManageBundleComponents")
-        .WithSummary("Manage bundle components");
+            (await handler.Handle(new ManageBundleComponents.Command(id, body.Components), ct)).ToHttpResult())
+            .WithName("ManageBundleComponents")
+            .WithSummary("Manage bundle components");
 
         // ── Bundle Option Groups ───────────────────────────────────────────
 
         group.MapGet("/{id:guid}/bundle/option-groups", async (
             Guid id,
-            [FromServices] GetBundleOptionGroups.Handler handler,
+            GetBundleOptionGroups.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new GetBundleOptionGroups.Query(id), ct);
-            return result.ToHttpResult();
-        })
-        .WithName("GetBundleOptionGroups")
-        .WithSummary("Get bundle option groups");
+            (await handler.Handle(new GetBundleOptionGroups.Query(id), ct)).ToHttpResult())
+            .WithName("GetBundleOptionGroups")
+            .WithSummary("Get bundle option groups");
 
         group.MapPost("/{id:guid}/bundle/option-groups", async (
             Guid id,
             [FromBody] CreateBundleOptionGroup.Request body,
-            [FromServices] CreateBundleOptionGroup.Handler handler,
+            CreateBundleOptionGroup.Handler handler,
             CancellationToken ct) =>
-        {
-            var request = body with { BundleProductId = id };
-            var result = await handler.Handle(request, ct);
-            return result.ToCreatedResult($"/api/products/{id}/bundle/option-groups");
-        })
-        .WithName("CreateBundleOptionGroup")
-        .WithSummary("Create a bundle option group");
+            (await handler.Handle(body with { BundleProductId = id }, ct)).ToCreatedResult($"/api/products/{id}/bundle/option-groups"))
+            .WithName("CreateBundleOptionGroup")
+            .WithSummary("Create a bundle option group");
 
         group.MapPut("/{id:guid}/bundle/option-groups/{groupId:guid}", async (
             Guid id,
             Guid groupId,
             [FromBody] UpdateBundleOptionGroup.Command body,
-            [FromServices] UpdateBundleOptionGroup.Handler handler,
+            UpdateBundleOptionGroup.Handler handler,
             CancellationToken ct) =>
-        {
-            var command = body with { Id = groupId };
-            var result = await handler.Handle(command, ct);
-            return result.ToHttpResult();
-        })
-        .WithName("UpdateBundleOptionGroup")
-        .WithSummary("Update a bundle option group");
+            (await handler.Handle(body with { Id = groupId }, ct)).ToHttpResult())
+            .WithName("UpdateBundleOptionGroup")
+            .WithSummary("Update a bundle option group");
 
         group.MapDelete("/{id:guid}/bundle/option-groups/{groupId:guid}", async (
             Guid id,
             Guid groupId,
-            [FromServices] DeleteBundleOptionGroup.Handler handler,
+            DeleteBundleOptionGroup.Handler handler,
             CancellationToken ct) =>
-        {
-            var result = await handler.Handle(new DeleteBundleOptionGroup.Command(groupId), ct);
-            return result.ToNoContentResult();
-        })
-        .WithName("DeleteBundleOptionGroup")
-        .WithSummary("Delete a bundle option group");
+            (await handler.Handle(new DeleteBundleOptionGroup.Command(groupId), ct)).ToNoContentResult())
+            .WithName("DeleteBundleOptionGroup")
+            .WithSummary("Delete a bundle option group");
     }
 }
 
-// ── Request DTOs for manage/bulk endpoints ─────────────────────────────────
+// ── Body records ───────────────────────────────────────────────────────────
+public record UpdateProductBody(
+    string? ProductCode, string Name, string? ShortDescription, string? Description,
+    string? ProductType, decimal CostPrice, decimal SalePrice, decimal? OriginalPrice,
+    bool IsTaxInclusive, bool IsFeatured, bool IsActive,
+    Guid CategoryId, Guid? BrandId, Guid? UnitId, string? Sku, string? Barcode);
+
 record ManageProductTagsRequest(List<Guid> TagIds);
 record ManageProductSpecsRequest(List<ManageProductSpecValues.SpecValueInput> Values);
 record ManageProductAttributesRequest(List<ManageProductAttributeLinks.AttributeLinkInput> Links);
