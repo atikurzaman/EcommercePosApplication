@@ -41,11 +41,11 @@ public static class StockItemEndpoints
             if (!movementResult.IsSuccess)
                 return movementResult.ToHttpResult();
 
-            return Results.Ok(ApiResponse<object>.Ok(new
+            return Result<object>.Success(new
             {
                 item = itemResult.Value,
                 history = movementResult.Value
-            }));
+            }).ToHttpResult();
         })
         .WithName("GetStockItemById")
         .WithSummary("Get stock item with history");

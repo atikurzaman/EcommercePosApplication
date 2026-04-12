@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Auth;
+using EcommercePos.Api.Extensions;
 using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Api.Endpoints;
@@ -17,8 +18,7 @@ public static class AuthEndpoints
         {
             var command = new RegisterUser.Command(request.Email, request.Password, request.FirstName, request.LastName, request.Phone);
             var result = await handler.Handle(command, ct);
-            if (!result.IsSuccess) return Results.BadRequest(new { message = result.Error?.Message });
-            return Results.Created($"/api/auth/register", result.Value);
+            return result.ToCreatedResult("/api/auth/register");
         })
         .AllowAnonymous()
         .WithName("Register")
@@ -31,8 +31,7 @@ public static class AuthEndpoints
         {
             var command = new LoginUser.Command(request.Email, request.Password);
             var result = await handler.Handle(command, ct);
-            if (!result.IsSuccess) return Results.Json(new { message = result.Error?.Message }, statusCode: 401);
-            return Results.Ok(result.Value);
+            return result.ToHttpResult();
         })
         .AllowAnonymous()
         .WithName("Login")
@@ -44,8 +43,7 @@ public static class AuthEndpoints
             CancellationToken ct) =>
         {
             var result = await handler.Handle(new GetCurrentUser.Query(), claims, ct);
-            if (!result.IsSuccess) return Results.Unauthorized();
-            return Results.Ok(result.Value);
+            return result.ToHttpResult();
         })
         .WithName("GetCurrentUser")
         .WithSummary("Get current user");
@@ -57,11 +55,12 @@ public static class AuthEndpoints
             CancellationToken ct) =>
         {
             var userId = claims.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null || !Guid.TryParse(userId, out var id)) return Results.Unauthorized();
+            if (userId == null || !Guid.TryParse(userId, out var id))
+                return Result.Failure(Error.Unauthorized("Invalid user context")).ToHttpResult();
+
             var command = new ChangePassword.Command(id, request.CurrentPassword, request.NewPassword);
             var result = await handler.Handle(command, ct);
-            if (!result.IsSuccess) return Results.BadRequest(new { message = result.Error?.Message });
-            return Results.Ok(new { message = "Password changed successfully" });
+            return result.ToHttpResult();
         })
         .WithName("ChangePassword")
         .WithSummary("Change password");
@@ -71,7 +70,7 @@ public static class AuthEndpoints
             CancellationToken ct) =>
         {
             var roles = await handler.Handle(new GetRoles.Query(), ct);
-            return Results.Ok(roles);
+            return Result<List<GetRoles.Response>>.Success(roles).ToHttpResult();
         })
         .WithName("GetUserRoles")
         .WithSummary("Get all roles");

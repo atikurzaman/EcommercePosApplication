@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.InventoryAdjustment;
 using EcommercePos.Api.Extensions;
 using EcommercePos.Api.Filters;
+using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -42,8 +43,10 @@ public static class InventoryAdjustmentEndpoints
             ApproveInventoryAdjustment.Handler handler,
             CancellationToken ct) =>
         {
-            var approverId = approvedByUserId ?? Guid.Parse("00000000-0000-0000-0000-000000000001");
-            var result = await handler.Handle(new ApproveInventoryAdjustment.Command(id, approverId), ct);
+            if (!approvedByUserId.HasValue || approvedByUserId.Value == Guid.Empty)
+                return Result.Failure(Error.Validation("approvedByUserId is required")).ToHttpResult();
+
+            var result = await handler.Handle(new ApproveInventoryAdjustment.Command(id, approvedByUserId.Value), ct);
             return result.ToHttpResult();
         })
         .WithName("ApproveInventoryAdjustment")

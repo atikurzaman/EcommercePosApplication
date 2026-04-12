@@ -3,6 +3,7 @@ using EcommercePos.Application.Features.Product;
 using EcommercePos.Application.Features.Catalog;
 using EcommercePos.Api.Extensions;
 using EcommercePos.Api.Filters;
+using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -68,7 +69,7 @@ public static class ProductEndpoints
             .WithSummary("Toggle product featured status");
 
         group.MapGet("/types", (CancellationToken ct) =>
-            Results.Ok(new { data = new[] { "STANDARD", "VARIANT", "BUNDLE", "DIGITAL", "SERVICE" } }))
+            Result<object>.Success(new[] { "STANDARD", "VARIANT", "BUNDLE", "DIGITAL", "SERVICE" }).ToHttpResult())
             .WithName("GetProductTypes")
             .WithSummary("Get product types");
 

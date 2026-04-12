@@ -15,10 +15,7 @@ public static class CartEndpoints
         group.MapGet("/", async (
             [FromServices] IMediator mediator,
             CancellationToken ct) =>
-        {
-            var result = await mediator.Send(new GetCartsQuery(), ct);
-            return result.ToHttpResult();
-        })
+            (await mediator.Send(new GetCartsQuery(), ct)).ToHttpResult())
         .WithName("GetCarts")
         .WithSummary("Get all carts");
 
@@ -26,10 +23,7 @@ public static class CartEndpoints
             Guid id,
             [FromServices] IMediator mediator,
             CancellationToken ct) =>
-        {
-            var result = await mediator.Send(new GetCartByIdQuery(id), ct);
-            return result.ToHttpResult();
-        })
+            (await mediator.Send(new GetCartByIdQuery(id), ct)).ToHttpResult())
         .WithName("GetCartById")
         .WithSummary("Get cart by id");
 
@@ -37,10 +31,7 @@ public static class CartEndpoints
             [FromBody] CreateCartCommand command,
             [FromServices] IMediator mediator,
             CancellationToken ct) =>
-        {
-            var result = await mediator.Send(command, ct);
-            return result.ToCreatedResult($"/api/carts/{result.Value?.Id}");
-        })
+            (await mediator.Send(command, ct)).ToCreatedResult("/api/carts"))
         .WithName("CreateCart")
         .WithSummary("Create a new cart");
 
@@ -48,10 +39,7 @@ public static class CartEndpoints
             [FromBody] AddCartItemCommand command,
             [FromServices] IMediator mediator,
             CancellationToken ct) =>
-        {
-            var result = await mediator.Send(command, ct);
-            return result.ToHttpResult();
-        })
+            (await mediator.Send(command, ct)).ToHttpResult())
         .WithName("AddCartItem")
         .WithSummary("Add item to cart");
 
@@ -60,11 +48,7 @@ public static class CartEndpoints
             [FromBody] decimal quantity,
             [FromServices] IMediator mediator,
             CancellationToken ct) =>
-        {
-            var command = new UpdateCartItemCommand(itemId, quantity);
-            var result = await mediator.Send(command, ct);
-            return result.ToHttpResult();
-        })
+            (await mediator.Send(new UpdateCartItemCommand(itemId, quantity), ct)).ToHttpResult())
         .WithName("UpdateCartItem")
         .WithSummary("Update cart item quantity");
 
@@ -72,10 +56,7 @@ public static class CartEndpoints
             Guid itemId,
             [FromServices] IMediator mediator,
             CancellationToken ct) =>
-        {
-            var result = await mediator.Send(new RemoveCartItemCommand(itemId), ct);
-            return result.ToNoContentResult();
-        })
+            (await mediator.Send(new RemoveCartItemCommand(itemId), ct)).ToNoContentResult())
         .WithName("RemoveCartItem")
         .WithSummary("Remove item from cart");
 
@@ -83,10 +64,7 @@ public static class CartEndpoints
             [FromBody] ApplyCouponCommand command,
             [FromServices] IMediator mediator,
             CancellationToken ct) =>
-        {
-            var result = await mediator.Send(command, ct);
-            return result.ToHttpResult();
-        })
+            (await mediator.Send(command, ct)).ToHttpResult())
         .WithName("ApplyCoupon")
         .WithSummary("Apply coupon to cart");
     }
