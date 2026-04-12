@@ -41,5 +41,53 @@ public static class CollectionEndpoints
         })
         .WithName("GetCollectionById")
         .WithSummary("Get collection with products");
+
+        group.MapPost("/", async (
+            [FromBody] CreateCollection.Request request,
+            [FromServices] CreateCollection.Handler handler,
+            CancellationToken ct) =>
+        {
+            var result = await handler.Handle(request, ct);
+            return result.ToCreatedResult($"/api/collections");
+        })
+        .WithName("CreateCollection")
+        .WithSummary("Create a new collection");
+
+        group.MapPut("/{id:guid}", async (
+            Guid id,
+            [FromBody] UpdateCollection.Command body,
+            [FromServices] UpdateCollection.Handler handler,
+            CancellationToken ct) =>
+        {
+            var command = body with { Id = id };
+            var result = await handler.Handle(command, ct);
+            return result.ToHttpResult();
+        })
+        .WithName("UpdateCollection")
+        .WithSummary("Update a collection");
+
+        group.MapDelete("/{id:guid}", async (
+            Guid id,
+            [FromServices] DeleteCollection.Handler handler,
+            CancellationToken ct) =>
+        {
+            var result = await handler.Handle(new DeleteCollection.Command(id), ct);
+            return result.ToNoContentResult();
+        })
+        .WithName("DeleteCollection")
+        .WithSummary("Delete a collection");
+
+        group.MapPut("/{id:guid}/items", async (
+            Guid id,
+            [FromBody] ManageCollectionItems.Command body,
+            [FromServices] ManageCollectionItems.Handler handler,
+            CancellationToken ct) =>
+        {
+            var command = body with { CollectionId = id };
+            var result = await handler.Handle(command, ct);
+            return result.ToHttpResult();
+        })
+        .WithName("UpdateCollectionItems")
+        .WithSummary("Set products in a collection");
     }
 }

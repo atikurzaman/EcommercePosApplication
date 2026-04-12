@@ -71,30 +71,42 @@ public static class GetCollectionById
             var entity = await _context.ProductCollections
                 .AsNoTracking()
                 .Where(c => c.Id == query.Id && !c.IsDeleted)
-                .Select(c => new Response(
-                    c.Id, c.Name, c.Slug, c.Description, c.ImageUrl,
-                    c.DisplayOrder, c.IsActive, c.ShowInHomePage,
-                    c.ProductCollectionItems
-                        .Where(i => !i.IsDeleted)
-                        .Join(_context.Products.Where(p => !p.IsDeleted),
-                            i => i.ProductId, p => p.Id,
-                            (i, p) => new CollectionProductInfo(
-                                i.Id, i.ProductId, p.Name, p.ProductCode,
-                                p.ProductImages
-                                    .Where(img => !img.IsDeleted)
-                                    .OrderBy(img => img.SortOrder)
-                                    .Select(img => img.ImageUrl)
-                                    .FirstOrDefault(),
-                                p.SalePrice,
-                                i.DisplayOrder))
-                        .OrderBy(x => x.DisplayOrder)
-                        .ToList()))
                 .FirstOrDefaultAsync(ct);
 
             if (entity == null)
                 return Result<Response>.Failure(Error.NotFound($"Collection with id '{query.Id}' was not found."));
 
-            return Result<Response>.Success(entity);
+            var collectionItems = await _context.ProductCollectionItems
+                .AsNoTracking()
+                .Where(i => i.ProductCollectionId == query.Id && !i.IsDeleted)
+                .Select(i => new { i.Id, i.ProductId, i.DisplayOrder })
+                .ToListAsync(ct);
+
+            var productIds = collectionItems.Select(i => i.ProductId).ToList();
+
+            var products = await _context.Products
+                .AsNoTracking()
+                .Where(p => productIds.Contains(p.Id) && !p.IsDeleted)
+                .Select(p => new { p.Id, p.Name, p.ProductCode, p.SalePrice })
+                .ToListAsync(ct);
+
+            var productMap = products.ToDictionary(p => p.Id);
+
+            var productInfos = collectionItems
+                .Where(i => productMap.ContainsKey(i.ProductId))
+                .OrderBy(i => i.DisplayOrder)
+                .Select(i => new CollectionProductInfo(
+                    i.Id, i.ProductId,
+                    productMap[i.ProductId].Name,
+                    productMap[i.ProductId].ProductCode,
+                    null,
+                    productMap[i.ProductId].SalePrice,
+                    i.DisplayOrder))
+                .ToList();
+
+            return Result<Response>.Success(new Response(
+                entity.Id, entity.Name, entity.Slug, entity.Description, entity.ImageUrl,
+                entity.DisplayOrder, entity.IsActive, entity.ShowInHomePage, productInfos));
         }
     }
 }
@@ -317,27 +329,46 @@ public static class GetHomePageCollections
                 .AsNoTracking()
                 .Where(c => !c.IsDeleted && c.IsActive && c.ShowInHomePage)
                 .OrderBy(c => c.DisplayOrder)
-                .Select(c => new Response(
-                    c.Id, c.Name, c.Slug, c.Description, c.ImageUrl,
-                    c.DisplayOrder,
-                    c.ProductCollectionItems
-                        .Where(i => !i.IsDeleted)
-                        .Join(_context.Products.Where(p => !p.IsDeleted && p.IsActive),
-                            i => i.ProductId, p => p.Id,
-                            (i, p) => new CollectionProductInfo(
-                                i.ProductId, p.Name, p.ProductCode,
-                                p.ProductImages
-                                    .Where(img => !img.IsDeleted)
-                                    .OrderBy(img => img.SortOrder)
-                                    .Select(img => img.ImageUrl)
-                                    .FirstOrDefault(),
-                                p.SalePrice,
-                                i.DisplayOrder))
-                        .OrderBy(x => x.DisplayOrder)
-                        .ToList()))
+                .Select(c => new { c.Id, c.Name, c.Slug, c.Description, c.ImageUrl, c.DisplayOrder })
                 .ToListAsync(ct);
 
-            return Result<List<Response>>.Success(collections);
+            if (collections.Count == 0)
+                return Result<List<Response>>.Success([]);
+
+            var collectionIds = collections.Select(c => c.Id).ToList();
+
+            var collectionItems = await _context.ProductCollectionItems
+                .AsNoTracking()
+                .Where(i => collectionIds.Contains(i.ProductCollectionId) && !i.IsDeleted)
+                .Select(i => new { i.ProductCollectionId, i.ProductId, i.DisplayOrder })
+                .ToListAsync(ct);
+
+            var productIds = collectionItems.Select(i => i.ProductId).Distinct().ToList();
+
+            var products = await _context.Products
+                .AsNoTracking()
+                .Where(p => productIds.Contains(p.Id) && !p.IsDeleted && p.IsActive)
+                .Select(p => new { p.Id, p.Name, p.ProductCode, p.SalePrice })
+                .ToListAsync(ct);
+
+            var productMap = products.ToDictionary(p => p.Id);
+
+            var result = collections.Select(c => new Response(
+                c.Id, c.Name, c.Slug, c.Description, c.ImageUrl, c.DisplayOrder,
+                collectionItems
+                    .Where(i => i.ProductCollectionId == c.Id && productMap.ContainsKey(i.ProductId))
+                    .OrderBy(i => i.DisplayOrder)
+                    .Select(i => new CollectionProductInfo(
+                        i.ProductId,
+                        productMap[i.ProductId].Name,
+                        productMap[i.ProductId].ProductCode,
+                        null,
+                        productMap[i.ProductId].SalePrice,
+                        i.DisplayOrder))
+                    .ToList()
+            )).ToList();
+
+            return Result<List<Response>>.Success(result);
         }
     }
 }
