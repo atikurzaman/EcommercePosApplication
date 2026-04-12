@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Customer;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 using Microsoft.EntityFrameworkCore;
 using EcommercePos.Persistence.Data;
 
@@ -33,6 +34,7 @@ public static class CustomerEndpoints
             CreateCustomer.Handler handler,
             CancellationToken ct) =>
             (await handler.Handle(command, ct)).ToCreatedResult("/api/customers"))
+            .AddEndpointFilter<ValidationFilter<CreateCustomer.Command>>()
             .WithName("CreateCustomer")
             .WithSummary("Create a new customer");
 
@@ -45,6 +47,7 @@ public static class CustomerEndpoints
                 id, body.Phone, body.AlternatePhone, body.Email, body.DateOfBirth,
                 body.Gender, body.CompanyName, body.TaxNumber, body.AddressLine1,
                 body.City, body.Country, body.CreditLimit, body.IsActive), ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateCustomerBody>>()
             .WithName("UpdateCustomer")
             .WithSummary("Update customer");
 

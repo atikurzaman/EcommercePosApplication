@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Unit;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -31,6 +32,7 @@ public static class UnitEndpoints
             CreateUnit.Handler handler,
             CancellationToken ct) =>
             (await handler.Handle(command, ct)).ToCreatedResult("/api/units"))
+            .AddEndpointFilter<ValidationFilter<CreateUnit.Command>>()
             .WithName("CreateUnit")
             .WithSummary("Create a new unit");
 
@@ -42,6 +44,7 @@ public static class UnitEndpoints
             (await handler.Handle(new UpdateUnit.Command(
                 id, body.ShortName, body.Name, body.Description,
                 body.BaseUnitId, body.ConversionFactor, body.IsActive), ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateUnitBody>>()
             .WithName("UpdateUnit")
             .WithSummary("Update an existing unit");
 

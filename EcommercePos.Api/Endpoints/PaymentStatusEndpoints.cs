@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Lookup;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class PaymentStatusEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/payment-statuses/{request.StatusCode}");
         })
+        .AddEndpointFilter<ValidationFilter<CreatePaymentStatus.Request>>()
         .WithName("CreatePaymentStatus")
         .WithSummary("Create a new payment status");
 
@@ -53,6 +55,7 @@ public static class PaymentStatusEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdatePaymentStatus.Request>>()
         .WithName("UpdatePaymentStatus")
         .WithSummary("Update an existing payment status");
 

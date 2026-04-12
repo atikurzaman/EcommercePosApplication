@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Lookup;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class WishlistTypeEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/wishlist-types/{request.TypeCode}");
         })
+        .AddEndpointFilter<ValidationFilter<CreateWishlistType.Request>>()
         .WithName("CreateWishlistType")
         .WithSummary("Create a new wishlist type");
 
@@ -53,6 +55,7 @@ public static class WishlistTypeEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdateWishlistType.Request>>()
         .WithName("UpdateWishlistType")
         .WithSummary("Update an existing wishlist type");
 

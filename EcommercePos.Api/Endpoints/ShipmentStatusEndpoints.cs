@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Lookup;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class ShipmentStatusEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/shipment-statuses/{request.StatusCode}");
         })
+        .AddEndpointFilter<ValidationFilter<CreateShipmentStatus.Request>>()
         .WithName("CreateShipmentStatus")
         .WithSummary("Create a new shipment status");
 
@@ -53,6 +55,7 @@ public static class ShipmentStatusEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdateShipmentStatus.Request>>()
         .WithName("UpdateShipmentStatus")
         .WithSummary("Update an existing shipment status");
 

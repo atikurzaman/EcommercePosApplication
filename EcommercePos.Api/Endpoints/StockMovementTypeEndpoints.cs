@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Lookup;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class StockMovementTypeEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/stock-movement-types/{request.TypeCode}");
         })
+        .AddEndpointFilter<ValidationFilter<CreateStockMovementType.Request>>()
         .WithName("CreateStockMovementType")
         .WithSummary("Create a new stock movement type");
 
@@ -53,6 +55,7 @@ public static class StockMovementTypeEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdateStockMovementType.Request>>()
         .WithName("UpdateStockMovementType")
         .WithSummary("Update an existing stock movement type");
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Employee;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 using Microsoft.EntityFrameworkCore;
 using EcommercePos.Persistence.Data;
 
@@ -33,6 +34,7 @@ public static class EmployeeEndpoints
             CreateEmployee.Handler handler,
             CancellationToken ct) =>
             (await handler.Handle(command, ct)).ToCreatedResult("/api/employees"))
+            .AddEndpointFilter<ValidationFilter<CreateEmployee.Command>>()
             .WithName("CreateEmployee")
             .WithSummary("Create a new employee");
 
@@ -48,6 +50,7 @@ public static class EmployeeEndpoints
                 body.Department, body.EmployeeType, body.Salary,
                 body.BankName, body.BankAccountNumber, body.NationalId,
                 body.EmergencyContactName, body.EmergencyContactPhone, body.IsActive), ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateEmployeeBody>>()
             .WithName("UpdateEmployee")
             .WithSummary("Update employee");
 

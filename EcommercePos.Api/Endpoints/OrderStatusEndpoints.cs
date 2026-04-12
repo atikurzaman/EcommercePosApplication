@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Lookup;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class OrderStatusEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/order-statuses/{request.StatusCode}");
         })
+        .AddEndpointFilter<ValidationFilter<CreateOrderStatus.Request>>()
         .WithName("CreateOrderStatus")
         .WithSummary("Create a new order status");
 
@@ -53,6 +55,7 @@ public static class OrderStatusEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdateOrderStatus.Request>>()
         .WithName("UpdateOrderStatus")
         .WithSummary("Update an existing order status");
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Lookup;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class CustomerTierEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/customer-tiers/{request.TierCode}");
         })
+        .AddEndpointFilter<ValidationFilter<CreateCustomerTier.Request>>()
         .WithName("CreateCustomerTier")
         .WithSummary("Create a new customer tier");
 
@@ -53,6 +55,7 @@ public static class CustomerTierEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdateCustomerTier.Request>>()
         .WithName("UpdateCustomerTier")
         .WithSummary("Update an existing customer tier");
 

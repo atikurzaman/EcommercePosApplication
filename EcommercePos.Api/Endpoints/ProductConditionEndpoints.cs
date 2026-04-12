@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Lookup;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class ProductConditionEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/product-conditions/{request.ConditionCode}");
         })
+        .AddEndpointFilter<ValidationFilter<CreateProductCondition.Request>>()
         .WithName("CreateProductCondition")
         .WithSummary("Create a new product condition");
 
@@ -53,6 +55,7 @@ public static class ProductConditionEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdateProductCondition.Request>>()
         .WithName("UpdateProductCondition")
         .WithSummary("Update an existing product condition");
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Pos;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -45,6 +46,7 @@ public static class PosTransactionEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToCreatedResult($"/api/pos-transactions/{result.Value?.Id}");
         })
+        .AddEndpointFilter<ValidationFilter<CreatePosTransaction.Request>>()
         .WithName("CreatePosTransaction")
         .WithSummary("Create a new POS transaction (full sale)");
 

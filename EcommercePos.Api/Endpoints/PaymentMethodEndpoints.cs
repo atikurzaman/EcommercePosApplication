@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Lookup;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class PaymentMethodEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/payment-methods/{request.MethodCode}");
         })
+        .AddEndpointFilter<ValidationFilter<CreatePaymentMethod.Request>>()
         .WithName("CreatePaymentMethod")
         .WithSummary("Create a new payment method");
 
@@ -53,6 +55,7 @@ public static class PaymentMethodEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdatePaymentMethod.Request>>()
         .WithName("UpdatePaymentMethod")
         .WithSummary("Update an existing payment method");
 

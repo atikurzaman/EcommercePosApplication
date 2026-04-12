@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.TaxRate;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -31,6 +32,7 @@ public static class TaxRateEndpoints
             CreateTaxRate.Handler handler,
             CancellationToken ct) =>
             (await handler.Handle(command, ct)).ToCreatedResult("/api/tax-rates"))
+            .AddEndpointFilter<ValidationFilter<CreateTaxRate.Command>>()
             .WithName("CreateTaxRate")
             .WithSummary("Create a new tax rate");
 
@@ -44,6 +46,7 @@ public static class TaxRateEndpoints
                 body.IsActive, body.TaxType, body.IsPercentage, body.IsInclusive,
                 body.IsDefault, body.Country, body.ApplyToShipping, body.Priority,
                 body.EffectiveFrom, body.EffectiveTo), ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateTaxRateBody>>()
             .WithName("UpdateTaxRate")
             .WithSummary("Update an existing tax rate");
 

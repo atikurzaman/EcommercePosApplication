@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Lookup;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class ReturnStatusEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/return-statuses/{request.StatusCode}");
         })
+        .AddEndpointFilter<ValidationFilter<CreateReturnStatus.Request>>()
         .WithName("CreateReturnStatus")
         .WithSummary("Create a new return status");
 
@@ -53,6 +55,7 @@ public static class ReturnStatusEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdateReturnStatus.Request>>()
         .WithName("UpdateReturnStatus")
         .WithSummary("Update an existing return status");
 

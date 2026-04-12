@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Pos;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class WarehouseEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/warehouses/{result.Value?.Id}");
         })
+        .AddEndpointFilter<ValidationFilter<CreateWarehouse.Request>>()
         .WithName("CreateWarehouse")
         .WithSummary("Create a new warehouse");
 
@@ -61,6 +63,7 @@ public static class WarehouseEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdateWarehouse.Request>>()
         .WithName("UpdateWarehouse")
         .WithSummary("Update an existing warehouse");
 

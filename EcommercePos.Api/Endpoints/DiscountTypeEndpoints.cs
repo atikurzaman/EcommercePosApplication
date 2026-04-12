@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Lookup;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,6 +41,7 @@ public static class DiscountTypeEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/discount-types/{request.TypeCode}");
         })
+        .AddEndpointFilter<ValidationFilter<CreateDiscountType.Request>>()
         .WithName("CreateDiscountType")
         .WithSummary("Create a new discount type");
 
@@ -53,6 +55,7 @@ public static class DiscountTypeEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdateDiscountType.Request>>()
         .WithName("UpdateDiscountType")
         .WithSummary("Update an existing discount type");
 

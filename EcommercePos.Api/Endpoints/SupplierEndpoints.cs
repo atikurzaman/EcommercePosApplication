@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Supplier;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 using Microsoft.EntityFrameworkCore;
 using EcommercePos.Persistence.Data;
 
@@ -33,6 +34,7 @@ public static class SupplierEndpoints
             CreateSupplier.Handler handler,
             CancellationToken ct) =>
             (await handler.Handle(command, ct)).ToCreatedResult("/api/suppliers"))
+            .AddEndpointFilter<ValidationFilter<CreateSupplier.Command>>()
             .WithName("CreateSupplier")
             .WithSummary("Create a new supplier");
 
@@ -47,6 +49,7 @@ public static class SupplierEndpoints
                 body.City, body.State, body.PostalCode, body.Country,
                 body.SupplierType, body.TaxRegistrationNo, body.PaymentTerms,
                 body.LeadTimeDays, body.Notes, body.IsActive), ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateSupplierBody>>()
             .WithName("UpdateSupplier")
             .WithSummary("Update supplier");
 

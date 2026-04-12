@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Catalog;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -50,6 +51,7 @@ public static class CollectionEndpoints
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/collections");
         })
+        .AddEndpointFilter<ValidationFilter<CreateCollection.Request>>()
         .WithName("CreateCollection")
         .WithSummary("Create a new collection");
 
@@ -63,6 +65,7 @@ public static class CollectionEndpoints
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
+        .AddEndpointFilter<ValidationFilter<UpdateCollection.Command>>()
         .WithName("UpdateCollection")
         .WithSummary("Update a collection");
 
