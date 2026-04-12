@@ -7,7 +7,14 @@ namespace EcommercePos.Application.Features.Inventory;
 
 public static class GetStockItems
 {
-    public sealed record Request(int PageIndex = 0, int PageSize = 10, string? Search = null, Guid? WarehouseId = null, Guid? ProductId = null, bool? LowStock = null);
+    public sealed record Request(
+        int PageIndex = 0,
+        int PageSize = 10,
+        string? Search = null,
+        Guid? WarehouseId = null,
+        Guid? ProductId = null,
+        Guid? CategoryId = null,
+        bool? LowStock = null);
 
     public sealed record Response
     {
@@ -25,7 +32,14 @@ public static class GetStockItems
         public bool IsLowStock { get; init; }
     }
 
-    public sealed record Query(int PageIndex, int PageSize, string? Search, Guid? WarehouseId, Guid? ProductId, bool? LowStock);
+    public sealed record Query(
+        int PageIndex,
+        int PageSize,
+        string? Search,
+        Guid? WarehouseId,
+        Guid? ProductId,
+        Guid? CategoryId,
+        bool? LowStock);
 
     public sealed class Handler
     {
@@ -57,6 +71,11 @@ public static class GetStockItems
             if (query.ProductId.HasValue)
             {
                 dbQuery = dbQuery.Where(s => s.ProductId == query.ProductId.Value);
+            }
+
+            if (query.CategoryId.HasValue)
+            {
+                dbQuery = dbQuery.Where(s => s.Product.CategoryId == query.CategoryId.Value);
             }
 
             if (query.LowStock == true)

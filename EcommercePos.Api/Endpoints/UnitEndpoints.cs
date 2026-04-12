@@ -38,13 +38,11 @@ public static class UnitEndpoints
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateUnitBody body,
+            [FromBody] UpdateUnit.Command body,
             UpdateUnit.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new UpdateUnit.Command(
-                id, body.ShortName, body.Name, body.Description,
-                body.BaseUnitId, body.ConversionFactor, body.IsActive), ct)).ToHttpResult())
-            .AddEndpointFilter<ValidationFilter<UpdateUnitBody>>()
+            (await handler.Handle(body with { Id = id }, ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateUnit.Command>>()
             .WithName("UpdateUnit")
             .WithSummary("Update an existing unit");
 
@@ -57,7 +55,3 @@ public static class UnitEndpoints
             .WithSummary("Soft delete a unit");
     }
 }
-
-public record UpdateUnitBody(
-    string ShortName, string Name, string? Description,
-    Guid? BaseUnitId, decimal? ConversionFactor, bool IsActive);

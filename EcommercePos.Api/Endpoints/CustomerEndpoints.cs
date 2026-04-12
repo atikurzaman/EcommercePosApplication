@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Customer;
 using EcommercePos.Api.Extensions;
 using EcommercePos.Api.Filters;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,14 +38,11 @@ public static class CustomerEndpoints
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateCustomerBody body,
+            [FromBody] UpdateCustomer.Command body,
             UpdateCustomer.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new UpdateCustomer.Command(
-                id, body.Phone, body.AlternatePhone, body.Email, body.DateOfBirth,
-                body.Gender, body.CompanyName, body.TaxNumber, body.AddressLine1,
-                body.City, body.Country, body.CreditLimit, body.IsActive), ct)).ToHttpResult())
-            .AddEndpointFilter<ValidationFilter<UpdateCustomerBody>>()
+            (await handler.Handle(body with { Id = id }, ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateCustomer.Command>>()
             .WithName("UpdateCustomer")
             .WithSummary("Update customer");
 
@@ -59,57 +54,27 @@ public static class CustomerEndpoints
             .WithName("DeleteCustomer")
             .WithSummary("Soft delete customer");
 
-        group.MapPost("/{id:guid}/toggle-active", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var customer = await context.Customers.FindAsync(new object[] { id }, ct);
-            if (customer == null || customer.IsDeleted)
-                return Results.NotFound(new { error = "Customer not found" });
+        group.MapPost("/{id:guid}/toggle-active", async (
+            Guid id,
+            ToggleCustomerActive.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new ToggleCustomerActive.Command(id), ct)).ToHttpResult())
+            .WithName("ToggleCustomerActive")
+            .WithSummary("Toggle customer active status");
 
-            customer.IsActive = !customer.IsActive;
-            customer.UpdatedAt = DateTime.UtcNow;
-            await context.SaveChangesAsync(ct);
+        group.MapGet("/stats", async (
+            GetCustomerStats.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new GetCustomerStats.Query(), ct)).ToHttpResult())
+            .WithName("GetCustomerStats")
+            .WithSummary("Get customer statistics");
 
-            return Results.Ok(new { data = new { customer.Id, customer.IsActive } });
-        })
-        .WithName("ToggleCustomerActive")
-        .WithSummary("Toggle customer active status");
-
-        group.MapGet("/stats", async (ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var today = DateTime.UtcNow.Date;
-            var stats = new
-            {
-                TotalCustomers = await context.Customers.CountAsync(c => !c.IsDeleted, ct),
-                ActiveCustomers = await context.Customers.CountAsync(c => !c.IsDeleted && c.IsActive, ct),
-                NewCustomersToday = await context.Customers.CountAsync(c => !c.IsDeleted && c.RegistrationDate >= today, ct),
-                TotalLoyaltyPoints = await context.Customers.Where(c => !c.IsDeleted).SumAsync(c => c.LoyaltyPoints, ct)
-            };
-
-            return Results.Ok(new { data = stats });
-        })
-        .WithName("GetCustomerStats")
-        .WithSummary("Get customer statistics");
-
-        group.MapGet("/addresses/{customerId:guid}", async (Guid customerId, ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var addresses = await context.CustomerAddresses
-                .Where(a => a.CustomerId == customerId && !a.IsDeleted)
-                .OrderByDescending(a => a.IsDefault).ThenBy(a => a.CreatedAt)
-                .Select(a => new
-                {
-                    a.Id, a.AddressType, a.Label, a.FullName, a.PhoneNumber,
-                    a.AddressLine1, a.AddressLine2, a.City, a.State, a.PostalCode, a.IsDefault
-                })
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = addresses });
-        })
-        .WithName("GetCustomerAddresses")
-        .WithSummary("Get customer addresses");
+        group.MapGet("/addresses/{customerId:guid}", async (
+            Guid customerId,
+            GetCustomerAddresses.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new GetCustomerAddresses.Query(customerId), ct)).ToHttpResult())
+            .WithName("GetCustomerAddresses")
+            .WithSummary("Get customer addresses");
     }
 }
-
-public record UpdateCustomerBody(
-    string? Phone, string? AlternatePhone, string? Email,
-    DateTime? DateOfBirth, string? Gender, string? CompanyName, string? TaxNumber,
-    string? AddressLine1, string? City, string? Country, decimal? CreditLimit, bool IsActive);

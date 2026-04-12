@@ -64,11 +64,11 @@ public static class PosTransactionEndpoints
 
         group.MapPost("/{id:guid}/resume", async (
             Guid id,
-            [FromBody] ResumeHeldTransactionRequest request,
+            [FromBody] ResumeHeldTransaction.Command request,
             [FromServices] ResumeHeldTransaction.Handler handler,
             CancellationToken ct) =>
         {
-            var command = new ResumeHeldTransaction.Command(id, request.Payments);
+            var command = request with { TransactionId = id };
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
@@ -77,11 +77,11 @@ public static class PosTransactionEndpoints
 
         group.MapPost("/{id:guid}/void", async (
             Guid id,
-            [FromBody] VoidPosTransactionRequest request,
+            [FromBody] VoidPosTransaction.Command request,
             [FromServices] VoidPosTransaction.Handler handler,
             CancellationToken ct) =>
         {
-            var command = new VoidPosTransaction.Command(id, request.VoidedBy, request.VoidReason);
+            var command = request with { TransactionId = id };
             var result = await handler.Handle(command, ct);
             return result.ToNoContentResult();
         })
@@ -89,6 +89,3 @@ public static class PosTransactionEndpoints
         .WithSummary("Void a POS transaction");
     }
 }
-
-public record ResumeHeldTransactionRequest(List<PaymentTenderInput> Payments);
-public record VoidPosTransactionRequest(Guid VoidedBy, string VoidReason);

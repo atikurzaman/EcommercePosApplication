@@ -69,11 +69,11 @@ public static class RoleEndpoints
 
         group.MapPut("/{id:guid}/permissions", async (
             Guid id,
-            [FromBody] AssignPermissionsRequest request,
+            [FromBody] List<AssignPermissionsToRole.PermissionAssignment> permissions,
             [FromServices] AssignPermissionsToRole.Handler handler,
             CancellationToken ct) =>
         {
-            var command = new AssignPermissionsToRole.Command(id, request.Permissions);
+            var command = new AssignPermissionsToRole.Command(id, permissions);
             var result = await handler.Handle(command, ct);
             return result.ToNoContentResult();
         })
@@ -82,11 +82,11 @@ public static class RoleEndpoints
 
         group.MapPut("/{id:guid}/menus", async (
             Guid id,
-            [FromBody] AssignMenusRequest request,
+            [FromBody] List<AssignMenusToRole.MenuAssignment> menus,
             [FromServices] AssignMenusToRole.Handler handler,
             CancellationToken ct) =>
         {
-            var command = new AssignMenusToRole.Command(id, request.Menus);
+            var command = new AssignMenusToRole.Command(id, menus);
             var result = await handler.Handle(command, ct);
             return result.ToNoContentResult();
         })
@@ -94,6 +94,3 @@ public static class RoleEndpoints
         .WithSummary("Assign menus to a role");
     }
 }
-
-record AssignPermissionsRequest(List<AssignPermissionsToRole.PermissionAssignment> Permissions);
-record AssignMenusRequest(List<AssignMenusToRole.MenuAssignment> Menus);

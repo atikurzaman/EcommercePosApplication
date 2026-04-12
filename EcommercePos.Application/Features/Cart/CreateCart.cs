@@ -1,48 +1,28 @@
-using Microsoft.EntityFrameworkCore;
-using Mapster;
+using EcommercePos.Application.Services;
 using EcommercePos.Persistence.Data;
 using EcommercePos.Shared.Common;
+using MediatR;
 
 namespace EcommercePos.Application.Features.Cart;
 
-public static class CreateCart
-{
-    public sealed record Request(Guid? CustomerId, string? SessionId);
+public record CreateCartCommand(Guid? CustomerId, Guid? UserId, string? SessionId) 
+    : IRequest<Result<Carts>>;
 
-    public sealed record Response
+public class CreateCartHandler : IRequestHandler<CreateCartCommand, Result<Carts>>
+{
+    private readonly ICartService _cartService;
+
+    public CreateCartHandler(ICartService cartService)
     {
-        public Guid Id { get; init; }
+        _cartService = cartService;
     }
 
-    public sealed record Command(Request Request);
-
-    public sealed class Handler
+    public async Task<Result<Carts>> Handle(CreateCartCommand request, CancellationToken ct)
     {
-        private readonly ApplicationDbContext _context;
-
-        public Handler(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<Result<Response>> Handle(Command command, CancellationToken ct)
-        {
-            var cart = new Carts
-            {
-                Id = Guid.NewGuid(),
-                CustomerId = command.Request.CustomerId,
-                SessionId = command.Request.SessionId ?? Guid.NewGuid().ToString(),
-                SubTotal = 0,
-                DiscountAmount = 0,
-                Total = 0,
-                CreatedAt = DateTime.Now,
-                IsDeleted = false
-            };
-
-            _context.Carts.Add(cart);
-            await _context.SaveChangesAsync(ct);
-
-            return Result<Response>.Success(new Response { Id = cart.Id });
-        }
+        return await _cartService.CreateCartAsync(
+            request.CustomerId,
+            request.UserId,
+            request.SessionId ?? Guid.NewGuid().ToString(),
+            ct);
     }
 }

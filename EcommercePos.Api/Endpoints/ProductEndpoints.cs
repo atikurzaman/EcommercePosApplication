@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using EcommercePos.Application.Features.Product;
 using EcommercePos.Application.Features.Catalog;
 using EcommercePos.Api.Extensions;
 using EcommercePos.Api.Filters;
-using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -43,15 +41,11 @@ public static class ProductEndpoints
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateProductBody body,
+            [FromBody] UpdateProduct.Command body,
             UpdateProduct.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new UpdateProduct.Command(
-                id, body.ProductCode, body.Name, body.ShortDescription, body.Description,
-                body.ProductType, body.CostPrice, body.SalePrice, body.OriginalPrice,
-                body.IsTaxInclusive, body.IsFeatured, body.IsActive,
-                body.CategoryId, body.BrandId, body.UnitId, body.Sku, body.Barcode), ct)).ToHttpResult())
-            .AddEndpointFilter<ValidationFilter<UpdateProductBody>>()
+            (await handler.Handle(body with { Id = id }, ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateProduct.Command>>()
             .WithName("UpdateProduct")
             .WithSummary("Update product");
 
@@ -65,41 +59,25 @@ public static class ProductEndpoints
 
         // ── Simple utility endpoints (kept as direct DB) ───────────────────
 
-        group.MapPost("/{id:guid}/toggle-featured", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var product = await context.Products.FindAsync(new object[] { id }, ct);
-            if (product == null || product.IsDeleted)
-                return Results.NotFound(new { error = "Product not found" });
-
-            product.IsFeatured = !product.IsFeatured;
-            product.UpdatedAt = DateTime.UtcNow;
-            await context.SaveChangesAsync(ct);
-            return Results.Ok(new { data = new { product.Id, product.IsFeatured } });
-        })
-        .WithName("ToggleProductFeatured")
-        .WithSummary("Toggle product featured status");
+        group.MapPost("/{id:guid}/toggle-featured", async (
+            Guid id,
+            ToggleProductFeatured.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new ToggleProductFeatured.Command(id), ct)).ToHttpResult())
+            .WithName("ToggleProductFeatured")
+            .WithSummary("Toggle product featured status");
 
         group.MapGet("/types", (CancellationToken ct) =>
             Results.Ok(new { data = new[] { "STANDARD", "VARIANT", "BUNDLE", "DIGITAL", "SERVICE" } }))
             .WithName("GetProductTypes")
             .WithSummary("Get product types");
 
-        group.MapGet("/stats", async (ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var stats = new
-            {
-                TotalProducts = await context.Products.Where(p => !p.IsDeleted).CountAsync(ct),
-                ActiveProducts = await context.Products.Where(p => !p.IsDeleted && p.IsActive).CountAsync(ct),
-                FeaturedProducts = await context.Products.Where(p => !p.IsDeleted && p.IsFeatured).CountAsync(ct),
-                LowStockProducts = await context.Products
-                    .Include(p => p.StockItems)
-                    .Where(p => !p.IsDeleted && p.StockItems.Any(s => s.QuantityOnHand <= p.ReorderLevel))
-                    .CountAsync(ct)
-            };
-            return Results.Ok(new { data = stats });
-        })
-        .WithName("GetProductStats")
-        .WithSummary("Get product statistics");
+        group.MapGet("/stats", async (
+            GetProductStats.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new GetProductStats.Query(), ct)).ToHttpResult())
+            .WithName("GetProductStats")
+            .WithSummary("Get product statistics");
 
         // ── Variants ───────────────────────────────────────────────────────
 
@@ -206,10 +184,10 @@ public static class ProductEndpoints
 
         group.MapPut("/{id:guid}/tags", async (
             Guid id,
-            [FromBody] ManageProductTagsRequest body,
+            [FromBody] List<Guid> tagIds,
             ManageProductTags.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new ManageProductTags.Command(id, body.TagIds), ct)).ToNoContentResult())
+            (await handler.Handle(new ManageProductTags.Command(id, tagIds), ct)).ToNoContentResult())
             .WithName("ManageProductTags")
             .WithSummary("Manage product tags");
 
@@ -225,10 +203,10 @@ public static class ProductEndpoints
 
         group.MapPut("/{id:guid}/specifications", async (
             Guid id,
-            [FromBody] ManageProductSpecsRequest body,
+            [FromBody] List<ManageProductSpecValues.SpecValueInput> values,
             ManageProductSpecValues.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new ManageProductSpecValues.Command(id, body.Values), ct)).ToNoContentResult())
+            (await handler.Handle(new ManageProductSpecValues.Command(id, values), ct)).ToNoContentResult())
             .WithName("ManageProductSpecValues")
             .WithSummary("Manage product specification values");
 
@@ -298,10 +276,10 @@ public static class ProductEndpoints
 
         group.MapPut("/{id:guid}/attributes", async (
             Guid id,
-            [FromBody] ManageProductAttributesRequest body,
+            [FromBody] List<ManageProductAttributeLinks.AttributeLinkInput> links,
             ManageProductAttributeLinks.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new ManageProductAttributeLinks.Command(id, body.Links), ct)).ToHttpResult())
+            (await handler.Handle(new ManageProductAttributeLinks.Command(id, links), ct)).ToHttpResult())
             .WithName("ManageProductAttributeLinks")
             .WithSummary("Manage product attribute links");
 
@@ -317,10 +295,10 @@ public static class ProductEndpoints
 
         group.MapPut("/{id:guid}/bundle/components", async (
             Guid id,
-            [FromBody] ManageBundleComponentsRequest body,
+            [FromBody] List<ManageBundleComponents.ComponentInput> components,
             ManageBundleComponents.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new ManageBundleComponents.Command(id, body.Components), ct)).ToHttpResult())
+            (await handler.Handle(new ManageBundleComponents.Command(id, components), ct)).ToHttpResult())
             .WithName("ManageBundleComponents")
             .WithSummary("Manage bundle components");
 
@@ -364,14 +342,3 @@ public static class ProductEndpoints
     }
 }
 
-// ── Body records ───────────────────────────────────────────────────────────
-public record UpdateProductBody(
-    string? ProductCode, string Name, string? ShortDescription, string? Description,
-    string? ProductType, decimal CostPrice, decimal SalePrice, decimal? OriginalPrice,
-    bool IsTaxInclusive, bool IsFeatured, bool IsActive,
-    Guid CategoryId, Guid? BrandId, Guid? UnitId, string? Sku, string? Barcode);
-
-record ManageProductTagsRequest(List<Guid> TagIds);
-record ManageProductSpecsRequest(List<ManageProductSpecValues.SpecValueInput> Values);
-record ManageProductAttributesRequest(List<ManageProductAttributeLinks.AttributeLinkInput> Links);
-record ManageBundleComponentsRequest(List<ManageBundleComponents.ComponentInput> Components);

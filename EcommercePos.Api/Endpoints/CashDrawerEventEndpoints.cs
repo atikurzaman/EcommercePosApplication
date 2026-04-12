@@ -17,7 +17,10 @@ public static class CashDrawerEventEndpoints
             CancellationToken ct) =>
         {
             if (cashShiftId == null || cashShiftId == Guid.Empty)
-                return Results.BadRequest(ApiResponse<object>.Fail("cashShiftId is required"));
+                return Result<List<GetCashDrawerEvents.Response>>
+                    .Failure(Error.Validation("cashShiftId is required"))
+                    .ToHttpResult();
+
             var result = await handler.Handle(new GetCashDrawerEvents.Request(cashShiftId.Value), ct);
             return result.ToHttpResult();
         })

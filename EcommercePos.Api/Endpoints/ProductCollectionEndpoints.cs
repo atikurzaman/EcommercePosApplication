@@ -45,13 +45,11 @@ public static class ProductCollectionEndpoints
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateCollectionBody body,
+            [FromBody] UpdateCollection.Command body,
             [FromServices] UpdateCollection.Handler handler,
             CancellationToken ct) =>
         {
-            var command = new UpdateCollection.Command(
-                id, body.Name, body.Slug, body.Description, body.ImageUrl,
-                body.DisplayOrder, body.IsActive, body.ShowInHomePage);
+            var command = body with { Id = id };
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
@@ -71,11 +69,11 @@ public static class ProductCollectionEndpoints
 
         group.MapPut("/{id:guid}/items", async (
             Guid id,
-            [FromBody] ManageCollectionItemsBody body,
+            [FromBody] List<ManageCollectionItems.CollectionItemInput> items,
             [FromServices] ManageCollectionItems.Handler handler,
             CancellationToken ct) =>
         {
-            var command = new ManageCollectionItems.Command(id, body.Items);
+            var command = new ManageCollectionItems.Command(id, items);
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
@@ -83,10 +81,3 @@ public static class ProductCollectionEndpoints
         .WithSummary("Manage collection items");
     }
 }
-
-record UpdateCollectionBody(
-    string Name, string? Slug, string? Description, string? ImageUrl,
-    int DisplayOrder, bool IsActive, bool ShowInHomePage);
-
-record ManageCollectionItemsBody(
-    List<ManageCollectionItems.CollectionItemInput> Items);

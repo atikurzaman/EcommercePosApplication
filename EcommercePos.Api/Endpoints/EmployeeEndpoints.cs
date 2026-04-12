@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Employee;
 using EcommercePos.Api.Extensions;
 using EcommercePos.Api.Filters;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -40,17 +38,11 @@ public static class EmployeeEndpoints
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateEmployeeBody body,
+            [FromBody] UpdateEmployee.Command body,
             UpdateEmployee.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new UpdateEmployee.Command(
-                id, body.FirstName, body.Phone, body.LastName, body.Gender,
-                body.DateOfBirth, body.Email, body.AddressLine1, body.City,
-                body.JoiningDate, body.TerminationDate, body.Designation,
-                body.Department, body.EmployeeType, body.Salary,
-                body.BankName, body.BankAccountNumber, body.NationalId,
-                body.EmergencyContactName, body.EmergencyContactPhone, body.IsActive), ct)).ToHttpResult())
-            .AddEndpointFilter<ValidationFilter<UpdateEmployeeBody>>()
+            (await handler.Handle(body with { Id = id }, ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateEmployee.Command>>()
             .WithName("UpdateEmployee")
             .WithSummary("Update employee");
 
@@ -62,54 +54,26 @@ public static class EmployeeEndpoints
             .WithName("DeleteEmployee")
             .WithSummary("Soft delete employee");
 
-        group.MapPost("/{id:guid}/toggle-active", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var employee = await context.Employees.FindAsync(new object[] { id }, ct);
-            if (employee == null || employee.IsDeleted)
-                return Results.NotFound(new { error = "Employee not found" });
+        group.MapPost("/{id:guid}/toggle-active", async (
+            Guid id,
+            ToggleEmployeeActive.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new ToggleEmployeeActive.Command(id), ct)).ToHttpResult())
+            .WithName("ToggleEmployeeActive")
+            .WithSummary("Toggle employee active status");
 
-            employee.IsActive = !employee.IsActive;
-            employee.UpdatedAt = DateTime.UtcNow;
-            await context.SaveChangesAsync(ct);
+        group.MapGet("/departments", async (
+            GetDepartments.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new GetDepartments.Query(), ct)).ToHttpResult())
+            .WithName("GetDepartments")
+            .WithSummary("Get distinct employee departments");
 
-            return Results.Ok(new { data = new { employee.Id, employee.IsActive } });
-        })
-        .WithName("ToggleEmployeeActive")
-        .WithSummary("Toggle employee active status");
-
-        group.MapGet("/departments", async (ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var departments = await context.Employees
-                .Where(e => !e.IsDeleted && e.Department != null)
-                .Select(e => e.Department)
-                .Distinct()
-                .OrderBy(d => d)
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = departments });
-        })
-        .WithName("GetDepartments")
-        .WithSummary("Get distinct employee departments");
-
-        group.MapGet("/stats", async (ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var stats = new
-            {
-                TotalEmployees = await context.Employees.CountAsync(e => !e.IsDeleted, ct),
-                ActiveEmployees = await context.Employees.CountAsync(e => !e.IsDeleted && e.IsActive, ct)
-            };
-
-            return Results.Ok(new { data = stats });
-        })
-        .WithName("GetEmployeeStats")
-        .WithSummary("Get employee statistics");
+        group.MapGet("/stats", async (
+            GetEmployeeStats.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new GetEmployeeStats.Query(), ct)).ToHttpResult())
+            .WithName("GetEmployeeStats")
+            .WithSummary("Get employee statistics");
     }
 }
-
-public record UpdateEmployeeBody(
-    string? FirstName, string? Phone, string? LastName, string? Gender,
-    DateTime? DateOfBirth, string? Email, string? AddressLine1, string? City,
-    DateTime? JoiningDate, DateTime? TerminationDate, string? Designation,
-    string? Department, string? EmployeeType, decimal? Salary, string? BankName,
-    string? BankAccountNumber, string? NationalId, string? EmergencyContactName,
-    string? EmergencyContactPhone, bool? IsActive);

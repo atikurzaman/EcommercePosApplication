@@ -87,12 +87,11 @@ public static class AttributeTypeEndpoints
 
         group.MapPost("/{id:guid}/options", async (
             Guid id,
-            [FromBody] CreateAttributeOptionBody body,
+            [FromBody] CreateAttributeOption.Request body,
             [FromServices] CreateAttributeOption.Handler handler,
             CancellationToken ct) =>
         {
-            var request = new CreateAttributeOption.Request(
-                id, body.Value, body.DisplayValue, body.ColorId, body.SortOrder, body.IsActive);
+            var request = body with { AttributeTypeId = id };
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/attribute-types/{id}/options");
         })
@@ -101,11 +100,11 @@ public static class AttributeTypeEndpoints
 
         group.MapPost("/{id:guid}/options/bulk", async (
             Guid id,
-            [FromBody] BulkCreateAttributeOptionsBody body,
+            [FromBody] List<BulkCreateAttributeOptions.OptionInput> options,
             [FromServices] BulkCreateAttributeOptions.Handler handler,
             CancellationToken ct) =>
         {
-            var request = new BulkCreateAttributeOptions.Request(id, body.Options);
+            var request = new BulkCreateAttributeOptions.Request(id, options);
             var result = await handler.Handle(request, ct);
             return result.ToCreatedResult($"/api/attribute-types/{id}/options");
         })
@@ -140,10 +139,3 @@ public static class AttributeTypeEndpoints
         .WithSummary("Soft delete an attribute option");
     }
 }
-
-// ── Request body DTOs (avoid conflict with handler Request types) ──────────
-record CreateAttributeOptionBody(
-    string Value, string? DisplayValue, Guid? ColorId, int SortOrder, bool IsActive);
-
-record BulkCreateAttributeOptionsBody(
-    List<BulkCreateAttributeOptions.OptionInput> Options);

@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Category;
 using EcommercePos.Api.Extensions;
 using EcommercePos.Api.Filters;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -21,32 +19,19 @@ public static class CategoryEndpoints
             .WithName("GetCategories")
             .WithSummary("Get paginated categories");
 
-        group.MapGet("/tree", async (ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var categories = await context.Categories
-                .Where(c => !c.IsDeleted)
-                .OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name)
-                .Select(c => new CategoryTreeItem(c.Id, c.Name, c.Slug, c.ParentCategoryId,
-                    c.DisplayOrder, c.IsActive, c.ImageUrl, null))
-                .ToListAsync(ct);
+        group.MapGet("/tree", async (
+            GetCategoryTree.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new GetCategoryTree.Query(), ct)).ToHttpResult())
+            .WithName("GetCategoryTree")
+            .WithSummary("Get hierarchical category tree");
 
-            return Results.Ok(new { data = BuildCategoryTree(categories) });
-        })
-        .WithName("GetCategoryTree")
-        .WithSummary("Get hierarchical category tree");
-
-        group.MapGet("/flat", async (ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var categories = await context.Categories
-                .Where(c => !c.IsDeleted && c.IsActive)
-                .OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name)
-                .Select(c => new { c.Id, c.Name, c.ParentCategoryId, c.DisplayOrder })
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = categories });
-        })
-        .WithName("GetCategoryFlat")
-        .WithSummary("Get flat category list for dropdowns");
+        group.MapGet("/flat", async (
+            GetCategoryFlat.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new GetCategoryFlat.Query(), ct)).ToHttpResult())
+            .WithName("GetCategoryFlat")
+            .WithSummary("Get flat category list for dropdowns");
 
         group.MapGet("/{id:guid}", async (
             Guid id,
@@ -67,14 +52,11 @@ public static class CategoryEndpoints
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateCategoryBody body,
+            [FromBody] UpdateCategory.Command body,
             UpdateCategory.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new UpdateCategory.Command(
-                id, body.Name, body.Slug, body.Description, body.ImageUrl,
-                body.ParentCategoryId, body.DisplayOrder, body.IsFeatured,
-                body.IsActive, body.MetaTitle, body.MetaDescription), ct)).ToHttpResult())
-            .AddEndpointFilter<ValidationFilter<UpdateCategoryBody>>()
+            (await handler.Handle(body with { Id = id }, ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateCategory.Command>>()
             .WithName("UpdateCategory")
             .WithSummary("Update an existing category");
 
@@ -86,41 +68,12 @@ public static class CategoryEndpoints
             .WithName("DeleteCategory")
             .WithSummary("Soft delete a category");
 
-        group.MapPatch("/{id:guid}/toggle", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var category = await context.Categories.FindAsync(new object[] { id }, ct);
-            if (category == null || category.IsDeleted)
-                return Results.NotFound(new { error = "Category not found" });
-
-            category.IsActive = !category.IsActive;
-            category.UpdatedAt = DateTime.UtcNow;
-            await context.SaveChangesAsync(ct);
-
-            return Results.Ok(new { data = new { category.Id, category.IsActive } });
-        })
-        .WithName("ToggleCategory")
-        .WithSummary("Toggle category active status");
-    }
-
-    private static List<CategoryTreeItem> BuildCategoryTree(List<CategoryTreeItem> flat)
-    {
-        var roots = flat.Where(c => c.ParentCategoryId == null ||
-            !flat.Any(p => p.Id == c.ParentCategoryId)).ToList();
-
-        static List<CategoryTreeItem> GetChildren(Guid parentId, List<CategoryTreeItem> all) =>
-            all.Where(c => c.ParentCategoryId == parentId)
-               .Select(c => c with { Children = GetChildren(c.Id, all) })
-               .ToList();
-
-        return roots.Select(r => r with { Children = GetChildren(r.Id, flat) }).ToList();
+        group.MapPatch("/{id:guid}/toggle", async (
+            Guid id,
+            ToggleCategoryActive.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new ToggleCategoryActive.Command(id), ct)).ToHttpResult())
+            .WithName("ToggleCategory")
+            .WithSummary("Toggle category active status");
     }
 }
-
-public record CategoryTreeItem(
-    Guid Id, string Name, string? Slug, Guid? ParentCategoryId,
-    int DisplayOrder, bool IsActive, string? ImageUrl, List<CategoryTreeItem>? Children);
-
-public record UpdateCategoryBody(
-    string Name, string? Slug, string? Description, string? ImageUrl,
-    Guid? ParentCategoryId, int DisplayOrder, bool IsFeatured, bool IsActive,
-    string? MetaTitle, string? MetaDescription);

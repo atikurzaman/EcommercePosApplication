@@ -60,7 +60,7 @@ public static class UserEndpoints
 
         group.MapPut("/{id:guid}/roles", async (
             Guid id,
-            [FromBody] AssignRolesToUserRequest request,
+            [FromBody] AssignRolesToUser.Request request,
             [FromServices] AssignRolesToUser.Handler handler,
             CancellationToken ct) =>
         {
@@ -94,5 +94,3 @@ public static class UserEndpoints
         .WithSummary("Get user permission codes");
     }
 }
-
-record AssignRolesToUserRequest(List<Guid> RoleIds);

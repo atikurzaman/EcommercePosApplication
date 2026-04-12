@@ -1,66 +1,23 @@
-using Microsoft.EntityFrameworkCore;
-using Mapster;
+using EcommercePos.Application.Services;
 using EcommercePos.Persistence.Data;
 using EcommercePos.Shared.Common;
+using MediatR;
 
 namespace EcommercePos.Application.Features.Cart;
 
-public static class GetCarts
-{
-    public sealed record Request(int PageIndex = 0, int PageSize = 10, Guid? CustomerId = null);
+public record GetCartsQuery : IRequest<Result<List<Carts>>>;
 
-    public sealed record Response
+public class GetCartsHandler : IRequestHandler<GetCartsQuery, Result<List<Carts>>>
+{
+    private readonly ICartService _cartService;
+
+    public GetCartsHandler(ICartService cartService)
     {
-        public Guid Id { get; init; }
-        public Guid? CustomerId { get; init; }
-        public decimal SubTotal { get; init; }
-        public decimal DiscountAmount { get; init; }
-        public decimal Total { get; init; }
-        public int ItemCount { get; init; }
-        public DateTime CreatedAt { get; init; }
+        _cartService = cartService;
     }
 
-    public sealed record Query(int PageIndex, int PageSize, Guid? CustomerId);
-
-    public sealed class Handler
+    public async Task<Result<List<Carts>>> Handle(GetCartsQuery request, CancellationToken ct)
     {
-        private readonly ApplicationDbContext _context;
-
-        public Handler(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<Result<PagedResult<Response>>> Handle(Query query, CancellationToken ct)
-        {
-            var dbQuery = _context.Carts
-                .Where(c => !c.IsDeleted)
-                .AsNoTracking();
-
-            if (query.CustomerId.HasValue)
-            {
-                dbQuery = dbQuery.Where(c => c.CustomerId == query.CustomerId.Value);
-            }
-
-            var totalCount = await dbQuery.CountAsync(ct);
-            var items = await dbQuery
-                .Include(c => c.CartItems)
-                .OrderByDescending(c => c.CreatedAt)
-                .Skip(query.PageIndex * query.PageSize)
-                .Take(query.PageSize)
-                .Select(c => new Response
-                {
-                    Id = c.Id,
-                    CustomerId = c.CustomerId,
-                    SubTotal = c.SubTotal,
-                    DiscountAmount = c.DiscountAmount,
-                    Total = c.Total,
-                    ItemCount = c.CartItems.Count(i => !i.IsDeleted),
-                    CreatedAt = c.CreatedAt
-                })
-                .ToListAsync(ct);
-
-            return Result<PagedResult<Response>>.Success(new PagedResult<Response>(items, totalCount, query.PageIndex, query.PageSize));
-        }
+        return await _cartService.GetCartsAsync(ct);
     }
 }

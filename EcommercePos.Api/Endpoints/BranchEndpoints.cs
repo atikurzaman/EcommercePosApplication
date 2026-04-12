@@ -36,14 +36,10 @@ public static class BranchEndpoints
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateBranchBody body,
+            [FromBody] UpdateBranch.Command body,
             UpdateBranch.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new UpdateBranch.Command(
-                id, body.WarehouseCode, body.Name, body.Description,
-                body.AddressLine1, body.AddressLine2, body.City,
-                body.Area, body.State, body.PostalCode,
-                body.Phone, body.Email, body.IsActive), ct)).ToHttpResult())
+            (await handler.Handle(body with { Id = id }, ct)).ToHttpResult())
             .WithName("UpdateBranch")
             .WithSummary("Update an existing branch");
 
@@ -56,9 +52,3 @@ public static class BranchEndpoints
             .WithSummary("Soft delete a branch");
     }
 }
-
-public record UpdateBranchBody(
-    string WarehouseCode, string Name, string? Description,
-    string? AddressLine1, string? AddressLine2, string? City,
-    string? Area, string? State, string? PostalCode,
-    string? Phone, string? Email, bool IsActive);

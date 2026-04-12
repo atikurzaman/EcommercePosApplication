@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Application.Features.Inventory;
+using EcommercePos.Api.Extensions;
+using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -11,130 +12,59 @@ public static class StockItemEndpoints
         var group = app.MapGroup("/api/stock-items").WithTags("StockItems");
 
         group.MapGet("/", async (
-            [AsParameters] GetStockItemsRequest request,
-            ApplicationDbContext context,
+            [FromQuery] int pageIndex,
+            [FromQuery] int pageSize,
+            [FromQuery] string? search,
+            [FromQuery] Guid? warehouseId,
+            [FromQuery] Guid? categoryId,
+            GetStockItems.Handler handler,
             CancellationToken ct) =>
         {
-            var query = context.StockItems
-                .Include(s => s.Product)
-                .Include(s => s.Warehouse)
-                .Where(s => !s.IsDeleted)
-                .AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                query = query.Where(s => s.Product.Name.Contains(request.Search));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.WarehouseId))
-            {
-                query = query.Where(s => s.WarehouseId == Guid.Parse(request.WarehouseId));
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.CategoryId))
-            {
-                query = query.Where(s => s.Product.CategoryId == Guid.Parse(request.CategoryId));
-            }
-
-            var totalCount = await query.CountAsync(ct);
-            var items = await query
-                .OrderBy(s => s.Product.Name)
-                .Skip(request.PageIndex * request.PageSize)
-                .Take(request.PageSize)
-                .Select(s => new StockItemResponse(
-                    s.Id, s.ProductId, s.Product.Name, s.VariantId,
-                    s.WarehouseId, s.Warehouse.Name,
-                    s.QuantityOnHand, s.ReservedQuantity, s.AverageCostPrice,
-                    s.ReorderLevel ?? 0, s.LastUpdatedAt))
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = items, totalCount });
+            var query = new GetStockItems.Query(pageIndex, pageSize, search, warehouseId, null, categoryId, null);
+            var result = await handler.Handle(query, ct);
+            return result.ToPagedResult();
         })
         .WithName("GetStockItems")
         .WithSummary("Get paginated stock items");
 
-        group.MapGet("/{id:guid}", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            GetStockItemById.Handler itemHandler,
+            GetStockMovements.Handler movementHandler,
+            CancellationToken ct) =>
         {
-            var item = await context.StockItems
-                .Include(s => s.Product)
-                .Include(s => s.Warehouse)
-                .Include(s => s.StockMovements.OrderByDescending(m => m.OccurredAt).Take(20))
-                .ThenInclude(m => m.MovementTypeCodeNavigation)
-                .Where(s => s.Id == id && !s.IsDeleted)
-                .FirstOrDefaultAsync(ct);
+            var itemResult = await itemHandler.Handle(new GetStockItemById.Query(id), ct);
+            if (!itemResult.IsSuccess)
+                return itemResult.ToHttpResult();
 
-            if (item == null)
-                return Results.NotFound(new { error = "Stock item not found" });
+            var movementResult = await movementHandler.Handle(new GetStockMovements.Query(id), ct);
+            if (!movementResult.IsSuccess)
+                return movementResult.ToHttpResult();
 
-            var response = new StockItemDetailResponse(
-                item.Id, item.ProductId, item.Product.Name, item.VariantId,
-                item.WarehouseId, item.Warehouse.Name,
-                item.QuantityOnHand, item.ReservedQuantity, item.AverageCostPrice,
-                item.ReorderLevel ?? 0, item.LastUpdatedAt,
-                item.StockMovements.Select(m => new StockMovementHistoryItem(
-                    m.Id, m.MovementTypeCodeNavigation.TypeCode, m.QuantityIn, m.QuantityOut,
-                    m.BalanceAfter, m.ReferenceNumber, m.OccurredAt)).ToList());
-
-            return Results.Ok(new { data = response });
+            return Results.Ok(ApiResponse<object>.Ok(new
+            {
+                item = itemResult.Value,
+                history = movementResult.Value
+            }));
         })
         .WithName("GetStockItemById")
         .WithSummary("Get stock item with history");
 
-        group.MapGet("/low-stock", async (ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var items = await context.StockItems
-                .Include(s => s.Product)
-                .Include(s => s.Warehouse)
-                .Where(s => !s.IsDeleted && s.ReorderLevel.HasValue && s.QuantityOnHand <= s.ReorderLevel)
-                .OrderBy(s => s.QuantityOnHand)
-                .Select(s => new StockItemResponse(
-                    s.Id, s.ProductId, s.Product.Name, s.VariantId,
-                    s.WarehouseId, s.Warehouse.Name,
-                    s.QuantityOnHand, s.ReservedQuantity, s.AverageCostPrice,
-                    s.ReorderLevel ?? 0, s.LastUpdatedAt))
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = items });
-        })
+        group.MapGet("/low-stock", async (
+            [FromQuery] Guid? warehouseId,
+            GetLowStockItems.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new GetLowStockItems.Query(warehouseId), ct)).ToHttpResult())
         .WithName("GetLowStockItems")
         .WithSummary("Get items below reorder level");
 
-        group.MapPut("/{id:guid}/reorder-level", async (Guid id, UpdateReorderLevelRequest request, ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var item = await context.StockItems.FindAsync(new object[] { id }, ct);
-            if (item == null || item.IsDeleted)
-                return Results.NotFound(new { error = "Stock item not found" });
-
-            item.ReorderLevel = request.ReorderLevel;
-            item.UpdatedAt = DateTime.UtcNow;
-            await context.SaveChangesAsync(ct);
-
-            return Results.Ok(new { data = new { item.Id, item.ReorderLevel } });
-        })
+        group.MapPut("/{id:guid}/reorder-level", async (
+            Guid id,
+            [FromBody] decimal reorderLevel,
+            UpdateReorderLevel.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new UpdateReorderLevel.Command(id, reorderLevel), ct)).ToHttpResult())
         .WithName("UpdateReorderLevel")
         .WithSummary("Update reorder level");
     }
 }
-
-public record GetStockItemsRequest(
-    int PageIndex = 0, int PageSize = 10, string? Search = null,
-    string? WarehouseId = null, string? CategoryId = null);
-
-public record StockItemResponse(
-    Guid Id, Guid ProductId, string ProductName, Guid? VariantId,
-    Guid WarehouseId, string WarehouseName,
-    decimal QuantityOnHand, decimal ReservedQuantity, decimal AverageCostPrice,
-    decimal ReorderLevel, DateTime LastUpdatedAt);
-
-public record StockItemDetailResponse(
-    Guid Id, Guid ProductId, string ProductName, Guid? VariantId,
-    Guid WarehouseId, string WarehouseName,
-    decimal QuantityOnHand, decimal ReservedQuantity, decimal AverageCostPrice,
-    decimal ReorderLevel, DateTime LastUpdatedAt,
-    List<StockMovementHistoryItem> History);
-
-public record StockMovementHistoryItem(
-    Guid Id, string Type, decimal QuantityIn, decimal QuantityOut,
-    decimal BalanceAfter, string? ReferenceNumber, DateTime OccurredAt);
-
-public record UpdateReorderLevelRequest(decimal ReorderLevel);

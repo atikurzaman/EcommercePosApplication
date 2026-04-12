@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using EcommercePos.Persistence.Data;
 using EcommercePos.Persistence.Seeding;
-using EcommercePos.Api.Endpoints;
 using EcommercePos.Api.Middleware;
 using EcommercePos.Api.Services;
 using EcommercePos.Application.DependencyInjection;
@@ -12,8 +11,10 @@ using EcommercePos.Shared.Common;
 using EcommercePos.Shared.Cryptography;
 using EcommercePos.Persistence.Interceptors;
 using EcommercePos.Api.Authorization;
+using EcommercePos.Api.Endpoints;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,18 +26,28 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddScoped<AuditableEntityInterceptor>();
+
+var redisConnection = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp => 
+    ConnectionMultiplexer.Connect(redisConnection));
+
 builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
 {
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.AddInterceptors(sp.GetRequiredService<AuditableEntityInterceptor>());
+    
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableSensitiveDataLogging();
+        options.EnableDetailedErrors();
+        options.LogTo(Console.WriteLine, LogLevel.Information);
+    }
 });
 
-// Auto-register all Application handlers, validators, and services
 builder.Services.AddApplicationServices();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-// Add password hashing service (secure Bcrypt)
 builder.Services.AddScoped<IPasswordService, BcryptPasswordService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -93,11 +104,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        // Use migrations instead of EnsureCreated for production-ready database management
         context.Database.Migrate();
-
-        // Optional: Seed data if needed
-        // await SeedDataAsync(context);
     }
     catch (Exception ex)
     {
@@ -114,63 +121,8 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapCategoryEndpoints();
-app.MapBrandEndpoints();
-app.MapBranchEndpoints();
-app.MapProductEndpoints();
-app.MapCustomerEndpoints();
-app.MapSupplierEndpoints();
-app.MapEmployeeEndpoints();
-app.MapSaleEndpoints();
-app.MapPurchaseEndpoints();
-app.MapUnitEndpoints();
-app.MapTaxRateEndpoints();
-app.MapDeliveryZoneEndpoints();
-app.MapColorEndpoints();
-app.MapTagEndpoints();
-app.MapPickupPointEndpoints();
-app.MapWarehouseEndpoints();
-app.MapRoleEndpoints();
-app.MapPermissionEndpoints();
-app.MapMenuEndpoints();
-app.MapUserEndpoints();
-app.MapShippingMethodEndpoints();
-app.MapAttributeTypeEndpoints();
-app.MapProductCollectionEndpoints();
-app.MapExpenseCategoryEndpoints();
-app.MapProductConditionEndpoints();
-app.MapCustomerTierEndpoints();
-app.MapPaymentStatusEndpoints();
-app.MapOrderStatusEndpoints();
-app.MapDiscountTypeEndpoints();
-app.MapReturnStatusEndpoints();
-app.MapShipmentStatusEndpoints();
-app.MapPaymentMethodEndpoints();
-app.MapCurrencyEndpoints();
-app.MapWishlistTypeEndpoints();
-app.MapStockMovementTypeEndpoints();
-app.MapPosTransactionEndpoints();
-app.MapPosReturnEndpoints();
+app.MapControllers();
 app.MapCashShiftEndpoints();
-app.MapPosCounterEndpoints();
-app.MapPosTerminalEndpoints();
 app.MapCashDrawerEventEndpoints();
-app.MapDayEndSummaryEndpoints();
-app.MapExpenseEndpoints();
-app.MapCartEndpoints();
-
-app.MapStockItemEndpoints();
-app.MapStockMovementEndpoints();
-app.MapInventoryAdjustmentEndpoints();
-app.MapStockTransferEndpoints();
-app.MapReorderRuleEndpoints();
-
-app.MapOrderEndpoints();
-
-app.MapCollectionEndpoints();
-app.MapSpecificationEndpoints();
-app.MapReportEndpoints();
-
-app.MapAuthEndpoints();
 
 app.Run();

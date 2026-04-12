@@ -38,15 +38,11 @@ public static class TaxRateEndpoints
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateTaxRateBody body,
+            [FromBody] UpdateTaxRate.Command body,
             UpdateTaxRate.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new UpdateTaxRate.Command(
-                id, body.TaxName, body.TaxRate, body.TaxCode, body.Description,
-                body.IsActive, body.TaxType, body.IsPercentage, body.IsInclusive,
-                body.IsDefault, body.Country, body.ApplyToShipping, body.Priority,
-                body.EffectiveFrom, body.EffectiveTo), ct)).ToHttpResult())
-            .AddEndpointFilter<ValidationFilter<UpdateTaxRateBody>>()
+            (await handler.Handle(body with { Id = id }, ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateTaxRate.Command>>()
             .WithName("UpdateTaxRate")
             .WithSummary("Update an existing tax rate");
 
@@ -59,9 +55,3 @@ public static class TaxRateEndpoints
             .WithSummary("Soft delete a tax rate");
     }
 }
-
-public record UpdateTaxRateBody(
-    string TaxName, decimal TaxRate, string? TaxCode, string? Description,
-    bool IsActive, string? TaxType, bool IsPercentage, bool IsInclusive,
-    bool IsDefault, string? Country, bool ApplyToShipping, int Priority,
-    DateTime? EffectiveFrom, DateTime? EffectiveTo);

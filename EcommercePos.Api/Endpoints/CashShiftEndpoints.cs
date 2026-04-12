@@ -57,13 +57,11 @@ public static class CashShiftEndpoints
 
         group.MapPost("/{id:guid}/close", async (
             Guid id,
-            [FromBody] CloseShiftRequest request,
+            [FromBody] CloseShift.Command request,
             [FromServices] CloseShift.Handler handler,
             CancellationToken ct) =>
         {
-            var command = new CloseShift.Command(
-                id, request.ClosedByUserId, request.ClosedByEmployeeId,
-                request.ClosingCash, request.Notes);
+            var command = request with { ShiftId = id };
             var result = await handler.Handle(command, ct);
             return result.ToHttpResult();
         })
@@ -71,7 +69,3 @@ public static class CashShiftEndpoints
         .WithSummary("Close an open cash shift");
     }
 }
-
-public record CloseShiftRequest(
-    Guid ClosedByUserId, Guid? ClosedByEmployeeId,
-    decimal ClosingCash, string? Notes);

@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Brand;
 using EcommercePos.Api.Extensions;
 using EcommercePos.Api.Filters;
-using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -21,23 +19,12 @@ public static class BrandEndpoints
             .WithName("GetBrands")
             .WithSummary("Get paginated brands");
 
-        group.MapGet("/with-count", async (ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var brands = await context.Brands
-                .Where(b => !b.IsDeleted)
-                .OrderBy(b => b.Name)
-                .Select(b => new
-                {
-                    b.Id, b.BrandCode, b.Name, b.Slug, b.Description,
-                    b.LogoUrl, b.Website, b.IsFeatured, b.IsActive,
-                    ProductCount = context.Products.Count(p => p.BrandId == b.Id && !p.IsDeleted)
-                })
-                .ToListAsync(ct);
-
-            return Results.Ok(new { data = brands });
-        })
-        .WithName("GetBrandsWithCount")
-        .WithSummary("Get brands with product count");
+        group.MapGet("/with-count", async (
+            GetBrandsWithCount.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new GetBrandsWithCount.Query(), ct)).ToHttpResult())
+            .WithName("GetBrandsWithCount")
+            .WithSummary("Get brands with product count");
 
         group.MapGet("/{id:guid}", async (
             Guid id,
@@ -58,13 +45,11 @@ public static class BrandEndpoints
 
         group.MapPut("/{id:guid}", async (
             Guid id,
-            [FromBody] UpdateBrandBody body,
+            [FromBody] UpdateBrand.Command body,
             UpdateBrand.Handler handler,
             CancellationToken ct) =>
-            (await handler.Handle(new UpdateBrand.Command(
-                id, body.Name, body.BrandCode, body.Description, body.LogoUrl,
-                body.Website, body.CountryOfOrigin, body.IsFeatured, body.IsActive), ct)).ToHttpResult())
-            .AddEndpointFilter<ValidationFilter<UpdateBrandBody>>()
+            (await handler.Handle(body with { Id = id }, ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateBrand.Command>>()
             .WithName("UpdateBrand")
             .WithSummary("Update an existing brand");
 
@@ -76,23 +61,12 @@ public static class BrandEndpoints
             .WithName("DeleteBrand")
             .WithSummary("Soft delete a brand");
 
-        group.MapPatch("/{id:guid}/toggle", async (Guid id, ApplicationDbContext context, CancellationToken ct) =>
-        {
-            var brand = await context.Brands.FindAsync(new object[] { id }, ct);
-            if (brand == null || brand.IsDeleted)
-                return Results.NotFound(new { error = "Brand not found" });
-
-            brand.IsActive = !brand.IsActive;
-            brand.UpdatedAt = DateTime.UtcNow;
-            await context.SaveChangesAsync(ct);
-
-            return Results.Ok(new { data = new { brand.Id, brand.IsActive } });
-        })
-        .WithName("ToggleBrand")
-        .WithSummary("Toggle brand active status");
+        group.MapPatch("/{id:guid}/toggle", async (
+            Guid id,
+            ToggleBrandActive.Handler handler,
+            CancellationToken ct) =>
+            (await handler.Handle(new ToggleBrandActive.Command(id), ct)).ToHttpResult())
+            .WithName("ToggleBrand")
+            .WithSummary("Toggle brand active status");
     }
 }
-
-public record UpdateBrandBody(
-    string Name, string? BrandCode, string? Description, string? LogoUrl,
-    string? Website, string? CountryOfOrigin, bool IsFeatured, bool IsActive);
