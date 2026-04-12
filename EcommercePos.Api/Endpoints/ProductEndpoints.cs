@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using EcommercePos.Application.Features.Product;
 using EcommercePos.Application.Features.Catalog;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Api.Endpoints;
@@ -36,6 +37,7 @@ public static class ProductEndpoints
             CreateProduct.Handler handler,
             CancellationToken ct) =>
             (await handler.Handle(command, ct)).ToCreatedResult("/api/products"))
+            .AddEndpointFilter<ValidationFilter<CreateProduct.Command>>()
             .WithName("CreateProduct")
             .WithSummary("Create a new product");
 
@@ -49,6 +51,7 @@ public static class ProductEndpoints
                 body.ProductType, body.CostPrice, body.SalePrice, body.OriginalPrice,
                 body.IsTaxInclusive, body.IsFeatured, body.IsActive,
                 body.CategoryId, body.BrandId, body.UnitId, body.Sku, body.Barcode), ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateProductBody>>()
             .WithName("UpdateProduct")
             .WithSummary("Update product");
 

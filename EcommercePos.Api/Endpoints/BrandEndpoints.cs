@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Brand;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 using Microsoft.EntityFrameworkCore;
 using EcommercePos.Persistence.Data;
 
@@ -51,6 +52,7 @@ public static class BrandEndpoints
             CreateBrand.Handler handler,
             CancellationToken ct) =>
             (await handler.Handle(command, ct)).ToCreatedResult("/api/brands"))
+            .AddEndpointFilter<ValidationFilter<CreateBrand.Command>>()
             .WithName("CreateBrand")
             .WithSummary("Create a new brand");
 
@@ -62,6 +64,7 @@ public static class BrandEndpoints
             (await handler.Handle(new UpdateBrand.Command(
                 id, body.Name, body.BrandCode, body.Description, body.LogoUrl,
                 body.Website, body.CountryOfOrigin, body.IsFeatured, body.IsActive), ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateBrandBody>>()
             .WithName("UpdateBrand")
             .WithSummary("Update an existing brand");
 

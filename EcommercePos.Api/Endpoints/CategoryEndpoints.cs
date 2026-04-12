@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Category;
 using EcommercePos.Api.Extensions;
+using EcommercePos.Api.Filters;
 using Microsoft.EntityFrameworkCore;
 using EcommercePos.Persistence.Data;
 
@@ -60,6 +61,7 @@ public static class CategoryEndpoints
             CreateCategory.Handler handler,
             CancellationToken ct) =>
             (await handler.Handle(command, ct)).ToCreatedResult("/api/categories"))
+            .AddEndpointFilter<ValidationFilter<CreateCategory.Command>>()
             .WithName("CreateCategory")
             .WithSummary("Create a new category");
 
@@ -72,6 +74,7 @@ public static class CategoryEndpoints
                 id, body.Name, body.Slug, body.Description, body.ImageUrl,
                 body.ParentCategoryId, body.DisplayOrder, body.IsFeatured,
                 body.IsActive, body.MetaTitle, body.MetaDescription), ct)).ToHttpResult())
+            .AddEndpointFilter<ValidationFilter<UpdateCategoryBody>>()
             .WithName("UpdateCategory")
             .WithSummary("Update an existing category");
 
