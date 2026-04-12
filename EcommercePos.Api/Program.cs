@@ -152,6 +152,7 @@ app.MapOrderEndpoints();
 
 app.MapCollectionEndpoints();
 app.MapSpecificationEndpoints();
+app.MapReportEndpoints();
 
 app.MapAuthEndpoints();
 

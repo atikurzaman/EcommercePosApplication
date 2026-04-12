@@ -66,8 +66,9 @@ public static class BrandEndpoints
             [FromServices] CreateBrand.Handler handler,
             CancellationToken ct) =>
         {
+            var cleanedCreate = request.Name.ToUpper().Replace(" ", "").Replace("-", "");
             var command = new CreateBrand.Command(
-                request.BrandCode ?? request.Name.ToUpper().Replace(" ", "").Substring(0, Math.Min(10, request.Name.Length)),
+                request.BrandCode ?? cleanedCreate.Substring(0, Math.Min(10, cleanedCreate.Length)),
                 request.Name, request.Description, request.LogoUrl,
                 request.Website, request.CountryOfOrigin, request.IsFeatured, request.IsActive);
             var result = await handler.Handle(command, ct);
@@ -82,8 +83,9 @@ public static class BrandEndpoints
             [FromServices] UpdateBrand.Handler handler,
             CancellationToken ct) =>
         {
+            var cleanedUpdate = request.Name.ToUpper().Replace(" ", "").Replace("-", "");
             var command = new UpdateBrand.Command(
-                id, request.BrandCode ?? request.Name.ToUpper().Replace(" ", "").Substring(0, Math.Min(10, request.Name.Length)),
+                id, request.BrandCode ?? cleanedUpdate.Substring(0, Math.Min(10, cleanedUpdate.Length)),
                 request.Name, request.Description, request.LogoUrl,
                 request.Website, request.CountryOfOrigin, request.IsFeatured, request.IsActive);
             var result = await handler.Handle(command, ct);

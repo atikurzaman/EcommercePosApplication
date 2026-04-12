@@ -9,7 +9,7 @@ public static class TaxRateEndpoints
 {
     public static void MapTaxRateEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/taxrates").WithTags("TaxRates");
+        var group = app.MapGroup("/api/tax-rates").WithTags("TaxRates");
 
         group.MapGet("/", async (
             [AsParameters] GetTaxRates.Request request,
@@ -45,7 +45,7 @@ public static class TaxRateEndpoints
                 request.IsDefault, request.Country, request.ApplyToShipping, request.Priority,
                 request.EffectiveFrom, request.EffectiveTo);
             var result = await handler.Handle(command, ct);
-            return result.ToCreatedResult($"/api/taxrates/{request.TaxName}");
+            return result.ToCreatedResult($"/api/tax-rates/{request.TaxName}");
         })
         .WithName("CreateTaxRate")
         .WithSummary("Create a new tax rate");
