@@ -1,0 +1,36 @@
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using EcommercePos.Persistence.Data;
+using EcommercePos.Shared.Common;
+
+namespace EcommercePos.Application.Features.Lookup;
+
+public static class GetPaymentStatuses
+{
+    public sealed record Request(int PageIndex = 0, int PageSize = 10, string? Search = null);
+    public sealed record Response(string StatusCode, string DisplayName);
+
+    public sealed class Handler
+    {
+        private readonly ApplicationDbContext _context;
+        public Handler(ApplicationDbContext context) => _context = context;
+
+        public async Task<Result<PagedResult<Response>>> Handle(Request request, CancellationToken ct)
+        {
+            var query = _context.PaymentStatuses.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(request.Search))
+                query = query.Where(c => c.StatusCode.Contains(request.Search) || c.DisplayName.Contains(request.Search));
+
+            var totalCount = await query.CountAsync(ct);
+            var items = await query
+                .OrderBy(c => c.StatusCode)
+                .Skip(request.PageIndex * request.PageSize)
+                .Take(request.PageSize)
+                .Select(c => new Response(c.StatusCode, c.DisplayName))
+                .ToListAsync(ct);
+
+            return Result<PagedResult<Response>>.Success(new PagedResult<Response>(items, totalCount, request.PageIndex, request.PageSize));
+        }
+    }
+}

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>UnifiedShopDb v5 — Database Documentation</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f1117;color:#e2e8f0;display:flex;min-height:100vh}
+#sidebar{width:270px;min-width:270px;background:#1a1d2e;border-right:1px solid #2d3352;height:100vh;overflow-y:auto;position:sticky;top:0}
+#sidebar h2{padding:10px 14px;font-size:12px;color:#7c8cf8;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border-bottom:1px solid #2d3352}
+.sbox{padding:6px 12px;position:sticky;top:0;background:#1a1d2e;z-index:9;border-bottom:1px solid #2d3352}
+.sbox input{width:100%;background:#0f1117;border:1px solid #2d3352;color:#e2e8f0;padding:5px 8px;border-radius:5px;font-size:11px}
+.sbox input::placeholder{color:#4c5899}
+.ns{margin-bottom:2px}
+.nsh{padding:5px 14px;font-size:10px;font-weight:700;color:#4c5899;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.nsh:hover{color:#7c8cf8}
+.nt{padding:3px 14px 3px 26px;font-size:11px;color:#8892aa;cursor:pointer;border-radius:4px;margin:1px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nt:hover,.nt.act{background:#2d3352;color:#e2e8f0}
+#main{flex:1;overflow-y:auto;padding:28px 36px;max-width:1140px}
+h1{font-size:26px;font-weight:800;color:#7c8cf8;margin-bottom:6px}
+.sub{color:#6c7a9c;font-size:13px;margin-bottom:24px}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px}
+.sc{background:#1a1d2e;border:1px solid #2d3352;border-radius:7px;padding:12px 18px;min-width:110px}
+.sc .n{font-size:22px;font-weight:800;color:#7c8cf8}
+.sc .l{font-size:11px;color:#6c7a9c;margin-top:3px}
+.sblk{margin-bottom:36px}
+.stitle{font-size:17px;font-weight:700;color:#7c8cf8;border-bottom:2px solid #2d3352;padding-bottom:7px;margin-bottom:14px}
+.sbadge{background:#2d3352;color:#7c8cf8;font-size:10px;border-radius:10px;padding:2px 9px;font-weight:600;margin-left:8px}
+.tcard{background:#1a1d2e;border:1px solid #2d3352;border-radius:7px;margin-bottom:16px;overflow:hidden}
+.tchead{padding:9px 14px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.tchead:hover{background:#1e2234}
+.tname{font-size:13px;font-weight:700;color:#e2e8f0;font-family:'Consolas','Courier New',monospace}
+.tnote{font-size:11px;color:#6c7a9c;margin-left:auto}
+.chev{transition:transform .18s;flex-shrink:0}
+.tbody{border-top:1px solid #2d3352;display:none}
+.tbody.open{display:block}
+.desc{padding:9px 14px;background:#161825;border-bottom:1px solid #2d3352;font-size:12px;color:#94a3b8;line-height:1.65}
+.nfbox{padding:7px 14px;background:#0d0f1c;border-bottom:1px solid #2d3352;font-size:11px;line-height:1.8}
+table.cols{width:100%;border-collapse:collapse}
+table.cols th{font-size:10px;color:#4c5899;text-transform:uppercase;letter-spacing:.5px;padding:5px 14px;border-bottom:1px solid #2d3352;text-align:left;background:#111320}
+table.cols td{font-size:11px;padding:5px 14px;border-bottom:1px solid #111320;vertical-align:top}
+table.cols tr:last-child td{border-bottom:none}
+table.cols tr:hover td{background:#151826}
+.cn{color:#e2e8f0;font-family:'Consolas',monospace;font-weight:600}
+.cn.pk{color:#fbbf24}.cn.fk{color:#7dd3fc}
+.ct{color:#6c7a9c;font-family:monospace;font-size:10px}
+.cd{color:#94a3b8;font-size:11px}
+.bpk{background:#78350f;color:#fbbf24;font-size:9px;padding:1px 4px;border-radius:2px;margin-right:3px;font-weight:700}
+.bfk{background:#0c3457;color:#7dd3fc;font-size:9px;padding:1px 4px;border-radius:2px;margin-right:3px;font-weight:700}
+.nf1{background:#1e3a5f;color:#7dd3fc;font-size:9px;padding:1px 5px;border-radius:3px;margin-left:6px}
+.nf2{background:#1e3a2a;color:#6ee7b7;font-size:9px;padding:1px 5px;border-radius:3px;margin-left:4px}
+.nf3{background:#3a1e2a;color:#f9a8d4;font-size:9px;padding:1px 5px;border-radius:3px;margin-left:4px}
+.vc{background:#1a1d2e;border:1px solid #3a4472;border-radius:7px;margin-bottom:14px;padding:14px}
+.vc h3{color:#7c8cf8;font-size:13px;margin-bottom:7px;font-family:'Consolas',monospace}
+.vc p{font-size:12px;color:#94a3b8;line-height:1.65}
+code{background:#161825;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:10px;color:#7dd3fc}
+.ix{padding:7px 14px;border-top:1px solid #161825}
+.ix h4{font-size:10px;color:#4c5899;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.ix-item{font-size:10px;color:#94a3b8;font-family:monospace;margin:2px 0}
+</style>
+</head>
+<body>
+<div id="sidebar">
+  <h2>UnifiedShopDb v5</h2>
+  <div class="sbox"><input placeholder="Search tables…" oninput="searchNav(this.value)"></div>
+  <div id="navtree"></div>
+</div>
+<div id="main">
+  <h1>UnifiedShopDb v5</h1>
+  <p class="sub">Unified POS + E-Commerce · SQL Server 2019+ · 115 Tables · 4 Views · Fully Qualified Names · GUID PKs · 1NF/2NF/3NF</p>
+  <div class="stats">
+    <div class="sc"><div class="n">115</div><div class="l">Tables</div></div>
+    <div class="sc"><div class="n">4</div><div class="l">Views</div></div>
+    <div class="sc"><div class="n">43+</div><div class="l">Indexes</div></div>
+    <div class="sc"><div class="n">GUID</div><div class="l">All PKs</div></div>
+    <div class="sc"><div class="n">1-2-3NF</div><div class="l">Normalised</div></div>
+    <div class="sc"><div class="n">BDT</div><div class="l">Base Currency</div></div>
+  </div>
+  <div id="sections"></div>
+
+  <div class="sblk" id="section-views">
+    <div class="stitle">📊 Computed Views<span class="sbadge">4 views</span></div>
+    <div class="vc"><h3>vw_ProductStats</h3><p>Replaces stored <code>RatingAverage</code> and <code>ReviewCount</code> on Products — a 1NF violation (stored computation). Returns <code>ProductId</code>, <code>ReviewCount</code>, <code>RatingAverage</code>, <code>VerifiedReviewCount</code> computed live from <code>Reviews</code>.</p></div>
+    <div class="vc"><h3>vw_CustomerStats</h3><p>Replaces <code>TotalOrders</code>, <code>TotalSpent</code>, <code>LastOrderDate</code>, <code>OrderCount</code> on Customers — all 1NF violations. Returns <code>CustomerId</code>, <code>OrderCount</code>, <code>TotalSpent</code>, <code>LastOrderDate</code>, <code>CompletedOrders</code>, <code>TotalRefunded</code>.</p></div>
+    <div class="vc"><h3>vw_StockAvailability</h3><p>Real-time available stock per product/variant/warehouse. Computes <code>AvailableQty = QuantityOnHand - ReservedQuantity</code> and <code>NeedsReorder</code> against configured thresholds across <code>StockItems</code>, <code>ProductVariants</code>, <code>Warehouses</code>.</p></div>
+    <div class="vc"><h3>vw_CustomerLoyaltyBalance</h3><p>Current loyalty point balance derived from <code>LoyaltyTransactions</code> ledger. Returns <code>CurrentBalance</code>, <code>TotalEarned</code>, <code>TotalRedeemed</code>, <code>NextExpiryDate</code>. Balance is never stored — always computed.</p></div>
+  </div>
+
+  <div class="sblk">
+    <div class="stitle">📐 Normalisation Summary</div>
+    <div class="tcard"><div class="tbody open"><div class="desc" style="display:block">
+      <strong style="color:#7dd3fc">1NF fixes —</strong> no stored aggregations, no CSV columns, no repeating groups<br>
+      • <code>Products.RatingAverage</code>, <code>ReviewCount</code> → removed → <code>vw_ProductStats</code><br>
+      • <code>Customers.TotalOrders / TotalSpent / LastOrderDate</code> → removed → <code>vw_CustomerStats</code><br>
+      • <code>Coupons.ApplicableCategories</code> CSV NVARCHAR → <code>DiscountApplicability</code> junction table<br>
+      • <code>LoyaltyPoints INT</code> on Customers → <code>LoyaltyTransactions</code> full ledger<br><br>
+      <strong style="color:#6ee7b7">2NF fixes —</strong> every non-key column depends on the whole primary key<br>
+      • Pure junction tables (<code>ProductTags</code>, <code>BrandCategories</code>, <code>ReviewHelpfulness</code>, <code>BlogPostTags</code>, <code>UserRoles</code>) carry zero non-key payload<br>
+      • <code>RolePermissions</code>: composite PK (RoleId + PermissionId); <code>IsGranted</code> depends on both parts<br><br>
+      <strong style="color:#f9a8d4">3NF fixes —</strong> no transitive dependencies<br>
+      • <code>Orders.PaymentMethod / Status / Date / TransactionId</code> → moved to <code>Payments</code><br>
+      • <code>Orders.InternalNote</code> + <code>AdminNote</code> merged → single <code>AdminNote</code><br>
+      • <code>Expenses.ExpenseCategory</code> string → removed; only <code>ExpenseCategoryId</code> FK remains<br>
+      • <code>AuditLogs</code>: no UpdatedAt / UpdatedBy / IsDeleted (immutable append-only; adding those would imply mutability)
+    </div></div></div>
+  </div>
+</div>
+
+<script>
+const SECS=[
+{id:"lookup",title:"Lookup / Enum",icon:"🏷",tables:[
+  {n:"OrderStatuses",desc:"Every valid state an order can occupy. IsTerminal=1 prevents further transitions.",
+   cols:[{n:"StatusCode",t:"NVARCHAR(30)",pk:1,d:"Machine-readable PK e.g. Pending, Confirmed, Shipped"},{n:"DisplayName",t:"NVARCHAR(80)",d:"UI label"},{n:"Description",t:"NVARCHAR(300)",d:"Admin tooltip"},{n:"SortOrder",t:"TINYINT",d:"Display sequence"},{n:"IsTerminal",t:"BIT",d:"1 = no further state transitions allowed"}]},
+  {n:"PaymentStatuses",desc:"All possible payment record states.",
+   cols:[{n:"StatusCode",t:"NVARCHAR(30)",pk:1,d:"e.g. Pending, Completed, Failed, Refunded, PartialRefund"},{n:"DisplayName",t:"NVARCHAR(80)",d:"UI label"}]},
+  {n:"PaymentMethods",desc:"Every accepted payment channel across POS and e-commerce. 3NF: replaces bare PaymentMethod strings.",
+   cols:[{n:"MethodCode",t:"NVARCHAR(40)",pk:1,d:"e.g. Cash, bKash, Card, COD, Wallet, GiftCard"},{n:"DisplayName",t:"NVARCHAR(80)",d:"UI label"},{n:"IsOnline",t:"BIT",d:"0 = cash/COD physical channel"},{n:"IsActive",t:"BIT",d:"Enable/disable method globally"},{n:"SortOrder",t:"TINYINT",d:"Checkout display order"}]},
+  {n:"ShipmentStatuses",desc:"Shipment lifecycle states.",
+   cols:[{n:"StatusCode",t:"NVARCHAR(30)",pk:1,d:"e.g. Pending, Packed, Dispatched, InTransit, Delivered"},{n:"DisplayName",t:"NVARCHAR(80)",d:"UI label"},{n:"SortOrder",t:"TINYINT",d:"Display sequence"}]},
+  {n:"ReturnStatuses",desc:"Shared states for Returns and RefundRequests.",
+   cols:[{n:"StatusCode",t:"NVARCHAR(30)",pk:1,d:"e.g. Requested, Approved, Rejected, Received, Refunded"},{n:"DisplayName",t:"NVARCHAR(80)",d:"UI label"},{n:"SortOrder",t:"TINYINT",d:"Display sequence"}]},
+  {n:"StockMovementTypes",desc:"Classifies every inventory movement. 3NF: replaces raw MovementType strings.",
+   cols:[{n:"TypeCode",t:"NVARCHAR(30)",pk:1,d:"e.g. Purchase, Sale, Return, Adjustment, Transfer, Damage"},{n:"DisplayName",t:"NVARCHAR(80)",d:"UI label"},{n:"IsInbound",t:"BIT",d:"1=stock increases; 0=decreases"}]},
+  {n:"DiscountTypes",desc:"Defines the promotional mechanic.",
+   cols:[{n:"TypeCode",t:"NVARCHAR(30)",pk:1,d:"e.g. Percentage, Fixed, BOGO, FreeShipping, BuyXGetY"},{n:"DisplayName",t:"NVARCHAR(80)",d:"UI label"}]},
+  {n:"CustomerTiers",desc:"Loyalty tier levels with discount rates and point multipliers.",
+   cols:[{n:"TierCode",t:"NVARCHAR(20)",pk:1,d:"e.g. Bronze, Silver, Gold, Platinum"},{n:"DisplayName",t:"NVARCHAR(80)",d:"UI label"},{n:"MinLifetimeSpend",t:"DECIMAL(18,2)",d:"Spend threshold to qualify for this tier"},{n:"DiscountPct",t:"DECIMAL(5,2)",d:"Automatic checkout discount for this tier"},{n:"PointsMultiplier",t:"DECIMAL(5,2)",d:"Loyalty point earn multiplier"},{n:"SortOrder",t:"TINYINT",d:"Ascending tier order"}]},
+  {n:"ProductConditions",desc:"Physical condition of a product listing.",
+   cols:[{n:"ConditionCode",t:"NVARCHAR(20)",pk:1,d:"e.g. New, Refurbished, Used, Damaged"},{n:"DisplayName",t:"NVARCHAR(50)",d:"UI label"}]},
+  {n:"WishlistTypes",desc:"Classifies the purpose of a wishlist.",
+   cols:[{n:"TypeCode",t:"NVARCHAR(20)",pk:1,d:"e.g. Personal, Registry, Public"},{n:"DisplayName",t:"NVARCHAR(50)",d:"UI label"}]},
+]},
+{id:"identity",title:"Identity / Auth",icon:"🔐",tables:[
+  {n:"Users",desc:"Core authentication identity extended with domain columns. GUID PK — NEWSEQUENTIALID() avoids clustered index fragmentation.",nf:"2NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK — DEFAULT NEWSEQUENTIALID()"},{n:"UserName",t:"NVARCHAR(256)",d:"Login username"},{n:"NormalizedUserName",t:"NVARCHAR(256)",d:"Upper-cased for case-insensitive lookup"},{n:"Email",t:"NVARCHAR(256)",d:"Email address"},{n:"PasswordHash",t:"NVARCHAR(MAX)",d:"PBKDF2 / bcrypt — never store plaintext"},{n:"SecurityStamp",t:"NVARCHAR(MAX)",d:"Rotated on password change to invalidate old tokens"},{n:"TwoFactorEnabled",t:"BIT",d:"2FA enabled flag"},{n:"LockoutEnd",t:"DATETIMEOFFSET",d:"NULL = account not currently locked"},{n:"AccessFailedCount",t:"INT",d:"Resets to 0 after successful login"},{n:"FirstName",t:"NVARCHAR(100)",d:"Display first name"},{n:"LastName",t:"NVARCHAR(100)",d:"Display last name"},{n:"IsActive",t:"BIT",d:"0 = account suspended by admin"},{n:"LastLoginAt",t:"DATETIME2",d:"Stamped on every successful authentication"},{n:"CreatedAt",t:"DATETIME2",d:"Record creation timestamp"}]},
+  {n:"Roles",desc:"Application security roles.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Name",t:"NVARCHAR(256)",d:"Role name e.g. Admin, Cashier, StoreManager"},{n:"NormalizedName",t:"NVARCHAR(256)",d:"Upper-cased for lookup"},{n:"Description",t:"NVARCHAR(255)",d:"Human-readable description for admin UI"},{n:"IsActive",t:"BIT",d:"Enable/disable role"}]},
+  {n:"UserRoles",desc:"M:N role assignments. 2NF: no non-key payload — composite PK is the entire table.",nf:"2NF",
+   cols:[{n:"UserId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Users",d:"FK → Users.Id — CASCADE DELETE"},{n:"RoleId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Roles",d:"FK → Roles.Id — CASCADE DELETE"}]},
+  {n:"UserClaims",desc:"Per-user fine-grained claims (key-value pairs).",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"ClaimType",t:"NVARCHAR(MAX)",d:"Claim URI e.g. http://schemas.xmlsoap.org/claims/Group"},{n:"ClaimValue",t:"NVARCHAR(MAX)",d:"Claim value"}]},
+  {n:"RoleClaims",desc:"Claims automatically inherited by all members of a role.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"RoleId",t:"UNIQUEIDENTIFIER",fk:"Roles",d:"FK → Roles.Id"},{n:"ClaimType",t:"NVARCHAR(MAX)",d:"Claim URI"},{n:"ClaimValue",t:"NVARCHAR(MAX)",d:"Claim value"}]},
+  {n:"UserLogins",desc:"External OAuth/OIDC provider links.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"LoginProvider",t:"NVARCHAR(128)",d:"e.g. Google, Facebook"},{n:"ProviderKey",t:"NVARCHAR(128)",d:"Subject identifier from provider"},{n:"ProviderDisplayName",t:"NVARCHAR(MAX)",d:"Friendly label for linked-accounts UI"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"}]},
+  {n:"UserTokens",desc:"2FA tokens, authenticator keys, recovery codes.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"LoginProvider",t:"NVARCHAR(128)",d:"Issuing provider or Local"},{n:"Name",t:"NVARCHAR(128)",d:"Token purpose e.g. AuthenticatorKey, RecoveryCode"},{n:"Value",t:"NVARCHAR(MAX)",d:"Token value — protect at application layer"}]},
+]},
+{id:"rbac",title:"RBAC & Security",icon:"🛡",tables:[
+  {n:"Permissions",desc:"Named atomic capabilities used by the RBAC layer. 3NF: Module depends only on PermissionCode.",nf:"3NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"PermissionCode",t:"NVARCHAR(100)",d:"Machine key e.g. products.create"},{n:"Name",t:"NVARCHAR(150)",d:"Display label e.g. Create Products"},{n:"Module",t:"NVARCHAR(100)",d:"Grouping e.g. Products, Orders, POS"},{n:"Description",t:"NVARCHAR(500)",d:"Tooltip description"},{n:"IsActive",t:"BIT",d:"Enable/disable permission"}]},
+  {n:"RolePermissions",desc:"Grants a permission to a role. IsGranted supports explicit deny. 2NF: IsGranted depends on full (RoleId, PermissionId) composite key.",nf:"2NF",
+   cols:[{n:"RoleId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Roles",d:"FK → Roles.Id"},{n:"PermissionId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Permissions",d:"FK → Permissions.Id"},{n:"IsGranted",t:"BIT",d:"0 = explicit deny supported"}]},
+  {n:"Menus",desc:"Hierarchical admin navigation tree. ParentMenuId = self-referencing adjacency list.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ParentMenuId",t:"UNIQUEIDENTIFIER",fk:"Menus",d:"Self-reference; NULL = root menu item"},{n:"MenuCode",t:"NVARCHAR(50)",d:"Slug e.g. products-list"},{n:"DisplayName",t:"NVARCHAR(150)",d:"Sidebar label"},{n:"MenuUrl",t:"NVARCHAR(300)",d:"SPA route URL"},{n:"IconClass",t:"NVARCHAR(100)",d:"CSS class e.g. fa fa-box"},{n:"MenuLevel",t:"TINYINT",d:"1=root 2=sub 3=leaf"},{n:"PermissionCode",t:"NVARCHAR(100)",d:"Required permission to see this item"}]},
+  {n:"RoleMenus",desc:"Per-role menu visibility and CRUD rights. 2NF: all five permission bits depend on full (RoleId, MenuId) key.",nf:"2NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"RoleId",t:"UNIQUEIDENTIFIER",fk:"Roles",d:"FK → Roles.Id"},{n:"MenuId",t:"UNIQUEIDENTIFIER",fk:"Menus",d:"FK → Menus.Id"},{n:"CanView",t:"BIT",d:"View access"},{n:"CanAdd",t:"BIT",d:"Create access"},{n:"CanEdit",t:"BIT",d:"Update access"},{n:"CanDelete",t:"BIT",d:"Delete access"},{n:"CanApprove",t:"BIT",d:"Approval access"}]},
+  {n:"UserRefreshTokens",desc:"JWT refresh token store with revocation and rotation audit trail.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"Token",t:"NVARCHAR(500)",d:"Opaque random token string"},{n:"ExpiresAt",t:"DATETIME2",d:"Token expiry timestamp"},{n:"CreatedByIp",t:"NVARCHAR(50)",d:"Client IP at token creation"},{n:"RevokedAt",t:"DATETIME2",d:"NULL = still valid"},{n:"RevokedByIp",t:"NVARCHAR(50)",d:"IP that revoked the token"},{n:"ReplacedByToken",t:"NVARCHAR(500)",d:"Token superseding this one (rotation chain)"}]},
+]},
+{id:"finance",title:"Finance & Payments",icon:"💳",tables:[
+  {n:"Currencies",desc:"ISO 4217 currency master for multi-currency support.",
+   cols:[{n:"CurrencyCode",t:"NCHAR(3)",pk:1,d:"ISO 4217 code e.g. BDT, USD, GBP"},{n:"Name",t:"NVARCHAR(50)",d:"Full currency name"},{n:"Symbol",t:"NVARCHAR(5)",d:"Rendered symbol e.g. ৳, $, £"},{n:"ExchangeRate",t:"DECIMAL(18,6)",d:"Rate relative to base currency"},{n:"DecimalPlaces",t:"TINYINT",d:"0 for BDT (no paisa shown)"},{n:"IsBaseCurrency",t:"BIT",d:"Exactly one row = 1"}]},
+  {n:"TaxRates",desc:"VAT/GST rate definitions. 3NF: IsInclusive, ApplyToShipping all depend on Id only.",nf:"3NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"TaxCode",t:"NVARCHAR(50)",d:"Short code e.g. BD-VAT-15"},{n:"TaxName",t:"NVARCHAR(100)",d:"Display label e.g. VAT 15%"},{n:"Rate",t:"DECIMAL(9,4)",d:"Percentage or fixed amount"},{n:"IsPercentage",t:"BIT",d:"1=Rate is %; 0=Rate is fixed amount"},{n:"IsInclusive",t:"BIT",d:"1=tax embedded in sale price"},{n:"IsDefault",t:"BIT",d:"Applied when no rate explicitly chosen"},{n:"Country",t:"NCHAR(2)",d:"ISO 3166-1 alpha-2 country code"}]},
+  {n:"PaymentGateways",desc:"Gateway provider configurations per payment method.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"MethodCode",t:"NVARCHAR(40)",fk:"PaymentMethods",d:"FK → PaymentMethods.MethodCode"},{n:"Name",t:"NVARCHAR(100)",d:"Gateway display name"},{n:"Provider",t:"NVARCHAR(80)",d:"Gateway company e.g. bKash Ltd"},{n:"ConfigurationJson",t:"NVARCHAR(MAX)",d:"Encrypted gateway credentials — use Always Encrypted"},{n:"IsLiveMode",t:"BIT",d:"0=sandbox/test mode"}]},
+  {n:"Payments",desc:"Every payment attempt for an order. Multiple rows = split payment. 3NF fix: payment fields moved here from Orders.",nf:"3NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders",d:"FK → Orders.Id"},{n:"MethodCode",t:"NVARCHAR(40)",fk:"PaymentMethods",d:"FK → PaymentMethods.MethodCode"},{n:"StatusCode",t:"NVARCHAR(30)",fk:"PaymentStatuses",d:"FK → PaymentStatuses.StatusCode"},{n:"Amount",t:"DECIMAL(18,2)",d:"Payment amount"},{n:"TransactionAmount",t:"DECIMAL(18,2)",d:"May differ due to partial captures"},{n:"GatewayFee",t:"DECIMAL(10,2)",d:"Deducted by gateway on settlement"},{n:"CurrencyCode",t:"NCHAR(3)",d:"FK → Currencies.CurrencyCode"},{n:"TransactionId",t:"NVARCHAR(250)",d:"Gateway-issued transaction reference"},{n:"GatewayResponse",t:"NVARCHAR(MAX)",d:"Raw JSON response for debugging"},{n:"PaidAt",t:"DATETIME2",d:"Timestamp of successful confirmation"},{n:"RefundedAt",t:"DATETIME2",d:"Timestamp of completed refund"}]},
+  {n:"CustomerWallets",desc:"Digital wallet per customer. Balance is authoritative here.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers",d:"FK → Customers.Id — 1:1 relationship"},{n:"CurrencyCode",t:"NCHAR(3)",fk:"Currencies",d:"FK → Currencies.CurrencyCode"},{n:"Balance",t:"DECIMAL(18,2)",d:"Current wallet balance — authoritative source"}]},
+  {n:"WalletTransactions",desc:"Complete credit/debit ledger for each wallet. BalanceAfter is an accepted denorm for fast history display.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"WalletId",t:"UNIQUEIDENTIFIER",fk:"CustomerWallets",d:"FK → CustomerWallets.Id"},{n:"Amount",t:"DECIMAL(18,2)",d:"Positive=credit; Negative=debit"},{n:"BalanceAfter",t:"DECIMAL(18,2)",d:"Snapshot after this transaction (accepted denorm)"},{n:"TransactionType",t:"NVARCHAR(30)",d:"Credit|Debit|Refund|Cashback|Adjustment|Bonus"},{n:"Status",t:"NVARCHAR(20)",d:"Pending|Completed|Failed|Reversed"},{n:"Reference",t:"NVARCHAR(100)",d:"Order number or gateway reference"}]},
+]},
+{id:"warehouse",title:"Warehouses & POS",icon:"🏪",tables:[
+  {n:"Warehouses",desc:"Physical and virtual sites. SiteType discriminator unifies Stores, Warehouses, Virtual locations and PickupPoints — avoids multiple nullable FKs across tables.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Code",t:"NVARCHAR(50)",d:"Short code e.g. WH-MAIN"},{n:"Name",t:"NVARCHAR(150)",d:"Display name"},{n:"SiteType",t:"NVARCHAR(20)",d:"Warehouse|Store|Virtual|PickupPoint"},{n:"ParentId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"Self-reference for warehouse zones"},{n:"City",t:"NVARCHAR(100)",d:"Location city"},{n:"Latitude",t:"DECIMAL(10,7)",d:"GPS latitude for store locator"},{n:"Longitude",t:"DECIMAL(10,7)",d:"GPS longitude for store locator"},{n:"IsDefault",t:"BIT",d:"1=used when no location specified"}]},
+  {n:"Employees",desc:"Store staff profiles linked to user accounts.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"Assigned store or warehouse"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"Linked identity account"},{n:"EmployeeCode",t:"NVARCHAR(50)",d:"Internal code e.g. EMP-0042"},{n:"FirstName",t:"NVARCHAR(100)",d:"First name"},{n:"Designation",t:"NVARCHAR(100)",d:"Job title"},{n:"Salary",t:"DECIMAL(18,2)",d:"Monthly salary"},{n:"JoiningDate",t:"DATETIME2",d:"Employment start date"},{n:"IsActive",t:"BIT",d:"Current employment status"}]},
+  {n:"PosCounters",desc:"Named counter positions within a store.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"FK → Warehouses.Id"},{n:"CounterCode",t:"NVARCHAR(50)",d:"e.g. COUNTER-01"},{n:"CounterName",t:"NVARCHAR(100)",d:"Display name"},{n:"IsActive",t:"BIT",d:"Operational status"}]},
+  {n:"PosTerminals",desc:"Hardware terminal at a POS counter.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"PosCounterId",t:"UNIQUEIDENTIFIER",fk:"PosCounters",d:"FK → PosCounters.Id"},{n:"TerminalCode",t:"NVARCHAR(50)",d:"Terminal identifier"},{n:"MachineName",t:"NVARCHAR(100)",d:"Windows machine name"},{n:"IPAddress",t:"NVARCHAR(50)",d:"Network IP address"},{n:"PrinterName",t:"NVARCHAR(100)",d:"Receipt printer driver name"}]},
+  {n:"CashShifts",desc:"Cashier shift with opening/closing float reconciliation. TotalSalesAmount is an accepted denorm updated after each sale.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"FK → Warehouses.Id"},{n:"PosCounterId",t:"UNIQUEIDENTIFIER",fk:"PosCounters",d:"FK → PosCounters.Id"},{n:"OpenedByEmployeeId",t:"UNIQUEIDENTIFIER",fk:"Employees",d:"Employee who opened shift"},{n:"ClosedByEmployeeId",t:"UNIQUEIDENTIFIER",fk:"Employees",d:"Employee who closed shift"},{n:"OpeningCash",t:"DECIMAL(18,2)",d:"Float at shift start"},{n:"ClosingCash",t:"DECIMAL(18,2)",d:"Physical count at close"},{n:"ExpectedCash",t:"DECIMAL(18,2)",d:"Calculated from opening + net movements"},{n:"CashVariance",t:"DECIMAL(18,2)",d:"ClosingCash - ExpectedCash"},{n:"TotalSalesAmount",t:"DECIMAL(18,2)",d:"Running total — accepted denorm"},{n:"Status",t:"NVARCHAR(20)",d:"Open|Closed|Reconciled"}]},
+  {n:"PosTransactions",desc:"Completed POS sales. CustomerName/Phone kept for walk-in customers without a profile.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ReceiptNumber",t:"NVARCHAR(50)",d:"Printed receipt reference"},{n:"CashShiftId",t:"UNIQUEIDENTIFIER",fk:"CashShifts",d:"FK → CashShifts.Id"},{n:"PosCounterId",t:"UNIQUEIDENTIFIER",fk:"PosCounters",d:"FK → PosCounters.Id"},{n:"CashierId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"Cashier user FK → Users.Id"},{n:"CashierEmployeeId",t:"UNIQUEIDENTIFIER",fk:"Employees",d:"FK → Employees.Id nullable"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers",d:"FK → Customers.Id — NULL for walk-in"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"FK → Warehouses.Id"},{n:"SubTotal",t:"DECIMAL(18,2)",d:"Pre-discount, pre-tax total"},{n:"DiscountAmount",t:"DECIMAL(18,2)",d:"Applied discount"},{n:"TotalTaxAmount",t:"DECIMAL(18,2)",d:"Total tax collected"},{n:"GrandTotal",t:"DECIMAL(18,2)",d:"Final amount charged"},{n:"PaidAmount",t:"DECIMAL(18,2)",d:"Total tendered by customer"},{n:"ChangeAmount",t:"DECIMAL(18,2)",d:"Change returned"},{n:"CustomerName",t:"NVARCHAR(150)",d:"Walk-in name when no customer profile"},{n:"Status",t:"NVARCHAR(20)",d:"Completed|Voided|Held|Refunded"}]},
+  {n:"PosTransactionLines",desc:"Line items on a POS sale. ProductName snapshotted for receipt accuracy.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"TransactionId",t:"UNIQUEIDENTIFIER",fk:"PosTransactions",d:"FK → PosTransactions.Id"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK → ProductVariants.Id nullable"},{n:"ProductName",t:"NVARCHAR(200)",d:"Snapshot for receipt accuracy"},{n:"Quantity",t:"DECIMAL(18,2)",d:"Sold quantity"},{n:"UnitPrice",t:"DECIMAL(18,2)",d:"Price at sale time"},{n:"DiscountAmount",t:"DECIMAL(18,2)",d:"Line-level discount"},{n:"TaxAmount",t:"DECIMAL(18,2)",d:"Line-level tax"},{n:"LineTotal",t:"DECIMAL(18,2)",d:"Qty × UnitPrice − Discount + Tax"}]},
+  {n:"PosPaymentTenders",desc:"Split-tender payment lines. Multiple rows per transaction support cash + card splits.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"TransactionId",t:"UNIQUEIDENTIFIER",fk:"PosTransactions",d:"FK → PosTransactions.Id"},{n:"MethodCode",t:"NVARCHAR(40)",fk:"PaymentMethods",d:"FK → PaymentMethods.MethodCode"},{n:"Amount",t:"DECIMAL(18,2)",d:"Amount tendered in this method"},{n:"TransactionNo",t:"NVARCHAR(100)",d:"MFS reference or card auth number"},{n:"CardLast4",t:"NCHAR(4)",d:"Last 4 digits of card for receipt"}]},
+  {n:"CashDrawerEvents",desc:"Every cash in/out movement for shift reconciliation.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"CashShiftId",t:"UNIQUEIDENTIFIER",fk:"CashShifts",d:"FK → CashShifts.Id"},{n:"PerformedBy",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"EventType",t:"NVARCHAR(25)",d:"Sale|Refund|PaidIn|PaidOut|OpenFloat|CloseCount"},{n:"Amount",t:"DECIMAL(18,2)",d:"Cash amount for this event"},{n:"OccurredAt",t:"DATETIME2",d:"Event timestamp"}]},
+  {n:"DayEndSummaries",desc:"Daily reconciliation report per store/warehouse.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"SummaryDate",t:"DATE",d:"Calendar date (not timestamp)"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"FK → Warehouses.Id"},{n:"TotalSalesAmount",t:"DECIMAL(18,2)",d:"Total sales for the day"},{n:"TotalTransactions",t:"INT",d:"Transaction count"},{n:"CashVariance",t:"DECIMAL(18,2)",d:"Cash discrepancy"},{n:"Status",t:"NVARCHAR(20)",d:"Open|Closed|Reconciled"}]},
+  {n:"ExpenseCategories",desc:"Categories for operational expense tracking.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Name",t:"NVARCHAR(100)",d:"Category name"},{n:"Description",t:"NVARCHAR(255)",d:"Description"},{n:"IsActive",t:"BIT",d:"Enable/disable category"}]},
+  {n:"Expenses",desc:"Operational cost records. 3NF fix: ExpenseCategory string column removed; only ExpenseCategoryId FK remains.",nf:"3NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"FK → Warehouses.Id"},{n:"ExpenseCategoryId",t:"UNIQUEIDENTIFIER",fk:"ExpenseCategories",d:"FK → ExpenseCategories.Id"},{n:"ExpenseDate",t:"DATETIME2",d:"Date the expense occurred"},{n:"Description",t:"NVARCHAR(255)",d:"Expense description"},{n:"Amount",t:"DECIMAL(18,2)",d:"Expense amount"},{n:"MethodCode",t:"NVARCHAR(40)",fk:"PaymentMethods",d:"FK → PaymentMethods.MethodCode"},{n:"ReceiptReference",t:"NVARCHAR(100)",d:"Receipt or voucher reference number"}]},
+]},
+{id:"catalog",title:"Catalog Reference",icon:"📚",tables:[
+  {n:"Brands",desc:"Product manufacturer or brand master.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Name",t:"NVARCHAR(100)",d:"Brand name"},{n:"Slug",t:"NVARCHAR(100)",d:"URL-safe identifier"},{n:"LogoUrl",t:"NVARCHAR(500)",d:"CDN URL for brand logo"},{n:"Website",t:"NVARCHAR(200)",d:"Brand website URL"},{n:"CountryOfOrigin",t:"NCHAR(2)",d:"ISO 3166-1 alpha-2 e.g. KR, JP"},{n:"IsFeatured",t:"BIT",d:"1=shown in featured-brands carousel"}]},
+  {n:"Categories",desc:"Hierarchical product taxonomy tree. ParentCategoryId creates adjacency list. 1NF: each row = one node.",nf:"1NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ParentCategoryId",t:"UNIQUEIDENTIFIER",fk:"Categories",d:"Self-reference; NULL=root category"},{n:"Name",t:"NVARCHAR(100)",d:"Category name"},{n:"Slug",t:"NVARCHAR(100)",d:"URL segment e.g. men-shirts"},{n:"IsFeatured",t:"BIT",d:"Show in featured carousel"},{n:"MetaTitle",t:"NVARCHAR(200)",d:"<title> tag override for SEO"},{n:"MetaDescription",t:"NVARCHAR(500)",d:"<meta description> for SEO"}]},
+  {n:"Suppliers",desc:"Vendor master for procurement.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"SupplierCode",t:"NVARCHAR(50)",d:"Internal code e.g. SUP-0042"},{n:"Name",t:"NVARCHAR(200)",d:"Supplier name"},{n:"ContactPerson",t:"NVARCHAR(150)",d:"Primary contact name"},{n:"PaymentTerms",t:"NVARCHAR(80)",d:"e.g. Net30, COD"},{n:"LeadTimeDays",t:"INT",d:"Average days from PO to delivery"},{n:"Balance",t:"DECIMAL(18,2)",d:"Outstanding payable balance"}]},
+  {n:"Colors",desc:"Color master used by product variants and EAV swatches.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Name",t:"NVARCHAR(80)",d:"Color name"},{n:"HexCode",t:"NCHAR(7)",d:"6-digit hex with hash e.g. #FF5733"}]},
+  {n:"Units",desc:"Unit-of-measure master with base-unit conversion. 3NF: ConversionFactor is intrinsic to this unit's definition.",nf:"3NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Name",t:"NVARCHAR(50)",d:"Full name e.g. Kilogram"},{n:"ShortName",t:"NVARCHAR(20)",d:"Abbreviated e.g. kg"},{n:"BaseUnitId",t:"UNIQUEIDENTIFIER",fk:"Units",d:"e.g. dozen → base piece"},{n:"ConversionFactor",t:"DECIMAL(18,6)",d:"How many base units = one of this unit"}]},
+  {n:"Tags",desc:"Keyword labels for products.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Name",t:"NVARCHAR(50)",d:"Tag name"},{n:"Slug",t:"NVARCHAR(50)",d:"URL-safe slug"}]},
+  {n:"BrandCategories",desc:"M:N brand–category junction. 2NF: no non-key payload.",nf:"2NF",
+   cols:[{n:"BrandId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Brands",d:"FK → Brands.Id"},{n:"CategoryId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Categories",d:"FK → Categories.Id"}]},
+]},
+{id:"products",title:"Products",icon:"🛍",tables:[
+  {n:"Products",desc:"Core product entity. ProductType discriminates Simple, Variant, FixedBundle, DynamicBundle, Service. 1NF fix: RatingAverage and ReviewCount removed (stored computations → vw_ProductStats).",nf:"1NF,3NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"CategoryId",t:"UNIQUEIDENTIFIER",fk:"Categories",d:"FK → Categories.Id"},{n:"BrandId",t:"UNIQUEIDENTIFIER",fk:"Brands",d:"FK → Brands.Id nullable"},{n:"TaxRateId",t:"UNIQUEIDENTIFIER",fk:"TaxRates",d:"Default tax rate for this product"},{n:"SellerId",t:"UNIQUEIDENTIFIER",fk:"Sellers",d:"FK → Sellers.Id (marketplace)"},{n:"Name",t:"NVARCHAR(200)",d:"Product name"},{n:"SKU",t:"NVARCHAR(50)",d:"Global stock-keeping unit"},{n:"Barcode",t:"NVARCHAR(100)",d:"EAN/UPC barcode"},{n:"ProductType",t:"NVARCHAR(20)",d:"Simple|Variant|FixedBundle|DynamicBundle|Service"},{n:"SalePrice",t:"DECIMAL(18,2)",d:"Current sale price"},{n:"CostPrice",t:"DECIMAL(18,2)",d:"Landed cost for margin reports"},{n:"OriginalPrice",t:"DECIMAL(18,2)",d:"Was price shown crossed out"},{n:"WeightKg",t:"DECIMAL(8,3)",d:"Gross weight for shipping calculation"},{n:"MinimumStockLevel",t:"INT",d:"Triggers low-stock alert"},{n:"IsActive",t:"BIT",d:"1=visible on storefront"}]},
+  {n:"ProductVariants",desc:"Sellable attribute combinations e.g. Red/XL/128GB. Stock tracked in StockItems — never on this table.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"Name",t:"NVARCHAR(100)",d:"Auto-generated label e.g. Red / XL"},{n:"SKU",t:"NVARCHAR(50)",d:"Variant-level SKU"},{n:"Barcode",t:"NVARCHAR(50)",d:"Variant-level barcode"},{n:"PriceModifier",t:"DECIMAL(18,2)",d:"Added to Product.SalePrice; 0 = same price"},{n:"OverridePrice",t:"DECIMAL(18,2)",d:"If set, PriceModifier is ignored"},{n:"IsDefault",t:"BIT",d:"1=pre-selected on product page"}]},
+  {n:"AttributeTypes",desc:"Variant-generating attribute axes e.g. Color, Size, RAM, Storage.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Name",t:"NVARCHAR(80)",d:"Axis name"},{n:"UiType",t:"NVARCHAR(20)",d:"Swatch|Dropdown|Button|Text"},{n:"AffectsPrice",t:"BIT",d:"1=selecting this axis changes price"},{n:"AffectsSku",t:"BIT",d:"1=contributes to variant SKU suffix"},{n:"AffectsImage",t:"BIT",d:"1=gallery switches on change"},{n:"AffectsStock",t:"BIT",d:"1=stock tracked per variant"},{n:"IsFilterable",t:"BIT",d:"1=shown in sidebar filter panel"}]},
+  {n:"AttributeOptions",desc:"Selectable values for an attribute axis. ColorId links to Colors master for swatch rendering.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"AttributeTypeId",t:"UNIQUEIDENTIFIER",fk:"AttributeTypes",d:"FK → AttributeTypes.Id"},{n:"ColorId",t:"UNIQUEIDENTIFIER",fk:"Colors",d:"FK for swatch-type attributes"},{n:"Value",t:"NVARCHAR(120)",d:"Raw value e.g. Red, XL, 16GB"},{n:"DisplayValue",t:"NVARCHAR(120)",d:"Override label shown in UI"},{n:"SortOrder",t:"INT",d:"Display sequence"}]},
+  {n:"ProductBatches",desc:"Batch/lot tracking for perishable and expiry-dated items.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"BatchNo",t:"NVARCHAR(100)",d:"Lot number from manufacturer"},{n:"ManufactureDate",t:"DATETIME2",d:"Manufacturing date"},{n:"ExpiryDate",t:"DATETIME2",d:"Expiry date for perishables"},{n:"PurchasePrice",t:"DECIMAL(18,2)",d:"Cost price for this batch"},{n:"SalePrice",t:"DECIMAL(18,2)",d:"Sale price for this batch"}]},
+  {n:"ProductSupplierLinks",desc:"One product can be sourced from multiple suppliers. 3NF fix: replaces single SupplierId FK on Products.",nf:"3NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"SupplierId",t:"UNIQUEIDENTIFIER",fk:"Suppliers",d:"FK → Suppliers.Id"},{n:"SupplierSKU",t:"NVARCHAR(50)",d:"Supplier's own item reference"},{n:"UnitCost",t:"DECIMAL(18,2)",d:"Supplier-specific unit cost"},{n:"LeadTimeDays",t:"INT",d:"Lead time specific to this supplier-product pair"},{n:"IsPreferred",t:"BIT",d:"1=default vendor for re-orders"}]},
+  {n:"ProductPriceHistories",desc:"Immutable audit trail of all price changes.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"ChangedByUserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"OldSalePrice",t:"DECIMAL(18,2)",d:"Previous sale price"},{n:"NewSalePrice",t:"DECIMAL(18,2)",d:"New sale price"},{n:"OldCostPrice",t:"DECIMAL(18,2)",d:"Previous cost price"},{n:"NewCostPrice",t:"DECIMAL(18,2)",d:"New cost price"},{n:"EffectiveFrom",t:"DATETIME2",d:"When change took effect"},{n:"Reason",t:"NVARCHAR(255)",d:"Price change reason"}]},
+  {n:"ProductAttributeLinks",desc:"Declares which attribute axes apply to a product. 2NF: IsRequired depends on (ProductId, AttributeTypeId).",nf:"2NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"AttributeTypeId",t:"UNIQUEIDENTIFIER",fk:"AttributeTypes",d:"FK → AttributeTypes.Id"},{n:"IsRequired",t:"BIT",d:"1=customer must select this axis"},{n:"SortOrder",t:"INT",d:"Display sequence on product page"}]},
+  {n:"VariantAttributeOptions",desc:"Assigns specific attribute option values to a variant. 2NF: pure junction table.",nf:"2NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK → ProductVariants.Id"},{n:"OptionId",t:"UNIQUEIDENTIFIER",fk:"AttributeOptions",d:"FK → AttributeOptions.Id"}]},
+  {n:"VariantAttributeMatrix",desc:"Pre-computed attribute-combination → variant lookup index. AttributeCombination = canonical sorted JSON for O(1) cart lookup.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK → ProductVariants.Id"},{n:"AttributeCombination",t:"NVARCHAR(MAX)",d:'Canonical JSON e.g. {"color":"<guid>","size":"<guid>"}'},{n:"IsAvailable",t:"BIT",d:"0=out-of-stock combination"}]},
+  {n:"ProductSpecifications",desc:"Flat specification names for product detail pages (display only, not variant-generating).",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"SpecName",t:"NVARCHAR(100)",d:"e.g. Display Resolution, Battery Capacity"},{n:"SortOrder",t:"INT",d:"Display sequence"}]},
+  {n:"ProductSpecificationValues",desc:"Per-product values for each specification. VariantId allows variant-level overrides.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"NULL=applies to all variants"},{n:"SpecId",t:"UNIQUEIDENTIFIER",fk:"ProductSpecifications",d:"FK → ProductSpecifications.Id"},{n:"Value",t:"NVARCHAR(MAX)",d:"e.g. 1080 × 2400 px"}]},
+  {n:"ProductImages",desc:"URL-referenced display images for products and variants.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"NULL=shown for all variants"},{n:"ImageUrl",t:"NVARCHAR(500)",d:"CDN or local URL"},{n:"AltText",t:"NVARCHAR(200)",d:"HTML alt attribute for accessibility and SEO"},{n:"IsPrimary",t:"BIT",d:"1=main image shown first"},{n:"SortOrder",t:"INT",d:"Gallery display sequence"}]},
+  {n:"ProductMedia",desc:"Metadata record for binary product images stored in ProductMediaBlob.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK nullable"},{n:"Scope",t:"NVARCHAR(20)",d:"Product|Variant|Bundle|Component"},{n:"MediaType",t:"NVARCHAR(10)",d:"Image|Video|Document"},{n:"FileName",t:"NVARCHAR(260)",d:"Server file name"},{n:"MimeType",t:"NVARCHAR(80)",d:"MIME type e.g. image/jpeg"},{n:"ETag",t:"NCHAR(32)",d:"MD5 hex hash (always 32 chars) for HTTP cache"}]},
+  {n:"ProductMediaBlob",desc:"Binary bytes only — separated from metadata. NEVER SELECT * from this table.",
+   cols:[{n:"MediaId",t:"UNIQUEIDENTIFIER",pk:1,fk:"ProductMedia",d:"FK → ProductMedia.Id — 1:1"},{n:"Data",t:"VARBINARY(MAX)",d:"Original file bytes"},{n:"ThumbnailData",t:"VARBINARY(MAX)",d:"150×150 px resized thumbnail"},{n:"WebpData",t:"VARBINARY(MAX)",d:"WebP-converted version for modern browsers"}]},
+  {n:"BundleComponents",desc:"Fixed component variants in a FixedBundle product.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"BundleProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id (the bundle)"},{n:"ComponentVariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK → ProductVariants.Id"},{n:"Quantity",t:"DECIMAL(18,2)",d:"Units of this component in the bundle"},{n:"IsSubstitutable",t:"BIT",d:"1=customer may swap for another variant"}]},
+  {n:"BundleOptionGroups",desc:"Named choice groups in a DynamicBundle.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"BundleProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"GroupName",t:"NVARCHAR(100)",d:"e.g. Choose your main course"},{n:"IsRequired",t:"BIT",d:"1=customer must make a selection"},{n:"MinSelections",t:"INT",d:"Minimum required selections"},{n:"MaxSelections",t:"INT",d:"Maximum allowed selections"}]},
+  {n:"BundleOptionItems",desc:"Variant choices available within a bundle option group.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"GroupId",t:"UNIQUEIDENTIFIER",fk:"BundleOptionGroups",d:"FK → BundleOptionGroups.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK → ProductVariants.Id"},{n:"PriceAdjustment",t:"DECIMAL(18,2)",d:"Upsell/downsell offset from group base"},{n:"IsDefault",t:"BIT",d:"1=pre-selected option"}]},
+]},
+{id:"inventory",title:"Inventory & Procurement",icon:"📦",tables:[
+  {n:"StockItems",desc:"Per-warehouse per-variant inventory balance. Single source of truth for stock levels. AverageCostPrice enables weighted-average COGS.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"NULL for simple products"},{n:"BatchId",t:"UNIQUEIDENTIFIER",fk:"ProductBatches",d:"FK nullable for batch tracking"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"FK → Warehouses.Id"},{n:"QuantityOnHand",t:"DECIMAL(18,2)",d:"Physical stock count"},{n:"ReservedQuantity",t:"DECIMAL(18,2)",d:"Held for open orders — prevents overselling"},{n:"AverageCostPrice",t:"DECIMAL(18,4)",d:"Weighted-average cost (COGS)"},{n:"ReorderLevel",t:"DECIMAL(18,2)",d:"Triggers low-stock alert at this level"},{n:"LastCountDate",t:"DATETIME2",d:"Date of most recent physical stock count"}]},
+  {n:"StockMovements",desc:"Immutable ledger of every stock quantity change. QuantityIn/Out are separate non-negative columns. BalanceAfter snapshots running balance.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK nullable"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"FK → Warehouses.Id"},{n:"MovementTypeCode",t:"NVARCHAR(30)",fk:"StockMovementTypes",d:"FK → StockMovementTypes.TypeCode"},{n:"QuantityIn",t:"DECIMAL(18,2)",d:"Units added to stock"},{n:"QuantityOut",t:"DECIMAL(18,2)",d:"Units removed from stock"},{n:"BalanceAfter",t:"DECIMAL(18,2)",d:"Running warehouse balance snapshot"},{n:"ReferenceType",t:"NVARCHAR(40)",d:"e.g. Order, PurchaseOrder, Adjustment"},{n:"ReferenceId",t:"UNIQUEIDENTIFIER",d:"GUID of the referencing record"},{n:"OccurredAt",t:"DATETIME2",d:"Movement timestamp"}]},
+  {n:"InventoryAdjustments",desc:"Header record for a batch stock correction.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"AdjustmentNo",t:"NVARCHAR(50)",d:"Reference number"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"FK → Warehouses.Id"},{n:"AdjustmentType",t:"NVARCHAR(30)",d:"StockCount|DamageWriteOff|ExpiryWriteOff|Correction|Found"},{n:"Reason",t:"NVARCHAR(200)",d:"Reason for adjustment"},{n:"ApprovedByUserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"}]},
+  {n:"InventoryAdjustmentLines",desc:"Line items for a stock adjustment. SystemQuantity vs CountedQuantity tracks discrepancy explicitly.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"InventoryAdjustmentId",t:"UNIQUEIDENTIFIER",fk:"InventoryAdjustments",d:"FK → InventoryAdjustments.Id"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK nullable"},{n:"SystemQuantity",t:"DECIMAL(18,2)",d:"What the system believes the stock is"},{n:"CountedQuantity",t:"DECIMAL(18,2)",d:"What was physically found during count"},{n:"AdjustmentQuantity",t:"DECIMAL(18,2)",d:"CountedQuantity - SystemQuantity (can be negative)"}]},
+  {n:"StockTransfers",desc:"Inter-warehouse transfer tracking.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"TransferNo",t:"NVARCHAR(50)",d:"Transfer reference number"},{n:"FromWarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"Origin warehouse"},{n:"ToWarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"Destination warehouse"},{n:"TransferDate",t:"DATETIME2",d:"Transfer date"},{n:"Status",t:"NVARCHAR(20)",d:"Pending|InTransit|Completed|Cancelled"}]},
+  {n:"StockTransferLines",desc:"Individual product lines within a stock transfer.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"TransferId",t:"UNIQUEIDENTIFIER",fk:"StockTransfers",d:"FK → StockTransfers.Id"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK nullable"},{n:"Quantity",t:"DECIMAL(18,2)",d:"Quantity to transfer"}]},
+  {n:"ReorderRules",desc:"Automatic reorder triggers per product/variant/warehouse.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK nullable"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"Scope to one warehouse; NULL=all"},{n:"PreferredSupplierId",t:"UNIQUEIDENTIFIER",fk:"Suppliers",d:"FK → Suppliers.Id"},{n:"ReorderLevel",t:"DECIMAL(18,2)",d:"Trigger threshold"},{n:"ReorderQuantity",t:"DECIMAL(18,2)",d:"Quantity to order when triggered"}]},
+  {n:"PurchaseOrders",desc:"Procurement orders to suppliers.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"OrderNumber",t:"NVARCHAR(50)",d:"Human-readable PO number"},{n:"SupplierId",t:"UNIQUEIDENTIFIER",fk:"Suppliers",d:"FK → Suppliers.Id"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"Receiving warehouse"},{n:"CreatedByUserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"ApprovedByUserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"Status",t:"NVARCHAR(25)",d:"Draft|PendingApproval|Approved|Sent|PartialReceived|Received|Cancelled"},{n:"GrandTotal",t:"DECIMAL(18,2)",d:"Total including taxes and costs"},{n:"PaidAmount",t:"DECIMAL(18,2)",d:"Amount paid to supplier"},{n:"DueAmount",t:"DECIMAL(18,2)",d:"GrandTotal - PaidAmount"}]},
+  {n:"PurchaseOrderLines",desc:"Line items on a purchase order. ProductName snapshotted for receipt accuracy.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"PurchaseOrderId",t:"UNIQUEIDENTIFIER",fk:"PurchaseOrders",d:"FK → PurchaseOrders.Id"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK nullable"},{n:"ProductName",t:"NVARCHAR(200)",d:"Snapshot for receipt accuracy"},{n:"Quantity",t:"DECIMAL(18,2)",d:"Ordered quantity"},{n:"ReceivedQuantity",t:"DECIMAL(18,2)",d:"Quantity confirmed received so far"},{n:"UnitPrice",t:"DECIMAL(18,2)",d:"Negotiated unit price"}]},
+  {n:"GoodsReceipts",desc:"Delivery confirmation records per purchase order.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"PurchaseOrderId",t:"UNIQUEIDENTIFIER",fk:"PurchaseOrders",d:"FK → PurchaseOrders.Id"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"Receiving warehouse"},{n:"ReceivedByUserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"ReceiptNumber",t:"NVARCHAR(50)",d:"GRN number"},{n:"ReceiptDate",t:"DATETIME2",d:"Date goods received"},{n:"Condition",t:"NVARCHAR(50)",d:"e.g. Good, Partial Damage"}]},
+  {n:"GoodsReceiptLines",desc:"Individual product lines received in a goods receipt.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"GoodsReceiptId",t:"UNIQUEIDENTIFIER",fk:"GoodsReceipts",d:"FK → GoodsReceipts.Id"},{n:"PurchaseOrderLineId",t:"UNIQUEIDENTIFIER",fk:"PurchaseOrderLines",d:"FK → PurchaseOrderLines.Id"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"Quantity",t:"DECIMAL(18,2)",d:"Quantity actually received"},{n:"UnitCost",t:"DECIMAL(18,2)",d:"Actual unit cost for COGS"}]},
+]},
+{id:"orders",title:"Orders & Customers",icon:"🛒",tables:[
+  {n:"Customers",desc:"Domain-level profile linked 1:1 to Users. 1NF fix: TotalOrders/TotalSpent/LastOrderDate removed (stored aggregations → vw_CustomerStats).",nf:"1NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id — 1:1 link to identity"},{n:"CustomerCode",t:"NVARCHAR(50)",d:"e.g. CUS-00042"},{n:"CustomerType",t:"NVARCHAR(30)",d:"Retail|Wholesale|Corporate|VIP"},{n:"Phone",t:"NVARCHAR(30)",d:"Primary phone"},{n:"Balance",t:"DECIMAL(18,2)",d:"Outstanding account receivable"},{n:"CreditLimit",t:"DECIMAL(18,2)",d:"Maximum credit balance permitted"},{n:"LoyaltyPoints",t:"INT",d:"Cached point balance (authoritative in LoyaltyTransactions)"},{n:"LastPurchaseDate",t:"DATETIME2",d:"Accepted denorm — updated by service after each order"}]},
+  {n:"CustomerProfiles",desc:"Loyalty tier assignment and marketing preferences.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers",d:"FK → Customers.Id — 1:1"},{n:"TierCode",t:"NVARCHAR(20)",fk:"CustomerTiers",d:"FK → CustomerTiers.TierCode"},{n:"NewsletterOptIn",t:"BIT",d:"Email marketing consent"},{n:"SmsOptIn",t:"BIT",d:"SMS marketing consent"},{n:"TierUpgradeDate",t:"DATETIME2",d:"Date customer last moved up a tier"}]},
+  {n:"LoyaltyTransactions",desc:"Full loyalty point ledger. Balance = SUM(Points). 1NF fix: replaces stored LoyaltyPoints INT on Customers.",nf:"1NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers",d:"FK → Customers.Id"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders",d:"Source order FK nullable"},{n:"TransactionType",t:"NVARCHAR(20)",d:"Earn|Redeem|Expire|Adjust|Bonus"},{n:"Points",t:"INT",d:"Positive=credit; Negative=debit"},{n:"ExpiryDate",t:"DATETIME2",d:"When this batch of points expires"},{n:"IsUsed",t:"BIT",d:"1=these points have been redeemed"}]},
+  {n:"CustomerAddresses",desc:"Customer shipping and billing addresses.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers",d:"FK → Customers.Id"},{n:"AddressType",t:"NVARCHAR(20)",d:"Shipping|Billing|Both"},{n:"Label",t:"NVARCHAR(50)",d:"User nickname e.g. Home, Office"},{n:"FullName",t:"NVARCHAR(120)",d:"Recipient full name"},{n:"AddressLine1",t:"NVARCHAR(500)",d:"Street address"},{n:"City",t:"NVARCHAR(100)",d:"City"},{n:"Country",t:"NCHAR(2)",d:"ISO 3166-1 alpha-2"},{n:"IsDefault",t:"BIT",d:"1=pre-selected at checkout"}]},
+  {n:"Orders",desc:"E-commerce purchase orders. 3NF fix: PaymentMethod/Status/Date/TransactionId moved to Payments; InternalNote merged into AdminNote.",nf:"3NF",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"OrderNumber",t:"NVARCHAR(50)",d:"Human-readable e.g. ORD-2025-00042"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers",d:"FK → Customers.Id"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses",d:"Fulfilment site"},{n:"ShippingAddressId",t:"UNIQUEIDENTIFIER",fk:"CustomerAddresses",d:"FK → CustomerAddresses.Id"},{n:"StatusCode",t:"NVARCHAR(30)",fk:"OrderStatuses",d:"FK → OrderStatuses.StatusCode"},{n:"SubTotal",t:"DECIMAL(18,2)",d:"Pre-discount total"},{n:"ShippingAmount",t:"DECIMAL(18,2)",d:"Shipping charge"},{n:"TaxAmount",t:"DECIMAL(18,2)",d:"Total tax"},{n:"DiscountAmount",t:"DECIMAL(18,2)",d:"Applied discount"},{n:"TotalAmount",t:"DECIMAL(18,2)",d:"Grand total"},{n:"PaidAmount",t:"DECIMAL(18,2)",d:"Total paid so far"},{n:"AdminNote",t:"NVARCHAR(2000)",d:"Internal staff commentary (merged from InternalNote + AdminNote)"}]},
+  {n:"OrderItems",desc:"Snapshotted line items. ProductName/VariantName stored for receipt accuracy even after future renames.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders",d:"FK → Orders.Id"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants",d:"FK nullable"},{n:"SellerId",t:"UNIQUEIDENTIFIER",fk:"Sellers",d:"Marketplace seller FK"},{n:"ProductName",t:"NVARCHAR(200)",d:"Snapshot at order time"},{n:"VariantName",t:"NVARCHAR(120)",d:"Snapshot at order time"},{n:"Quantity",t:"DECIMAL(18,2)",d:"Ordered quantity"},{n:"UnitPrice",t:"DECIMAL(18,2)",d:"Price at order time"},{n:"UnitCost",t:"DECIMAL(18,2)",d:"For margin reporting"},{n:"TotalPrice",t:"DECIMAL(18,2)",d:"Line total"}]},
+  {n:"OrderItemTaxes",desc:"Per-line tax breakdown for e-commerce orders.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"OrderItemId",t:"UNIQUEIDENTIFIER",fk:"OrderItems",d:"FK → OrderItems.Id"},{n:"TaxRateId",t:"UNIQUEIDENTIFIER",fk:"TaxRates",d:"FK → TaxRates.Id"},{n:"TaxName",t:"NVARCHAR(100)",d:"Snapshot of tax name at order time"},{n:"TaxRate",t:"DECIMAL(9,4)",d:"Snapshot of rate at order time"},{n:"TaxAmount",t:"DECIMAL(18,2)",d:"Tax amount for this line"}]},
+  {n:"Shipments",desc:"Outbound delivery records. One order can have multiple shipments.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders",d:"FK → Orders.Id"},{n:"ShippingMethodId",t:"UNIQUEIDENTIFIER",fk:"ShippingMethods",d:"FK → ShippingMethods.Id"},{n:"CarrierId",t:"UNIQUEIDENTIFIER",fk:"ShippingCarriers",d:"FK → ShippingCarriers.Id"},{n:"TrackingNumber",t:"NVARCHAR(120)",d:"Carrier tracking number"},{n:"StatusCode",t:"NVARCHAR(30)",fk:"ShipmentStatuses",d:"FK → ShipmentStatuses.StatusCode"},{n:"ShippingCost",t:"DECIMAL(18,2)",d:"Actual shipping cost charged"}]},
+  {n:"Invoices",desc:"Formal invoice document linked to an order.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders",d:"FK → Orders.Id"},{n:"InvoiceNumber",t:"NVARCHAR(50)",d:"Invoice reference"},{n:"TotalAmount",t:"DECIMAL(18,2)",d:"Invoice total"},{n:"AmountDue",t:"DECIMAL(18,2)",d:"TotalAmount minus any advance paid"},{n:"PaymentDueDate",t:"DATETIME2",d:"For net-terms / credit sales"}]},
+  {n:"Returns",desc:"Customer return requests for e-commerce orders.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders",d:"FK → Orders.Id"},{n:"ReturnNumber",t:"NVARCHAR(50)",d:"Human-readable return reference"},{n:"RmaNumber",t:"NVARCHAR(50)",d:"Return Merchandise Authorisation number"},{n:"Reason",t:"NVARCHAR(500)",d:"Customer return reason"},{n:"StatusCode",t:"NVARCHAR(30)",fk:"ReturnStatuses",d:"FK → ReturnStatuses.StatusCode"},{n:"RefundAmount",t:"DECIMAL(18,2)",d:"Amount to be refunded"}]},
+  {n:"RefundRequests",desc:"Customer-initiated refund claims.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders",d:"FK → Orders.Id"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers",d:"FK → Customers.Id"},{n:"ReturnId",t:"UNIQUEIDENTIFIER",fk:"Returns",d:"FK → Returns.Id nullable"},{n:"RefundAmount",t:"DECIMAL(18,2)",d:"Requested refund amount"},{n:"StatusCode",t:"NVARCHAR(25)",fk:"ReturnStatuses",d:"FK → ReturnStatuses.StatusCode"},{n:"ReturnToWallet",t:"BIT",d:"1=credit wallet instead of original payment method"}]},
+  {n:"Reviews",desc:"Customer product ratings and text reviews.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products",d:"FK → Products.Id"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers",d:"FK → Customers.Id"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders",d:"FK nullable — links to purchase"},{n:"Rating",t:"TINYINT",d:"1–5 star rating"},{n:"IsVerifiedPurchase",t:"BIT",d:"1=reviewer has a confirmed purchase"},{n:"IsApproved",t:"BIT",d:"Moderation approval flag"},{n:"HelpfulCount",t:"INT",d:"Accepted denorm — updated by trigger"},{n:"AdminResponse",t:"NVARCHAR(MAX)",d:"Seller/admin reply text"}]},
+  {n:"ReviewHelpfulness",desc:"One vote per user per review. 2NF: IsHelpful depends on full (ReviewId, UserId) key.",nf:"2NF",
+   cols:[{n:"ReviewId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Reviews",d:"FK → Reviews.Id"},{n:"UserId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Users",d:"FK → Users.Id"},{n:"IsHelpful",t:"BIT",d:"1=helpful, 0=not helpful"},{n:"CreatedAt",t:"DATETIME2",d:"Vote timestamp"}]},
+  {n:"Wishlists",desc:"Customer saved product lists.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers",d:"FK → Customers.Id"},{n:"WishlistTypeCode",t:"NVARCHAR(20)",fk:"WishlistTypes",d:"FK → WishlistTypes.TypeCode"},{n:"Name",t:"NVARCHAR(100)",d:"Wishlist name"},{n:"SharingToken",t:"NVARCHAR(100)",d:"Unique token for public share URL"},{n:"IsPublic",t:"BIT",d:"1=visible via public link"}]},
+]},
+{id:"system",title:"System & CMS",icon:"⚙",tables:[
+  {n:"AuditLogs",desc:"Immutable security/compliance audit trail. BIGINT IDENTITY PK for write throughput. 3NF: no UpdatedAt/UpdatedBy/IsDeleted — these would imply mutability which violates immutability requirement.",nf:"3NF",
+   cols:[{n:"Id",t:"BIGINT IDENTITY",pk:1,d:"Auto-increment — BIGINT for high-volume insert performance"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id nullable (system actions)"},{n:"Action",t:"NVARCHAR(120)",d:"e.g. Create, Update, Delete, Login"},{n:"EntityName",t:"NVARCHAR(100)",d:"Table/aggregate name e.g. Products"},{n:"EntityId",t:"NVARCHAR(60)",d:"GUID or int PK as string (supports both)"},{n:"OldValues",t:"NVARCHAR(MAX)",d:"JSON snapshot of old state"},{n:"NewValues",t:"NVARCHAR(MAX)",d:"JSON snapshot of new state"},{n:"IpAddress",t:"NVARCHAR(50)",d:"Client IP address"},{n:"OccurredAt",t:"DATETIME2",d:"Event timestamp"}]},
+  {n:"ActivityLogs",desc:"User-visible action history — separate from immutable AuditLogs.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"ActivityType",t:"NVARCHAR(80)",d:"e.g. ProductViewed, OrderPlaced, LoginSuccess"},{n:"Description",t:"NVARCHAR(MAX)",d:"Human-readable description"},{n:"EntityType",t:"NVARCHAR(60)",d:"e.g. Product, Order"},{n:"EntityId",t:"UNIQUEIDENTIFIER",d:"GUID of the referenced entity"},{n:"OccurredAt",t:"DATETIME2",d:"Event timestamp"}]},
+  {n:"SupportTickets",desc:"Customer service tickets with priority and assignment.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"TicketNumber",t:"NVARCHAR(30)",d:"Human-readable reference"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"Submitter FK → Users.Id"},{n:"AssignedToId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"Assigned agent FK → Users.Id"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders",d:"Related order FK nullable"},{n:"Priority",t:"NVARCHAR(20)",d:"Low|Normal|High|Urgent"},{n:"Status",t:"NVARCHAR(20)",d:"Open|Pending|Resolved|Closed"}]},
+  {n:"SupportTicketMessages",desc:"Threaded conversation on a support ticket.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"SupportTicketId",t:"UNIQUEIDENTIFIER",fk:"SupportTickets",d:"FK → SupportTickets.Id"},{n:"SenderId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"Message",t:"NVARCHAR(MAX)",d:"Message content"},{n:"IsFromAdmin",t:"BIT",d:"1=staff reply"},{n:"AttachmentUrl",t:"NVARCHAR(500)",d:"CDN URL of attached file"}]},
+  {n:"Notifications",desc:"In-app, email and SMS notification records.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK nullable — NULL for broadcasts"},{n:"Title",t:"NVARCHAR(200)",d:"Notification headline"},{n:"Type",t:"NVARCHAR(50)",d:"e.g. OrderUpdate, Promo, LowStock"},{n:"IsRead",t:"BIT",d:"Read/unread status"},{n:"TargetRole",t:"NVARCHAR(256)",d:"Role ID for broadcast notifications"}]},
+  {n:"AppSettings",desc:"Key-value application configuration store.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Key",t:"NVARCHAR(120)",d:"Setting key — globally unique"},{n:"Value",t:"NVARCHAR(MAX)",d:"Setting value"},{n:"Category",t:"NVARCHAR(60)",d:"e.g. Store, Feature, Loyalty, Inventory"},{n:"DataType",t:"NVARCHAR(20)",d:"String|Bool|Int|Decimal|JSON|DateTime"},{n:"IsPublic",t:"BIT",d:"1=value may be returned to front-end clients"},{n:"IsEncrypted",t:"BIT",d:"1=value encrypted at rest"}]},
+  {n:"EmailTemplates",desc:"Transactional email template store with merge-tag support.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Name",t:"NVARCHAR(120)",d:"Template name"},{n:"Subject",t:"NVARCHAR(300)",d:"Email subject line"},{n:"Body",t:"NVARCHAR(MAX)",d:"HTML body with {{merge_tag}} placeholders"},{n:"TemplateType",t:"NVARCHAR(60)",d:"e.g. OrderConfirmation, PasswordReset, ShipmentUpdate"},{n:"IsActive",t:"BIT",d:"Enable/disable template"}]},
+  {n:"Blogs",desc:"Blog articles with full SEO support and author tracking.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"CategoryId",t:"UNIQUEIDENTIFIER",fk:"BlogCategories",d:"FK → BlogCategories.Id"},{n:"AuthorId",t:"UNIQUEIDENTIFIER",fk:"Users",d:"FK → Users.Id"},{n:"Title",t:"NVARCHAR(300)",d:"Article title"},{n:"Slug",t:"NVARCHAR(300)",d:"URL-safe slug"},{n:"Content",t:"NVARCHAR(MAX)",d:"Full rich-text content"},{n:"IsPublished",t:"BIT",d:"1=visible on blog"},{n:"ViewCount",t:"INT",d:"Accepted denorm — incremented asynchronously"},{n:"MetaTitle",t:"NVARCHAR(200)",d:"SEO title override"},{n:"MetaDescription",t:"NVARCHAR(500)",d:"SEO meta description"}]},
+  {n:"StaticPages",desc:"CMS pages such as About Us, Privacy Policy, Terms.",
+   cols:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1,d:"GUID PK"},{n:"Title",t:"NVARCHAR(200)",d:"Page title"},{n:"Slug",t:"NVARCHAR(200)",d:"URL-safe slug"},{n:"Content",t:"NVARCHAR(MAX)",d:"Full HTML/rich-text content"},{n:"IsPublished",t:"BIT",d:"1=publicly accessible"},{n:"MetaTitle",t:"NVARCHAR(200)",d:"SEO title"},{n:"MetaDescription",t:"NVARCHAR(500)",d:"SEO description"}]},
+]},
+];
+
+function buildNav(){
+  const tree=document.getElementById('navtree');
+  SECS.forEach(sec=>{
+    const sd=document.createElement('div');sd.className='ns';
+    const sh=document.createElement('div');sh.className='nsh';
+    sh.innerHTML=`<span>${sec.icon} ${sec.title}</span><span style="font-size:10px;color:#4c5899">${sec.tables.length}</span>`;
+    sh.onclick=()=>document.getElementById('sec-'+sec.id)?.scrollIntoView({behavior:'smooth'});
+    sd.appendChild(sh);
+    sec.tables.forEach(t=>{
+      const nt=document.createElement('div');nt.className='nt';nt.dataset.t=t.n;
+      nt.textContent=t.n;nt.title=t.n;
+      nt.onclick=()=>{document.querySelectorAll('.nt').forEach(x=>x.classList.remove('act'));nt.classList.add('act');document.getElementById('tbl-'+t.n)?.scrollIntoView({behavior:'smooth'});};
+      sd.appendChild(nt);
+    });
+    tree.appendChild(sd);
+  });
+}
+
+function buildSections(){
+  const cont=document.getElementById('sections');
+  SECS.forEach(sec=>{
+    const blk=document.createElement('div');blk.className='sblk';blk.id='sec-'+sec.id;
+    blk.innerHTML=`<div class="stitle">${sec.icon} ${sec.title}<span class="sbadge">${sec.tables.length} tables</span></div>`;
+    sec.tables.forEach(t=>{
+      const card=document.createElement('div');card.className='tcard';card.id='tbl-'+t.n;
+      const nfHtml=(t.nf||'').split(',').filter(Boolean).map(n=>`<span class="nf${n[0]}">${n}</span>`).join('');
+      const hdr=document.createElement('div');hdr.className='tchead';
+      hdr.innerHTML=`<span class="tname">📋 ${t.n}</span>${nfHtml}<span class="tnote chev">▶</span>`;
+      hdr.onclick=()=>{body.classList.toggle('open');hdr.querySelector('.chev').textContent=body.classList.contains('open')?'▼':'▶';};
+      card.appendChild(hdr);
+      const body=document.createElement('div');body.className='tbody';
+      if(t.desc){const d=document.createElement('div');d.className='desc';d.textContent=t.desc;body.appendChild(d);}
+      const tbl=document.createElement('table');tbl.className='cols';
+      tbl.innerHTML='<thead><tr><th>Column</th><th>Type</th><th>Description</th></tr></thead>';
+      const tb=document.createElement('tbody');
+      t.cols.forEach(c=>{
+        const tr=document.createElement('tr');
+        const pkb=c.pk?'<span class="bpk">PK</span>':'';
+        const fkb=c.fk?'<span class="bfk">FK</span>':'';
+        const cls=c.pk?'pk':(c.fk?'fk':'');
+        tr.innerHTML=`<td><span class="cn ${cls}">${pkb}${fkb}${c.n}</span></td><td class="ct">${c.t}</td><td class="cd">${c.d||''}</td>`;
+        tb.appendChild(tr);
+      });
+      tbl.appendChild(tb);body.appendChild(tbl);card.appendChild(body);blk.appendChild(card);
+    });
+    cont.appendChild(blk);
+  });
+}
+
+function searchNav(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('.nt').forEach(n=>{n.style.display=(!q||n.dataset.t.toLowerCase().includes(q))?'':'none';});
+}
+buildNav();buildSections();
+</script>
+</body>
+</html>

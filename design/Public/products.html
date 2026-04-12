@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop All Products - NEXUS Store</title>
+    <link rel="stylesheet" href="../assets/css/nexus-design-system.css">
+    <style>
+        /* Storefront Specific Styles */
+        :root {
+            --store-header-height: 140px;
+            --store-accent: #6366f1;
+            --store-text: #1f2937;
+            --store-text-muted: #6b7280;
+            --store-bg: #ffffff;
+            --store-bg-alt: #f9fafb;
+            --store-border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--store-bg);
+            color: var(--store-text);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .store-header {
+            background: white;
+            border-bottom: 1px solid var(--store-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            background: var(--store-accent);
+            color: white;
+            padding: 8px 0;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .header-main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .store-logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--store-accent);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 2px solid var(--store-border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--store-accent);
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--store-text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--store-text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .header-link:hover {
+            color: var(--store-accent);
+        }
+
+        .cart-badge {
+            background: var(--store-accent);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+
+        /* Navigation */
+        .header-nav {
+            background: var(--store-bg-alt);
+            border-bottom: 1px solid var(--store-border);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-link {
+            padding: 14px 0;
+            color: var(--store-text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--store-accent);
+            border-bottom-color: var(--store-accent);
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--store-text-muted);
+        }
+
+        .breadcrumb a {
+            color: var(--store-text-muted);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--store-accent);
+        }
+
+        .breadcrumb span {
+            color: var(--store-text);
+        }
+
+        /* Main Layout */
+        .shop-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px 48px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+        }
+
+        /* Sidebar Filters */
+        .filter-sidebar {
+            position: sticky;
+            top: 160px;
+            height: fit-content;
+        }
+
+        .filter-section {
+            background: white;
+            border: 1px solid var(--store-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .filter-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--store-text);
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-title button {
+            background: none;
+            border: none;
+            color: var(--store-accent);
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Category Tree */
+        .category-tree {
+            list-style: none;
+        }
+
+        .category-item {
+            margin-bottom: 8px;
+        }
+
+        .category-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--store-text);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 6px 0;
+        }
+
+        .category-link:hover {
+            color: var(--store-accent);
+        }
+
+        .category-link.active {
+            color: var(--store-accent);
+            font-weight: 600;
+        }
+
+        .category-count {
+            color: var(--store-text-muted);
+            font-size: 12px;
+        }
+
+        .category-children {
+            list-style: none;
+            padding-left: 16px;
+            margin-top: 4px;
+        }
+
+        /* Price Range */
+        .price-range {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .price-input {
+            flex: 1;
+        }
+
+        .price-input label {
+            display: block;
+            font-size: 12px;
+            color: var(--store-text-muted);
+            margin-bottom: 4px;
+        }
+
+        .price-input input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--store-border);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .price-slider {
+            margin: 16px 0;
+        }
+
+        .price-slider input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: var(--store-border);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .price-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--store-accent);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Checkbox Filters */
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--store-accent);
+        }
+
+        .filter-option label {
+            font-size: 14px;
+            color: var(--store-text);
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Rating Filter */
+        .rating-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #fbbf24;
+        }
+
+        .star.empty {
+            color: var(--store-border);
+        }
+
+        /* Color Swatches */
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-swatch:hover,
+        .color-swatch.selected {
+            border-color: var(--store-accent);
+            transform: scale(1.1);
+        }
+
+        .color-swatch.selected::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Size Options */
+        .size-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .size-btn {
+            min-width: 40px;
+            padding: 6px 12px;
+            border: 1px solid var(--store-border);
+            border-radius: 6px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .size-btn:hover {
+            border-color: var(--store-accent);
+        }
+
+        .size-btn.selected {
+            background: var(--store-accent);
+            color: white;
+            border-color: var(--store-accent);
+        }
+
+        /* Products Area */
+        .products-area {
+            min-width: 0;
+        }
+
+        /* Toolbar */
+        .products-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .results-info {
+            font-size: 14px;
+            color: var(--store-text-muted);
+        }
+
+        .results-info strong {
+            color: var(--store-text);
+        }
+
+        .toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .sort-select {
+            padding: 10px 36px 10px 14px;
+            border: 1px solid var(--store-border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
+            cursor: pointer;
+            appearance: none;
+        }
+
+        .view-toggle {
+            display: flex;
+            border: 1px solid var(--store-border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .view-btn {
+            padding: 8px 12px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            color: var(--store-text-muted);
+            transition: all 0.2s;
+        }
+
+        .view-btn:not(:last-child) {
+            border-right: 1px solid var(--store-border);
+        }
+
+        .view-btn:hover,
+        .view-btn.active {
+            background: var(--store-accent);
+            color: white;
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .products-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+
+        /* Product Card */
+        .product-card {
+            background: white;
+            border: 1px solid var(--store-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+        }
+
+        .product-image {
+            position: relative;
+            aspect-ratio: 1;
+            background: var(--store-bg-alt);
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-badges {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .product-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-sale {
+            background: #ef4444;
+            color: white;
+        }
+
+        .badge-new {
+            background: #22c55e;
+            color: white;
+        }
+
+        .badge-hot {
+            background: #f97316;
+            color: white;
+        }
+
+        .product-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.3s;
+        }
+
+        .product-card:hover .product-actions {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--store-text);
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--store-accent);
+            color: white;
+        }
+
+        .action-btn.wishlisted {
+            color: #ef4444;
+        }
+
+        .quick-add {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            opacity: 0;
+            transform: translateY(100%);
+            transition: all 0.3s;
+        }
+
+        .product-card:hover .quick-add {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .quick-add-btn {
+            width: 100%;
+            padding: 10px;
+            background: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-add-btn:hover {
+            background: var(--store-accent);
+            color: white;
+        }
+
+        .product-info {
+            padding: 16px;
+        }
+
+        .product-category {
+            font-size: 12px;
+            color: var(--store-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .product-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--store-text);
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-name a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .product-name a:hover {
+            color: var(--store-accent);
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .product-rating .stars {
+            font-size: 13px;
+        }
+
+        .review-count {
+            font-size: 12px;
+            color: var(--store-text-muted);
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .current-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--store-accent);
+        }
+
+        .original-price {
+            font-size: 14px;
+            color: var(--store-text-muted);
+            text-decoration: line-through;
+        }
+
+        .discount-percent {
+            font-size: 12px;
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        /* List View */
+        .products-grid.list-view .product-card {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+        }
+
+        .products-grid.list-view .product-image {
+            aspect-ratio: auto;
+            height: 200px;
+        }
+
+        .products-grid.list-view .product-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .products-grid.list-view .product-description {
+            display: block;
+            font-size: 14px;
+            color: var(--store-text-muted);
+            margin: 12px 0;
+            line-height: 1.5;
+        }
+
+        .products-grid.list-view .list-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .products-grid.list-view .list-add-btn {
+            padding: 10px 24px;
+            background: var(--store-accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .products-grid.list-view .list-wishlist-btn {
+            padding: 10px 16px;
+            background: white;
+            border: 1px solid var(--store-border);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 48px;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--store-border);
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--store-accent);
+            color: var(--store-accent);
+        }
+
+        .page-btn.active {
+            background: var(--store-accent);
+            color: white;
+            border-color: var(--store-accent);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-ellipsis {
+            padding: 0 8px;
+            color: var(--store-text-muted);
+        }
+
+        /* Active Filters */
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .active-filter {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--store-bg-alt);
+            border: 1px solid var(--store-border);
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .active-filter button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--store-text-muted);
+            padding: 0;
+            display: flex;
+        }
+
+        .active-filter button:hover {
+            color: #ef4444;
+        }
+
+        .clear-all-btn {
+            color: var(--store-accent);
+            background: none;
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Mobile Filter Toggle */
+        .mobile-filter-btn {
+            display: none;
+            padding: 12px 20px;
+            background: white;
+            border: 1px solid var(--store-border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Footer */
+        .store-footer {
+            background: #111827;
+            color: #9ca3af;
+            padding: 64px 24px 24px;
+            margin-top: 64px;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 48px;
+        }
+
+        .footer-section h4 {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 48px auto 0;
+            padding-top: 24px;
+            border-top: 1px solid #374151;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .payment-methods {
+            display: flex;
+            gap: 12px;
+        }
+
+        .payment-icon {
+            padding: 8px 12px;
+            background: #1f2937;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #d1d5db;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .shop-container {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-sidebar {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: white;
+                z-index: 200;
+                padding: 20px;
+                overflow-y: auto;
+            }
+
+            .filter-sidebar.open {
+                display: block;
+            }
+
+            .mobile-filter-btn {
+                display: flex;
+            }
+
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header-main {
+                flex-wrap: wrap;
+            }
+
+            .search-box {
+                order: 3;
+                max-width: none;
+                width: 100%;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .product-info {
+                padding: 12px;
+            }
+
+            .product-name {
+                font-size: 13px;
+            }
+
+            .current-price {
+                font-size: 15px;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="store-header">
+        <div class="header-top">
+            🎉 Free Delivery on orders over ৳2,000 | Use code NEXUS20 for 20% off
+        </div>
+        <div class="header-main">
+            <a href="homepage.html" class="store-logo">NEXUS</a>
+            
+            <div class="search-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="M21 21l-4.35-4.35"/>
+                </svg>
+                <input type="text" placeholder="Search products...">
+            </div>
+            
+            <div class="header-actions">
+                <a href="#" class="header-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Account
+                </a>
+                <a href="#" class="header-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                    Wishlist
+                </a>
+                <a href="cart.html" class="header-link">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"/>
+                        <circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    Cart
+                    <span class="cart-badge">3</span>
+                </a>
+            </div>
+        </div>
+        
+        <nav class="header-nav">
+            <div class="nav-container">
+                <a href="products.html" class="nav-link active">All Products</a>
+                <a href="#" class="nav-link">Electronics</a>
+                <a href="#" class="nav-link">Fashion</a>
+                <a href="#" class="nav-link">Home & Living</a>
+                <a href="#" class="nav-link">Beauty</a>
+                <a href="#" class="nav-link">Sports</a>
+                <a href="#" class="nav-link">Deals</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="homepage.html">Home</a>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+        </svg>
+        <span>All Products</span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="shop-container">
+        <!-- Sidebar Filters -->
+        <aside class="filter-sidebar">
+            <!-- Categories -->
+            <div class="filter-section">
+                <div class="filter-title">
+                    Categories
+                    <button>Clear</button>
+                </div>
+                <ul class="category-tree">
+                    <li class="category-item">
+                        <a href="#" class="category-link active">
+                            Electronics <span class="category-count">(234)</span>
+                        </a>
+                        <ul class="category-children">
+                            <li><a href="#" class="category-link">Smartphones <span class="category-count">(89)</span></a></li>
+                            <li><a href="#" class="category-link">Laptops <span class="category-count">(56)</span></a></li>
+                            <li><a href="#" class="category-link">Headphones <span class="category-count">(43)</span></a></li>
+                            <li><a href="#" class="category-link">Cameras <span class="category-count">(28)</span></a></li>
+                            <li><a href="#" class="category-link">Accessories <span class="category-count">(18)</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="category-item">
+                        <a href="#" class="category-link">Fashion <span class="category-count">(512)</span></a>
+                    </li>
+                    <li class="category-item">
+                        <a href="#" class="category-link">Home & Living <span class="category-count">(189)</span></a>
+                    </li>
+                    <li class="category-item">
+                        <a href="#" class="category-link">Beauty & Health <span class="category-count">(156)</span></a>
+                    </li>
+                    <li class="category-item">
+                        <a href="#" class="category-link">Sports & Outdoors <span class="category-count">(98)</span></a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Price Range -->
+            <div class="filter-section">
+                <div class="filter-title">
+                    Price Range
+                    <button>Clear</button>
+                </div>
+                <div class="price-range">
+                    <div class="price-input">
+                        <label>Min</label>
+                        <input type="number" placeholder="৳0" value="500">
+                    </div>
+                    <div class="price-input">
+                        <label>Max</label>
+                        <input type="number" placeholder="৳50,000" value="25000">
+                    </div>
+                </div>
+                <div class="price-slider">
+                    <input type="range" min="0" max="50000" value="25000">
+                </div>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox">
+                        <span>Under ৳1,000 <span class="category-count">(142)</span></span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" checked>
+                        <span>৳1,000 - ৳5,000 <span class="category-count">(256)</span></span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" checked>
+                        <span>৳5,000 - ৳15,000 <span class="category-count">(189)</span></span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox">
+                        <span>৳15,000 - ৳30,000 <span class="category-count">(87)</span></span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox">
+                        <span>Above ৳30,000 <span class="category-count">(34)</span></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Brands -->
+            <div class="filter-section">
+                <div class="filter-title">
+                    Brands
+                    <button>Clear</button>
+                </div>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" checked>
+                        <span>Samsung <span class="category-count">(45)</span></span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox">
+                        <span>Apple <span class="category-count">(38)</span></span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" checked>
+                        <span>Sony <span class="category-count">(29)</span></span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox">
+                        <span>Xiaomi <span class="category-count">(52)</span></span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox">
+                        <span>OnePlus <span class="category-count">(18)</span></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="filter-section">
+                <div class="filter-title">
+                    Customer Rating
+                    <button>Clear</button>
+                </div>
+                <div class="filter-options">
+                    <label class="filter-option rating-option">
+                        <input type="checkbox">
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                        </div>
+                        <span>& Up (89)</span>
+                    </label>
+                    <label class="filter-option rating-option">
+                        <input type="checkbox" checked>
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                        <span>& Up (156)</span>
+                    </label>
+                    <label class="filter-option rating-option">
+                        <input type="checkbox">
+                        <div class="stars">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star empty">★</span>
+                            <span class="star empty">★</span>
+                        </div>
+                        <span>& Up (234)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Colors -->
+            <div class="filter-section">
+                <div class="filter-title">
+                    Colors
+                    <button>Clear</button>
+                </div>
+                <div class="color-swatches">
+                    <button class="color-swatch selected" style="background: #000000;" title="Black"></button>
+                    <button class="color-swatch" style="background: #ffffff; border: 1px solid #e5e7eb;" title="White"></button>
+                    <button class="color-swatch selected" style="background: #6366f1;" title="Indigo"></button>
+                    <button class="color-swatch" style="background: #ef4444;" title="Red"></button>
+                    <button class="color-swatch" style="background: #22c55e;" title="Green"></button>
+                    <button class="color-swatch" style="background: #3b82f6;" title="Blue"></button>
+                    <button class="color-swatch" style="background: #f59e0b;" title="Yellow"></button>
+                    <button class="color-swatch" style="background: #ec4899;" title="Pink"></button>
+                </div>
+            </div>
+
+            <!-- Availability -->
+            <div class="filter-section">
+                <div class="filter-title">
+                    Availability
+                </div>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" checked>
+                        <span>In Stock <span class="category-count">(567)</span></span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox">
+                        <span>Pre-order <span class="category-count">(23)</span></span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Products Area -->
+        <main class="products-area">
+            <!-- Active Filters -->
+            <div class="active-filters">
+                <div class="active-filter">
+                    Electronics
+                    <button>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="active-filter">
+                    ৳1,000 - ৳15,000
+                    <button>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="active-filter">
+                    Samsung
+                    <button>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="active-filter">
+                    Sony
+                    <button>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <button class="clear-all-btn">Clear All</button>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="products-toolbar">
+                <button class="mobile-filter-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="4" y1="21" x2="4" y2="14"/>
+                        <line x1="4" y1="10" x2="4" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12" y2="3"/>
+                        <line x1="20" y1="21" x2="20" y2="16"/>
+                        <line x1="20" y1="12" x2="20" y2="3"/>
+                    </svg>
+                    Filters
+                </button>
+                
+                <div class="results-info">
+                    Showing <strong>1-24</strong> of <strong>234</strong> products
+                </div>
+                
+                <div class="toolbar-actions">
+                    <select class="sort-select">
+                        <option>Sort by: Featured</option>
+                        <option>Price: Low to High</option>
+                        <option>Price: High to Low</option>
+                        <option>Newest First</option>
+                        <option>Best Selling</option>
+                        <option>Avg. Customer Review</option>
+                    </select>
+                    
+                    <div class="view-toggle">
+                        <button class="view-btn active" title="Grid View">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="3" y="14" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                            </svg>
+                        </button>
+                        <button class="view-btn" title="List View">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="8" y1="6" x2="21" y2="6"/>
+                                <line x1="8" y1="12" x2="21" y2="12"/>
+                                <line x1="8" y1="18" x2="21" y2="18"/>
+                                <line x1="3" y1="6" x2="3.01" y2="6"/>
+                                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                                <line x1="3" y1="18" x2="3.01" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid">
+                <!-- Product 1 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://placehold.co/300x300/f3f4f6/6b7280?text=Smartphone" alt="Samsung Galaxy S24">
+                        <div class="product-badges">
+                            <span class="product-badge badge-sale">-15%</span>
+                            <span class="product-badge badge-hot">Hot</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn" title="Add to Wishlist">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </button>
+                            <button class="action-btn" title="Quick View">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="quick-add">
+                            <button class="quick-add-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Smartphones</div>
+                        <h3 class="product-name"><a href="product-detail.html">Samsung Galaxy S24 Ultra 256GB</a></h3>
+                        <div class="product-rating">
+                            <div class="stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <span class="review-count">(128 reviews)</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="current-price">৳134,999</span>
+                            <span class="original-price">৳159,999</span>
+                            <span class="discount-percent">-15%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://placehold.co/300x300/f3f4f6/6b7280?text=Headphones" alt="Sony WH-1000XM5">
+                        <div class="product-badges">
+                            <span class="product-badge badge-new">New</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn wishlisted" title="Remove from Wishlist">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </button>
+                            <button class="action-btn" title="Quick View">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="quick-add">
+                            <button class="quick-add-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Headphones</div>
+                        <h3 class="product-name"><a href="product-detail.html">Sony WH-1000XM5 Wireless Noise Cancelling</a></h3>
+                        <div class="product-rating">
+                            <div class="stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star empty">★</span>
+                            </div>
+                            <span class="review-count">(89 reviews)</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="current-price">৳34,999</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://placehold.co/300x300/f3f4f6/6b7280?text=Laptop" alt="MacBook Air M3">
+                        <div class="product-badges">
+                            <span class="product-badge badge-sale">-10%</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn" title="Add to Wishlist">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </button>
+                            <button class="action-btn" title="Quick View">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="quick-add">
+                            <button class="quick-add-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Laptops</div>
+                        <h3 class="product-name"><a href="product-detail.html">MacBook Air M3 13" 256GB Space Gray</a></h3>
+                        <div class="product-rating">
+                            <div class="stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <span class="review-count">(234 reviews)</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="current-price">৳164,999</span>
+                            <span class="original-price">৳184,999</span>
+                            <span class="discount-percent">-10%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://placehold.co/300x300/f3f4f6/6b7280?text=Smartwatch" alt="Apple Watch Series 9">
+                        <div class="product-actions">
+                            <button class="action-btn" title="Add to Wishlist">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </button>
+                            <button class="action-btn" title="Quick View">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="quick-add">
+                            <button class="quick-add-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Wearables</div>
+                        <h3 class="product-name"><a href="product-detail.html">Apple Watch Series 9 GPS 45mm</a></h3>
+                        <div class="product-rating">
+                            <div class="stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star empty">★</span>
+                            </div>
+                            <span class="review-count">(67 reviews)</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="current-price">৳54,999</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 5 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://placehold.co/300x300/f3f4f6/6b7280?text=Camera" alt="Canon EOS R6 II">
+                        <div class="product-badges">
+                            <span class="product-badge badge-hot">Best Seller</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn" title="Add to Wishlist">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </button>
+                            <button class="action-btn" title="Quick View">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="quick-add">
+                            <button class="quick-add-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Cameras</div>
+                        <h3 class="product-name"><a href="product-detail.html">Canon EOS R6 Mark II Body Only</a></h3>
+                        <div class="product-rating">
+                            <div class="stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <span class="review-count">(45 reviews)</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="current-price">৳289,999</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 6 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://placehold.co/300x300/f3f4f6/6b7280?text=Earbuds" alt="AirPods Pro">
+                        <div class="product-badges">
+                            <span class="product-badge badge-sale">-20%</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn" title="Add to Wishlist">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </button>
+                            <button class="action-btn" title="Quick View">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="quick-add">
+                            <button class="quick-add-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Audio</div>
+                        <h3 class="product-name"><a href="product-detail.html">Apple AirPods Pro (2nd Gen) USB-C</a></h3>
+                        <div class="product-rating">
+                            <div class="stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <span class="review-count">(312 reviews)</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="current-price">৳29,999</span>
+                            <span class="original-price">৳37,499</span>
+                            <span class="discount-percent">-20%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 7 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://placehold.co/300x300/f3f4f6/6b7280?text=Tablet" alt="iPad Pro">
+                        <div class="product-actions">
+                            <button class="action-btn" title="Add to Wishlist">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </button>
+                            <button class="action-btn" title="Quick View">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="quick-add">
+                            <button class="quick-add-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Tablets</div>
+                        <h3 class="product-name"><a href="product-detail.html">iPad Pro 11" M4 256GB WiFi</a></h3>
+                        <div class="product-rating">
+                            <div class="stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star empty">★</span>
+                            </div>
+                            <span class="review-count">(78 reviews)</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="current-price">৳139,999</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 8 -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://placehold.co/300x300/f3f4f6/6b7280?text=Speaker" alt="JBL Flip 6">
+                        <div class="product-badges">
+                            <span class="product-badge badge-new">New</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn" title="Add to Wishlist">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                            </button>
+                            <button class="action-btn" title="Quick View">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="quick-add">
+                            <button class="quick-add-btn">Add to Cart</button>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">Speakers</div>
+                        <h3 class="product-name"><a href="product-detail.html">JBL Flip 6 Portable Bluetooth Speaker</a></h3>
+                        <div class="product-rating">
+                            <div class="stars">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <span class="review-count">(156 reviews)</span>
+                        </div>
+                        <div class="product-price">
+                            <span class="current-price">৳12,499</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn" disabled>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"/>
+                    </svg>
+                </button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <span class="page-ellipsis">...</span>
+                <button class="page-btn">10</button>
+                <button class="page-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="store-footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>Shop</h4>
+                <ul class="footer-links">
+                    <li><a href="#">All Products</a></li>
+                    <li><a href="#">Electronics</a></li>
+                    <li><a href="#">Fashion</a></li>
+                    <li><a href="#">Home & Living</a></li>
+                    <li><a href="#">Deals & Offers</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Customer Service</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                    <li><a href="#">Shipping Info</a></li>
+                    <li><a href="#">Returns & Refunds</a></li>
+                    <li><a href="#">Track Order</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>About</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About NEXUS</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 NEXUS Store. All rights reserved.</p>
+            <div class="payment-methods">
+                <span class="payment-icon">bKash</span>
+                <span class="payment-icon">Nagad</span>
+                <span class="payment-icon">Visa</span>
+                <span class="payment-icon">Mastercard</span>
+                <span class="payment-icon">COD</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // View Toggle
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const grid = document.querySelector('.products-grid');
+                if (this.title === 'List View') {
+                    grid.classList.add('list-view');
+                } else {
+                    grid.classList.remove('list-view');
+                }
+            });
+        });
+
+        // Color Swatch Selection
+        document.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+
+        // Size Selection
+        document.querySelectorAll('.size-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+        });
+
+        // Mobile Filter Toggle
+        document.querySelector('.mobile-filter-btn')?.addEventListener('click', function() {
+            document.querySelector('.filter-sidebar').classList.toggle('open');
+        });
+    </script>
+</body>
+</html>

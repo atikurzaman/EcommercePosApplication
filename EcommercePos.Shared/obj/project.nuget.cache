@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "XWhdeeCnfwE=",
+  "dgSpecHash": "uWklXtHl4iM=",
   "success": true,
   "projectFilePath": "C:\\AI\\EcommercePosApp\\EcommercePos.Shared\\EcommercePos.Shared.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\PC\\.nuget\\packages\\bcrypt.net-next\\4.1.0\\bcrypt.net-next.4.1.0.nupkg.sha512"
+  ],
   "logs": []
 }

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products — NEXUS Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/nexus-design-system.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .product-cell {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-3);
+    }
+    
+    .product-thumb {
+      width: 44px;
+      height: 44px;
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--nx-text-tertiary);
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    
+    .product-info {
+      min-width: 0;
+    }
+    
+    .product-name {
+      font-weight: var(--nx-font-medium);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .product-sku {
+      font-size: var(--nx-text-xs);
+      color: var(--nx-text-tertiary);
+      font-family: var(--nx-font-mono);
+    }
+    
+    .variant-count {
+      font-size: var(--nx-text-xs);
+      color: var(--nx-text-secondary);
+      background: var(--nx-bg-hover);
+      padding: 2px 6px;
+      border-radius: var(--nx-radius-sm);
+    }
+    
+    .price-cell {
+      text-align: right;
+    }
+    
+    .price-current {
+      font-weight: var(--nx-font-medium);
+    }
+    
+    .price-compare {
+      font-size: var(--nx-text-xs);
+      color: var(--nx-text-tertiary);
+      text-decoration: line-through;
+    }
+    
+    .stock-cell {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-2);
+    }
+    
+    .bulk-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-3);
+      padding: var(--nx-space-3) var(--nx-space-4);
+      background: var(--nx-accent-bg);
+      border-bottom: 1px solid var(--nx-border-default);
+    }
+    
+    .bulk-actions.hidden {
+      display: none;
+    }
+    
+    .filter-tags {
+      display: flex;
+      gap: var(--nx-space-2);
+      flex-wrap: wrap;
+      margin-top: var(--nx-space-3);
+    }
+    
+    .filter-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--nx-space-1);
+      padding: var(--nx-space-1) var(--nx-space-2);
+      background: var(--nx-bg-secondary);
+      border: 1px solid var(--nx-border-default);
+      border-radius: var(--nx-radius-full);
+      font-size: var(--nx-text-xs);
+      color: var(--nx-text-secondary);
+    }
+    
+    .filter-tag button {
+      background: none;
+      border: none;
+      color: var(--nx-text-tertiary);
+      cursor: pointer;
+      padding: 0;
+      font-size: 10px;
+    }
+    
+    .filter-tag button:hover {
+      color: var(--nx-danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="nx-shell">
+    <!-- Sidebar (same as dashboard) -->
+    <aside class="nx-sidebar">
+      <div class="nx-sidebar-header">
+        <div class="nx-sidebar-logo">N</div>
+        <div class="nx-sidebar-brand">
+          <span class="nx-sidebar-title">NEXUS</span>
+          <span class="nx-sidebar-subtitle">Admin Portal</span>
+        </div>
+      </div>
+      
+      <div class="nx-sidebar-search">
+        <input type="text" placeholder="Search...">
+      </div>
+      
+      <nav class="nx-sidebar-nav">
+        <a href="dashboard.html" class="nx-nav-item">
+          <i class="fa fa-gauge-high nx-icon"></i>
+          <span>Dashboard</span>
+        </a>
+        
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header open">
+            <span><i class="fa fa-layer-group" style="opacity:0.5;margin-right:8px"></i>Catalog</span>
+            <span class="nx-caret" style="transform:rotate(90deg)">▶</span>
+          </div>
+          <div class="nx-nav-children open">
+            <a href="products.html" class="nx-nav-item active">Products</a>
+            <a href="variants.html" class="nx-nav-item">Variants</a>
+            <a href="categories.html" class="nx-nav-item">Categories</a>
+            <a href="brands.html" class="nx-nav-item">Brands</a>
+            <a href="attributes.html" class="nx-nav-item">Attributes</a>
+            <a href="tags.html" class="nx-nav-item">Tags</a>
+            <a href="reviews.html" class="nx-nav-item">Reviews</a>
+            <a href="collections.html" class="nx-nav-item">Collections</a>
+          </div>
+        </div>
+        
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header">
+            <span><i class="fa fa-cart-shopping" style="opacity:0.5;margin-right:8px"></i>Sales</span>
+            <span class="nx-caret">▶</span>
+          </div>
+        </div>
+        
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header">
+            <span><i class="fa fa-cash-register" style="opacity:0.5;margin-right:8px"></i>POS</span>
+            <span class="nx-caret">▶</span>
+          </div>
+        </div>
+        
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header">
+            <span><i class="fa fa-warehouse" style="opacity:0.5;margin-right:8px"></i>Inventory</span>
+            <span class="nx-caret">▶</span>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="nx-main">
+      <!-- Topbar -->
+      <header class="nx-topbar">
+        <div class="nx-breadcrumb">
+          <span>Catalog</span>
+          <span class="nx-breadcrumb-separator">/</span>
+          <span class="nx-breadcrumb-current">Products</span>
+        </div>
+        
+        <div class="nx-topbar-search">
+          <i class="fa fa-search" style="color:var(--nx-text-tertiary);font-size:12px"></i>
+          <input type="text" placeholder="Search anything...">
+        </div>
+        
+        <div class="nx-topbar-actions">
+          <button class="nx-topbar-btn"><i class="fa fa-bell"></i></button>
+          <button class="nx-topbar-btn"><i class="fa fa-envelope"></i></button>
+          <div class="nx-topbar-avatar">AU</div>
+        </div>
+      </header>
+      
+      <!-- Page Content -->
+      <div class="nx-content">
+        <!-- Page Header -->
+        <div class="nx-page-header">
+          <div>
+            <h1 class="nx-page-title">Products</h1>
+            <p class="nx-page-subtitle">Manage your product catalog — 1,247 products</p>
+          </div>
+          <div class="nx-page-actions">
+            <button class="nx-btn nx-btn-secondary">
+              <i class="fa fa-file-import"></i>
+              Import
+            </button>
+            <button class="nx-btn nx-btn-secondary">
+              <i class="fa fa-file-export"></i>
+              Export
+            </button>
+            <button class="nx-btn nx-btn-primary" onclick="openModal('product-modal')">
+              <i class="fa fa-plus"></i>
+              Add Product
+            </button>
+          </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="nx-stats-grid">
+          <div class="nx-stat-card">
+            <div class="nx-stat-value">1,247</div>
+            <div class="nx-stat-label">Total Products</div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value success">1,089</div>
+            <div class="nx-stat-label">Active</div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value warning">158</div>
+            <div class="nx-stat-label">Draft</div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value info">3,456</div>
+            <div class="nx-stat-label">Total Variants</div>
+          </div>
+        </div>
+        
+        <!-- Table Card -->
+        <div class="nx-card">
+          <!-- Toolbar -->
+          <div style="padding:var(--nx-space-4)">
+            <div class="nx-table-toolbar">
+              <div class="nx-table-search">
+                <i class="fa fa-search" style="color:var(--nx-text-tertiary);font-size:12px"></i>
+                <input type="text" placeholder="Search products...">
+              </div>
+              <div class="nx-table-filters">
+                <select class="nx-input nx-select" style="width:140px;height:36px">
+                  <option>All Categories</option>
+                  <option>Electronics</option>
+                  <option>Clothing</option>
+                  <option>Home & Garden</option>
+                </select>
+                <select class="nx-input nx-select" style="width:120px;height:36px">
+                  <option>All Brands</option>
+                  <option>Apple</option>
+                  <option>Samsung</option>
+                  <option>Sony</option>
+                </select>
+                <select class="nx-input nx-select" style="width:120px;height:36px">
+                  <option>All Status</option>
+                  <option>Active</option>
+                  <option>Draft</option>
+                  <option>Archived</option>
+                </select>
+                <button class="nx-btn nx-btn-secondary">
+                  <i class="fa fa-filter"></i>
+                  More Filters
+                </button>
+              </div>
+            </div>
+            
+            <!-- Active Filters -->
+            <div class="filter-tags">
+              <div class="filter-tag">
+                Category: Electronics
+                <button onclick="this.parentElement.remove()">×</button>
+              </div>
+              <div class="filter-tag">
+                Brand: Apple
+                <button onclick="this.parentElement.remove()">×</button>
+              </div>
+              <div class="filter-tag">
+                Status: Active
+                <button onclick="this.parentElement.remove()">×</button>
+              </div>
+              <button class="nx-btn nx-btn-ghost nx-btn-sm" style="margin-left:var(--nx-space-2)">Clear all</button>
+            </div>
+          </div>
+          
+          <!-- Bulk Actions Bar -->
+          <div class="bulk-actions" id="bulk-actions">
+            <input type="checkbox" class="nx-checkbox" checked>
+            <span class="nx-text-sm"><strong>3</strong> items selected</span>
+            <div style="margin-left:auto;display:flex;gap:var(--nx-space-2)">
+              <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                <i class="fa fa-edit"></i>
+                Edit
+              </button>
+              <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                <i class="fa fa-copy"></i>
+                Duplicate
+              </button>
+              <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                <i class="fa fa-archive"></i>
+                Archive
+              </button>
+              <button class="nx-btn nx-btn-sm nx-btn-danger">
+                <i class="fa fa-trash"></i>
+                Delete
+              </button>
+            </div>
+          </div>
+          
+          <!-- Data Table -->
+          <div class="nx-table-wrap">
+            <table class="nx-table">
+              <thead>
+                <tr>
+                  <th style="width:40px"><input type="checkbox" class="nx-checkbox"></th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Brand</th>
+                  <th style="text-align:right">Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                  <th style="width:100px">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox" class="nx-checkbox" checked></td>
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-thumb">📱</div>
+                      <div class="product-info">
+                        <div class="product-name">iPhone 15 Pro Max</div>
+                        <div class="product-sku">SKU: IPH15PM-256</div>
+                      </div>
+                      <span class="variant-count">4 variants</span>
+                    </div>
+                  </td>
+                  <td>Smartphones</td>
+                  <td>Apple</td>
+                  <td class="price-cell">
+                    <div class="price-current">৳189,900</div>
+                    <div class="price-compare">৳199,900</div>
+                  </td>
+                  <td>
+                    <div class="stock-cell">
+                      <span class="nx-status-dot danger"></span>
+                      <span>2 in stock</span>
+                    </div>
+                  </td>
+                  <td><span class="nx-badge nx-badge-success">Active</span></td>
+                  <td>
+                    <div class="nx-flex nx-gap-1">
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="Edit">
+                        <i class="fa fa-edit"></i>
+                      </button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="Duplicate">
+                        <i class="fa fa-copy"></i>
+                      </button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost nx-text-danger" title="Delete">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="nx-checkbox" checked></td>
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-thumb">📱</div>
+                      <div class="product-info">
+                        <div class="product-name">Samsung Galaxy S24 Ultra</div>
+                        <div class="product-sku">SKU: SGS24U-256</div>
+                      </div>
+                      <span class="variant-count">3 variants</span>
+                    </div>
+                  </td>
+                  <td>Smartphones</td>
+                  <td>Samsung</td>
+                  <td class="price-cell">
+                    <div class="price-current">৳169,900</div>
+                  </td>
+                  <td>
+                    <div class="stock-cell">
+                      <span class="nx-status-dot warning"></span>
+                      <span>5 in stock</span>
+                    </div>
+                  </td>
+                  <td><span class="nx-badge nx-badge-success">Active</span></td>
+                  <td>
+                    <div class="nx-flex nx-gap-1">
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-copy"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost nx-text-danger"><i class="fa fa-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="nx-checkbox" checked></td>
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-thumb">🎧</div>
+                      <div class="product-info">
+                        <div class="product-name">AirPods Pro 2nd Generation</div>
+                        <div class="product-sku">SKU: APP2-WHT</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Audio</td>
+                  <td>Apple</td>
+                  <td class="price-cell">
+                    <div class="price-current">৳39,900</div>
+                    <div class="price-compare">৳44,900</div>
+                  </td>
+                  <td>
+                    <div class="stock-cell">
+                      <span class="nx-status-dot danger"></span>
+                      <span>1 in stock</span>
+                    </div>
+                  </td>
+                  <td><span class="nx-badge nx-badge-success">Active</span></td>
+                  <td>
+                    <div class="nx-flex nx-gap-1">
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-copy"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost nx-text-danger"><i class="fa fa-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="nx-checkbox"></td>
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-thumb">💻</div>
+                      <div class="product-info">
+                        <div class="product-name">MacBook Air M3 15"</div>
+                        <div class="product-sku">SKU: MBA-M3-15</div>
+                      </div>
+                      <span class="variant-count">2 variants</span>
+                    </div>
+                  </td>
+                  <td>Laptops</td>
+                  <td>Apple</td>
+                  <td class="price-cell">
+                    <div class="price-current">৳184,900</div>
+                  </td>
+                  <td>
+                    <div class="stock-cell">
+                      <span class="nx-status-dot success"></span>
+                      <span>12 in stock</span>
+                    </div>
+                  </td>
+                  <td><span class="nx-badge nx-badge-success">Active</span></td>
+                  <td>
+                    <div class="nx-flex nx-gap-1">
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-copy"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost nx-text-danger"><i class="fa fa-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" class="nx-checkbox"></td>
+                  <td>
+                    <div class="product-cell">
+                      <div class="product-thumb">⌚</div>
+                      <div class="product-info">
+                        <div class="product-name">Apple Watch Series 9</div>
+                        <div class="product-sku">SKU: AWS9-45</div>
+                      </div>
+                      <span class="variant-count">6 variants</span>
+                    </div>
+                  </td>
+                  <td>Wearables</td>
+                  <td>Apple</td>
+                  <td class="price-cell">
+                    <div class="price-current">৳64,900</div>
+                  </td>
+                  <td>
+                    <div class="stock-cell">
+                      <span class="nx-status-dot success"></span>
+                      <span>28 in stock</span>
+                    </div>
+                  </td>
+                  <td><span class="nx-badge nx-badge-warning">Draft</span></td>
+                  <td>
+                    <div class="nx-flex nx-gap-1">
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-copy"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost nx-text-danger"><i class="fa fa-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Pagination -->
+          <div class="nx-table-footer">
+            <span class="nx-caption">Showing 1-5 of 1,247 products</span>
+            <div class="nx-pagination">
+              <button class="nx-pagination-btn">← Prev</button>
+              <button class="nx-pagination-btn active">1</button>
+              <button class="nx-pagination-btn">2</button>
+              <button class="nx-pagination-btn">3</button>
+              <button class="nx-pagination-btn">...</button>
+              <button class="nx-pagination-btn">250</button>
+              <button class="nx-pagination-btn">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Add/Edit Product Modal -->
+  <div class="nx-modal-backdrop" id="product-modal">
+    <div class="nx-modal" style="max-width:720px">
+      <div class="nx-modal-header">
+        <h2 class="nx-modal-title">Add New Product</h2>
+        <button class="nx-modal-close" onclick="closeModal('product-modal')">×</button>
+      </div>
+      <div class="nx-modal-body">
+        <!-- Tabs -->
+        <div class="nx-tabs">
+          <button class="nx-tab active">Basic Info</button>
+          <button class="nx-tab">Pricing</button>
+          <button class="nx-tab">Inventory</button>
+          <button class="nx-tab">Variants</button>
+          <button class="nx-tab">Images</button>
+          <button class="nx-tab">SEO</button>
+        </div>
+        
+        <!-- Basic Info Form -->
+        <div class="nx-form-grid">
+          <div class="nx-form-group full-width">
+            <label class="nx-form-label required">Product Name</label>
+            <input type="text" class="nx-input" placeholder="Enter product name">
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label required">SKU</label>
+            <input type="text" class="nx-input" placeholder="e.g., PRD-001">
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Barcode</label>
+            <input type="text" class="nx-input" placeholder="EAN/UPC code">
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label required">Category</label>
+            <select class="nx-input nx-select">
+              <option value="">Select category...</option>
+              <option>Electronics > Smartphones</option>
+              <option>Electronics > Laptops</option>
+              <option>Electronics > Audio</option>
+              <option>Clothing > Men</option>
+              <option>Clothing > Women</option>
+            </select>
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Brand</label>
+            <select class="nx-input nx-select">
+              <option value="">Select brand...</option>
+              <option>Apple</option>
+              <option>Samsung</option>
+              <option>Sony</option>
+              <option>LG</option>
+            </select>
+          </div>
+          
+          <div class="nx-form-group full-width">
+            <label class="nx-form-label">Short Description</label>
+            <textarea class="nx-input nx-textarea" rows="3" placeholder="Brief product description for listings"></textarea>
+          </div>
+          
+          <div class="nx-form-group full-width">
+            <label class="nx-form-label">Full Description</label>
+            <textarea class="nx-input nx-textarea" rows="5" placeholder="Detailed product description"></textarea>
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Tags</label>
+            <input type="text" class="nx-input" placeholder="Add tags separated by comma">
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Status</label>
+            <select class="nx-input nx-select">
+              <option>Draft</option>
+              <option>Active</option>
+              <option>Archived</option>
+            </select>
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Condition</label>
+            <select class="nx-input nx-select">
+              <option>Brand New</option>
+              <option>Refurbished</option>
+              <option>Used</option>
+            </select>
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Unit</label>
+            <select class="nx-input nx-select">
+              <option>Piece</option>
+              <option>Kg</option>
+              <option>Liter</option>
+              <option>Meter</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="nx-modal-footer">
+        <button class="nx-btn nx-btn-secondary" onclick="closeModal('product-modal')">Cancel</button>
+        <button class="nx-btn nx-btn-primary">
+          <i class="fa fa-save"></i>
+          Save Product
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+    }
+    
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+    
+    // Close modal on backdrop click
+    document.querySelectorAll('.nx-modal-backdrop').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('open');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

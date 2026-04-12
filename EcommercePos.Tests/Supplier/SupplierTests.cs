@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Application.Features.Supplier.Commands;
-using EcommercePos.Application.Features.Supplier.Queries;
+using EcommercePos.Application.Features.Supplier;
 using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Tests.Supplier;
@@ -84,7 +83,7 @@ public class CreateSupplierTests : IDisposable
     public async Task Handle_ValidRequest_CreatesSupplier()
     {
         var handler = new CreateSupplier.Handler(_context);
-        var command = new CreateSupplier.Command("SUP-001", "ABC Corp", "John Doe", "john@abc.com", "+8801711000000", null, "john@abc.com", null, null, "Dhaka", null, null, "Bangladesh", null, "TAX123", null, null, null, true);
+        var command = new CreateSupplier.Command("ABC Corp", "+8801711000000", null, "John Doe", null, "john@abc.com", "Dhaka", null, null, null, null, "Bangladesh", null, "TAX123", null, null, null);
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.True(result.IsSuccess);

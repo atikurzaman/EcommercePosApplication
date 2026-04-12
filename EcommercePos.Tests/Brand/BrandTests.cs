@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Application.Features.Brand.Commands;
-using EcommercePos.Application.Features.Brand.Queries;
+using EcommercePos.Application.Features.Brand;
 using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Tests.Brand;

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customers — NEXUS Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/nexus-design-system.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    .customer-cell {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-3);
+    }
+    
+    .customer-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    
+    .customer-avatar.gold {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: white;
+    }
+    
+    .customer-avatar.silver {
+      background: linear-gradient(135deg, #9ca3af, #6b7280);
+      color: white;
+    }
+    
+    .customer-avatar.bronze {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: white;
+    }
+    
+    .customer-avatar.default {
+      background: linear-gradient(135deg, var(--nx-accent-primary), #a855f7);
+      color: white;
+    }
+    
+    .customer-info {
+      min-width: 0;
+    }
+    
+    .customer-name {
+      font-weight: var(--nx-font-medium);
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-2);
+    }
+    
+    .customer-email {
+      font-size: var(--nx-text-xs);
+      color: var(--nx-text-tertiary);
+    }
+    
+    .loyalty-tier {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--nx-radius-full);
+      font-size: 10px;
+      font-weight: 600;
+    }
+    
+    .loyalty-tier.gold {
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+    }
+    
+    .loyalty-tier.silver {
+      background: rgba(156, 163, 175, 0.15);
+      color: #9ca3af;
+    }
+    
+    .loyalty-tier.bronze {
+      background: rgba(217, 119, 6, 0.15);
+      color: #d97706;
+    }
+    
+    .customer-detail-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 520px;
+      height: 100vh;
+      background: var(--nx-bg-secondary);
+      border-left: 1px solid var(--nx-border-default);
+      z-index: var(--nx-z-modal);
+      transform: translateX(100%);
+      transition: transform var(--nx-transition-slow);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .customer-detail-panel.open {
+      transform: translateX(0);
+    }
+    
+    .customer-profile-header {
+      padding: var(--nx-space-6);
+      background: linear-gradient(135deg, var(--nx-accent-primary), #a855f7);
+      text-align: center;
+      position: relative;
+    }
+    
+    .customer-profile-avatar {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--nx-accent-primary);
+      margin: 0 auto var(--nx-space-3);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .customer-profile-name {
+      font-size: var(--nx-text-xl);
+      font-weight: var(--nx-font-semibold);
+      margin-bottom: var(--nx-space-1);
+    }
+    
+    .customer-profile-email {
+      font-size: var(--nx-text-sm);
+      opacity: 0.8;
+    }
+    
+    .customer-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--nx-border-default);
+      margin-top: var(--nx-space-4);
+      border-radius: var(--nx-radius-lg);
+      overflow: hidden;
+    }
+    
+    .customer-stat {
+      background: rgba(0,0,0,0.2);
+      padding: var(--nx-space-3);
+      text-align: center;
+    }
+    
+    .customer-stat-value {
+      font-size: var(--nx-text-lg);
+      font-weight: var(--nx-font-semibold);
+    }
+    
+    .customer-stat-label {
+      font-size: var(--nx-text-xs);
+      opacity: 0.7;
+    }
+    
+    .close-panel-btn {
+      position: absolute;
+      top: var(--nx-space-3);
+      right: var(--nx-space-3);
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .customer-detail-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--nx-border-default);
+      padding: 0 var(--nx-space-4);
+    }
+    
+    .customer-detail-tab {
+      padding: var(--nx-space-3) var(--nx-space-4);
+      font-size: var(--nx-text-sm);
+      color: var(--nx-text-secondary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    
+    .customer-detail-tab.active {
+      color: var(--nx-accent-secondary);
+      border-bottom-color: var(--nx-accent-primary);
+    }
+    
+    .customer-detail-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--nx-space-4);
+    }
+    
+    .info-group {
+      margin-bottom: var(--nx-space-5);
+    }
+    
+    .info-group-title {
+      font-size: var(--nx-text-xs);
+      font-weight: var(--nx-font-semibold);
+      color: var(--nx-text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--nx-space-3);
+    }
+    
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--nx-space-2) 0;
+      font-size: var(--nx-text-sm);
+      border-bottom: 1px solid var(--nx-border-subtle);
+    }
+    
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    
+    .info-label {
+      color: var(--nx-text-secondary);
+    }
+    
+    .info-value {
+      font-weight: var(--nx-font-medium);
+      text-align: right;
+    }
+    
+    .recent-order-item {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-3);
+      padding: var(--nx-space-3);
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-md);
+      margin-bottom: var(--nx-space-2);
+    }
+    
+    .order-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--nx-bg-hover);
+      border-radius: var(--nx-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--nx-text-secondary);
+    }
+    
+    .order-details {
+      flex: 1;
+    }
+    
+    .order-id {
+      font-family: var(--nx-font-mono);
+      font-size: var(--nx-text-sm);
+      font-weight: var(--nx-font-medium);
+    }
+    
+    .order-date {
+      font-size: var(--nx-text-xs);
+      color: var(--nx-text-tertiary);
+    }
+    
+    .order-amount {
+      font-weight: var(--nx-font-semibold);
+    }
+  </style>
+</head>
+<body>
+  <div class="nx-shell">
+    <!-- Sidebar -->
+    <aside class="nx-sidebar">
+      <div class="nx-sidebar-header">
+        <div class="nx-sidebar-logo">N</div>
+        <div class="nx-sidebar-brand">
+          <span class="nx-sidebar-title">NEXUS</span>
+          <span class="nx-sidebar-subtitle">Admin Portal</span>
+        </div>
+      </div>
+      
+      <div class="nx-sidebar-search">
+        <input type="text" placeholder="Search...">
+      </div>
+      
+      <nav class="nx-sidebar-nav">
+        <a href="dashboard.html" class="nx-nav-item">
+          <i class="fa fa-gauge-high nx-icon"></i>
+          <span>Dashboard</span>
+        </a>
+        
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header">
+            <span><i class="fa fa-layer-group" style="opacity:0.5;margin-right:8px"></i>Catalog</span>
+            <span class="nx-caret">▶</span>
+          </div>
+        </div>
+        
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header">
+            <span><i class="fa fa-cart-shopping" style="opacity:0.5;margin-right:8px"></i>Sales</span>
+            <span class="nx-caret">▶</span>
+          </div>
+        </div>
+        
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header open">
+            <span><i class="fa fa-users" style="opacity:0.5;margin-right:8px"></i>Customers</span>
+            <span class="nx-caret" style="transform:rotate(90deg)">▶</span>
+          </div>
+          <div class="nx-nav-children open">
+            <a href="customers.html" class="nx-nav-item active">All Customers</a>
+            <a href="customer-profiles.html" class="nx-nav-item">Profiles</a>
+            <a href="addresses.html" class="nx-nav-item">Addresses</a>
+            <a href="wallets.html" class="nx-nav-item">Wallets</a>
+            <a href="loyalty.html" class="nx-nav-item">Loyalty</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="nx-main">
+      <!-- Topbar -->
+      <header class="nx-topbar">
+        <div class="nx-breadcrumb">
+          <span>Customers</span>
+          <span class="nx-breadcrumb-separator">/</span>
+          <span class="nx-breadcrumb-current">All Customers</span>
+        </div>
+        
+        <div class="nx-topbar-search">
+          <i class="fa fa-search" style="color:var(--nx-text-tertiary);font-size:12px"></i>
+          <input type="text" placeholder="Search customers...">
+        </div>
+        
+        <div class="nx-topbar-actions">
+          <button class="nx-topbar-btn"><i class="fa fa-bell"></i></button>
+          <div class="nx-topbar-avatar">AU</div>
+        </div>
+      </header>
+      
+      <!-- Page Content -->
+      <div class="nx-content">
+        <!-- Page Header -->
+        <div class="nx-page-header">
+          <div>
+            <h1 class="nx-page-title">Customers</h1>
+            <p class="nx-page-subtitle">Manage your customer database</p>
+          </div>
+          <div class="nx-page-actions">
+            <button class="nx-btn nx-btn-secondary">
+              <i class="fa fa-file-export"></i>
+              Export
+            </button>
+            <button class="nx-btn nx-btn-primary">
+              <i class="fa fa-plus"></i>
+              Add Customer
+            </button>
+          </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="nx-stats-grid">
+          <div class="nx-stat-card">
+            <div class="nx-stat-value">2,847</div>
+            <div class="nx-stat-label">Total Customers</div>
+            <div class="nx-stat-trend up">
+              <i class="fa fa-arrow-up"></i>
+              +156 this month
+            </div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value success">1,892</div>
+            <div class="nx-stat-label">Active Customers</div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value warning">342</div>
+            <div class="nx-stat-label">Loyalty Members</div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value">৳8,450</div>
+            <div class="nx-stat-label">Avg. Lifetime Value</div>
+          </div>
+        </div>
+        
+        <!-- Table Card -->
+        <div class="nx-card">
+          <div style="padding:var(--nx-space-4)">
+            <div class="nx-table-toolbar">
+              <div class="nx-table-search">
+                <i class="fa fa-search" style="color:var(--nx-text-tertiary);font-size:12px"></i>
+                <input type="text" placeholder="Search by name, email, phone...">
+              </div>
+              <div class="nx-table-filters">
+                <select class="nx-input nx-select" style="width:140px;height:36px">
+                  <option>All Tiers</option>
+                  <option>Gold</option>
+                  <option>Silver</option>
+                  <option>Bronze</option>
+                  <option>No Tier</option>
+                </select>
+                <select class="nx-input nx-select" style="width:130px;height:36px">
+                  <option>All Status</option>
+                  <option>Active</option>
+                  <option>Inactive</option>
+                </select>
+                <button class="nx-btn nx-btn-secondary">
+                  <i class="fa fa-filter"></i>
+                  Filters
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="nx-table-wrap">
+            <table class="nx-table">
+              <thead>
+                <tr>
+                  <th style="width:40px"><input type="checkbox" class="nx-checkbox"></th>
+                  <th>Customer</th>
+                  <th>Phone</th>
+                  <th>Tier</th>
+                  <th>Orders</th>
+                  <th style="text-align:right">Total Spent</th>
+                  <th>Wallet</th>
+                  <th>Status</th>
+                  <th style="width:80px">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr onclick="openCustomerPanel()" style="cursor:pointer">
+                  <td onclick="event.stopPropagation()"><input type="checkbox" class="nx-checkbox"></td>
+                  <td>
+                    <div class="customer-cell">
+                      <div class="customer-avatar gold">RA</div>
+                      <div class="customer-info">
+                        <div class="customer-name">
+                          Rahim Ahmed
+                          <span class="loyalty-tier gold"><i class="fa fa-crown"></i> Gold</span>
+                        </div>
+                        <div class="customer-email">rahim.ahmed@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>+880 1712-345678</td>
+                  <td><span class="loyalty-tier gold"><i class="fa fa-crown"></i> Gold</span></td>
+                  <td>45</td>
+                  <td style="text-align:right" class="nx-font-medium">৳245,890</td>
+                  <td>৳2,500</td>
+                  <td><span class="nx-badge nx-badge-success">Active</span></td>
+                  <td>
+                    <div class="nx-flex nx-gap-1">
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-eye"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr style="cursor:pointer">
+                  <td><input type="checkbox" class="nx-checkbox"></td>
+                  <td>
+                    <div class="customer-cell">
+                      <div class="customer-avatar silver">FK</div>
+                      <div class="customer-info">
+                        <div class="customer-name">
+                          Fatima Khan
+                          <span class="loyalty-tier silver">Silver</span>
+                        </div>
+                        <div class="customer-email">fatima.khan@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>+880 1819-876543</td>
+                  <td><span class="loyalty-tier silver">Silver</span></td>
+                  <td>28</td>
+                  <td style="text-align:right" class="nx-font-medium">৳156,450</td>
+                  <td>৳1,200</td>
+                  <td><span class="nx-badge nx-badge-success">Active</span></td>
+                  <td>
+                    <div class="nx-flex nx-gap-1">
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-eye"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr style="cursor:pointer">
+                  <td><input type="checkbox" class="nx-checkbox"></td>
+                  <td>
+                    <div class="customer-cell">
+                      <div class="customer-avatar bronze">KH</div>
+                      <div class="customer-info">
+                        <div class="customer-name">
+                          Kamal Hossain
+                          <span class="loyalty-tier bronze">Bronze</span>
+                        </div>
+                        <div class="customer-email">kamal.h@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>+880 1911-234567</td>
+                  <td><span class="loyalty-tier bronze">Bronze</span></td>
+                  <td>12</td>
+                  <td style="text-align:right" class="nx-font-medium">৳78,900</td>
+                  <td>৳500</td>
+                  <td><span class="nx-badge nx-badge-success">Active</span></td>
+                  <td>
+                    <div class="nx-flex nx-gap-1">
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-eye"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr style="cursor:pointer">
+                  <td><input type="checkbox" class="nx-checkbox"></td>
+                  <td>
+                    <div class="customer-cell">
+                      <div class="customer-avatar default">NI</div>
+                      <div class="customer-info">
+                        <div class="customer-name">Nusrat Islam</div>
+                        <div class="customer-email">nusrat.i@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>+880 1612-987654</td>
+                  <td><span class="nx-badge nx-badge-default">No Tier</span></td>
+                  <td>3</td>
+                  <td style="text-align:right" class="nx-font-medium">৳12,500</td>
+                  <td>৳0</td>
+                  <td><span class="nx-badge nx-badge-success">Active</span></td>
+                  <td>
+                    <div class="nx-flex nx-gap-1">
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-eye"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                    </div>
+                  </td>
+                </tr>
+                <tr style="cursor:pointer">
+                  <td><input type="checkbox" class="nx-checkbox"></td>
+                  <td>
+                    <div class="customer-cell">
+                      <div class="customer-avatar default">SB</div>
+                      <div class="customer-info">
+                        <div class="customer-name">Shakil Bhuiyan</div>
+                        <div class="customer-email">shakil.b@email.com</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>+880 1512-456789</td>
+                  <td><span class="nx-badge nx-badge-default">No Tier</span></td>
+                  <td>1</td>
+                  <td style="text-align:right" class="nx-font-medium">৳4,500</td>
+                  <td>৳0</td>
+                  <td><span class="nx-badge nx-badge-default">Inactive</span></td>
+                  <td>
+                    <div class="nx-flex nx-gap-1">
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-eye"></i></button>
+                      <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="nx-table-footer">
+            <span class="nx-caption">Showing 1-5 of 2,847 customers</span>
+            <div class="nx-pagination">
+              <button class="nx-pagination-btn">← Prev</button>
+              <button class="nx-pagination-btn active">1</button>
+              <button class="nx-pagination-btn">2</button>
+              <button class="nx-pagination-btn">3</button>
+              <button class="nx-pagination-btn">...</button>
+              <button class="nx-pagination-btn">570</button>
+              <button class="nx-pagination-btn">Next →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Customer Detail Panel -->
+  <div class="customer-detail-panel" id="customer-panel">
+    <div class="customer-profile-header">
+      <button class="close-panel-btn" onclick="closeCustomerPanel()">×</button>
+      <div class="customer-profile-avatar">RA</div>
+      <div class="customer-profile-name">Rahim Ahmed</div>
+      <div class="customer-profile-email">rahim.ahmed@email.com</div>
+      <div class="customer-stats-row">
+        <div class="customer-stat">
+          <div class="customer-stat-value">45</div>
+          <div class="customer-stat-label">Orders</div>
+        </div>
+        <div class="customer-stat">
+          <div class="customer-stat-value">৳245K</div>
+          <div class="customer-stat-label">Spent</div>
+        </div>
+        <div class="customer-stat">
+          <div class="customer-stat-value">2,450</div>
+          <div class="customer-stat-label">Points</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="customer-detail-tabs">
+      <button class="customer-detail-tab active">Overview</button>
+      <button class="customer-detail-tab">Orders</button>
+      <button class="customer-detail-tab">Addresses</button>
+      <button class="customer-detail-tab">Wallet</button>
+      <button class="customer-detail-tab">Activity</button>
+    </div>
+    
+    <div class="customer-detail-body">
+      <div class="info-group">
+        <div class="info-group-title">Contact Information</div>
+        <div class="info-row">
+          <span class="info-label">Phone</span>
+          <span class="info-value">+880 1712-345678</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value">rahim.ahmed@email.com</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Member Since</span>
+          <span class="info-value">Jan 15, 2023</span>
+        </div>
+      </div>
+      
+      <div class="info-group">
+        <div class="info-group-title">Loyalty Status</div>
+        <div class="info-row">
+          <span class="info-label">Current Tier</span>
+          <span class="info-value"><span class="loyalty-tier gold"><i class="fa fa-crown"></i> Gold</span></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Points Balance</span>
+          <span class="info-value">2,450 pts</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Points Multiplier</span>
+          <span class="info-value">2x</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Wallet Balance</span>
+          <span class="info-value" style="color:var(--nx-success)">৳2,500</span>
+        </div>
+      </div>
+      
+      <div class="info-group">
+        <div class="info-group-title">Recent Orders</div>
+        <div class="recent-order-item">
+          <div class="order-icon"><i class="fa fa-box"></i></div>
+          <div class="order-details">
+            <div class="order-id">#ORD-2024-0156</div>
+            <div class="order-date">Apr 05, 2026</div>
+          </div>
+          <div class="order-amount">৳12,450</div>
+          <span class="nx-badge nx-badge-warning">Pending</span>
+        </div>
+        <div class="recent-order-item">
+          <div class="order-icon"><i class="fa fa-box"></i></div>
+          <div class="order-details">
+            <div class="order-id">#ORD-2024-0142</div>
+            <div class="order-date">Mar 28, 2026</div>
+          </div>
+          <div class="order-amount">৳8,900</div>
+          <span class="nx-badge nx-badge-success">Delivered</span>
+        </div>
+        <div class="recent-order-item">
+          <div class="order-icon"><i class="fa fa-box"></i></div>
+          <div class="order-details">
+            <div class="order-id">#ORD-2024-0128</div>
+            <div class="order-date">Mar 15, 2026</div>
+          </div>
+          <div class="order-amount">৳45,600</div>
+          <span class="nx-badge nx-badge-success">Delivered</span>
+        </div>
+      </div>
+      
+      <div class="info-group">
+        <div class="info-group-title">Default Address</div>
+        <div style="font-size:var(--nx-text-sm);line-height:1.6">
+          House #45, Road #12<br>
+          Dhanmondi, Dhaka 1205<br>
+          Bangladesh
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function openCustomerPanel() {
+      document.getElementById('customer-panel').classList.add('open');
+    }
+    
+    function closeCustomerPanel() {
+      document.getElementById('customer-panel').classList.remove('open');
+    }
+  </script>
+</body>
+</html>

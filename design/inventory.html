@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory — NEXUS Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/nexus-design-system.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* Inventory specific styles */
+    .stock-level-indicator {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-2);
+    }
+    
+    .stock-bar {
+      width: 80px;
+      height: 8px;
+      background: var(--nx-bg-hover);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .stock-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    
+    .stock-bar-fill.critical { background: var(--nx-danger); width: 15%; }
+    .stock-bar-fill.low { background: var(--nx-warning); width: 35%; }
+    .stock-bar-fill.medium { background: var(--nx-info); width: 60%; }
+    .stock-bar-fill.good { background: var(--nx-success); width: 85%; }
+    .stock-bar-fill.full { background: var(--nx-success); width: 100%; }
+    
+    .warehouse-tabs {
+      display: flex;
+      gap: var(--nx-space-2);
+      margin-bottom: var(--nx-space-4);
+      border-bottom: 1px solid var(--nx-border-default);
+      padding-bottom: var(--nx-space-3);
+    }
+    
+    .warehouse-tab {
+      padding: var(--nx-space-2) var(--nx-space-4);
+      background: transparent;
+      border: none;
+      color: var(--nx-text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: var(--nx-radius-md);
+      transition: all var(--nx-transition-fast);
+    }
+    
+    .warehouse-tab:hover {
+      color: var(--nx-text-primary);
+      background: var(--nx-bg-elevated);
+    }
+    
+    .warehouse-tab.active {
+      color: var(--nx-accent-primary);
+      background: var(--nx-accent-primary-bg);
+    }
+    
+    .warehouse-tab .count {
+      margin-left: var(--nx-space-2);
+      padding: 2px 8px;
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-full);
+      font-size: 11px;
+    }
+    
+    .warehouse-tab.active .count {
+      background: var(--nx-accent-primary);
+      color: white;
+    }
+    
+    .movement-type {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-2);
+    }
+    
+    .movement-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--nx-radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+    
+    .movement-icon.in { background: var(--nx-success-bg); color: var(--nx-success); }
+    .movement-icon.out { background: var(--nx-danger-bg); color: var(--nx-danger); }
+    .movement-icon.transfer { background: var(--nx-info-bg); color: var(--nx-info); }
+    .movement-icon.adjust { background: var(--nx-warning-bg); color: var(--nx-warning); }
+    
+    .alert-card {
+      background: var(--nx-bg-secondary);
+      border: 1px solid var(--nx-border-default);
+      border-radius: var(--nx-radius-lg);
+      padding: var(--nx-space-4);
+    }
+    
+    .alert-card.critical {
+      border-left: 3px solid var(--nx-danger);
+    }
+    
+    .alert-card.warning {
+      border-left: 3px solid var(--nx-warning);
+    }
+    
+    .alert-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--nx-space-3);
+    }
+    
+    .alert-title {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-2);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    
+    .alert-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--nx-space-2);
+    }
+    
+    .alert-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--nx-space-2) var(--nx-space-3);
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-md);
+      font-size: 12px;
+    }
+    
+    .quick-action-row {
+      display: flex;
+      gap: var(--nx-space-3);
+      margin-bottom: var(--nx-space-5);
+    }
+    
+    .quick-action-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-2);
+      padding: var(--nx-space-3) var(--nx-space-4);
+      background: var(--nx-bg-secondary);
+      border: 1px solid var(--nx-border-default);
+      border-radius: var(--nx-radius-lg);
+      color: var(--nx-text-primary);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--nx-transition-fast);
+    }
+    
+    .quick-action-btn:hover {
+      border-color: var(--nx-accent-primary);
+      background: var(--nx-bg-elevated);
+    }
+    
+    .quick-action-btn i {
+      font-size: 14px;
+      color: var(--nx-accent-primary);
+    }
+    
+    /* Movement slide-over */
+    .movement-detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--nx-space-3) 0;
+      border-bottom: 1px solid var(--nx-border-subtle);
+    }
+    
+    .movement-detail-row:last-child {
+      border-bottom: none;
+    }
+    
+    .movement-detail-label {
+      color: var(--nx-text-secondary);
+      font-size: 12px;
+    }
+    
+    .movement-detail-value {
+      font-weight: 500;
+      font-size: 12px;
+    }
+    
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: var(--nx-space-5);
+    }
+    
+    @media (max-width: 1200px) {
+      .inventory-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="nx-shell">
+    <!-- Sidebar -->
+    <aside class="nx-sidebar">
+      <div class="nx-sidebar-header">
+        <div class="nx-sidebar-logo">N</div>
+        <div class="nx-sidebar-brand">
+          <span class="nx-sidebar-title">NEXUS</span>
+          <span class="nx-sidebar-subtitle">Admin Portal</span>
+        </div>
+      </div>
+      
+      <nav class="nx-sidebar-nav">
+        <a href="dashboard.html" class="nx-nav-item">
+          <i class="fa fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-label">Catalog</div>
+          <a href="products.html" class="nx-nav-item">
+            <i class="fa fa-box"></i>
+            <span>Products</span>
+          </a>
+          <a href="categories.html" class="nx-nav-item">
+            <i class="fa fa-folder-tree"></i>
+            <span>Categories</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-tags"></i>
+            <span>Brands</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-label">Sales</div>
+          <a href="orders.html" class="nx-nav-item">
+            <i class="fa fa-shopping-bag"></i>
+            <span>Orders</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-file-invoice"></i>
+            <span>Invoices</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-label">Inventory</div>
+          <a href="inventory.html" class="nx-nav-item active">
+            <i class="fa fa-warehouse"></i>
+            <span>Stock Levels</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-arrows-rotate"></i>
+            <span>Movements</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-truck-ramp-box"></i>
+            <span>Receiving</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-label">Customers</div>
+          <a href="customers.html" class="nx-nav-item">
+            <i class="fa fa-users"></i>
+            <span>All Customers</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-label">System</div>
+          <a href="settings.html" class="nx-nav-item">
+            <i class="fa fa-gear"></i>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+      
+      <div class="nx-sidebar-footer">
+        <div class="nx-sidebar-user">
+          <div class="nx-avatar nx-avatar-sm">AR</div>
+          <div class="nx-sidebar-user-info">
+            <span class="nx-sidebar-user-name">Admin User</span>
+            <span class="nx-sidebar-user-role">Super Admin</span>
+          </div>
+          <button class="nx-btn nx-btn-icon nx-btn-ghost nx-btn-sm">
+            <i class="fa fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="nx-main">
+      <!-- Topbar -->
+      <header class="nx-topbar">
+        <div class="nx-topbar-left">
+          <button class="nx-btn nx-btn-icon nx-btn-ghost nx-sidebar-toggle">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="nx-breadcrumb">
+            <a href="#">Inventory</a>
+            <span class="nx-breadcrumb-sep">/</span>
+            <span>Stock Levels</span>
+          </div>
+        </div>
+        <div class="nx-topbar-right">
+          <div class="nx-search-box">
+            <i class="fa fa-search"></i>
+            <input type="text" placeholder="Search inventory...">
+          </div>
+          <button class="nx-btn nx-btn-icon nx-btn-ghost">
+            <i class="fa fa-bell"></i>
+            <span class="nx-notification-dot"></span>
+          </button>
+        </div>
+      </header>
+      
+      <!-- Page Content -->
+      <div class="nx-content">
+        <!-- Page Header -->
+        <div class="nx-page-header">
+          <div class="nx-page-header-left">
+            <h1 class="nx-page-title">Inventory Management</h1>
+            <p class="nx-page-subtitle">Monitor stock levels and manage inventory movements</p>
+          </div>
+          <div class="nx-page-header-actions">
+            <button class="nx-btn nx-btn-secondary">
+              <i class="fa fa-download"></i> Export
+            </button>
+            <button class="nx-btn nx-btn-primary" onclick="openAdjustModal()">
+              <i class="fa fa-sliders"></i> Adjust Stock
+            </button>
+          </div>
+        </div>
+        
+        <!-- Stats Row -->
+        <div class="nx-stats-grid">
+          <div class="nx-stat-card">
+            <div class="nx-stat-icon" style="background: var(--nx-info-bg); color: var(--nx-info);">
+              <i class="fa fa-boxes-stacked"></i>
+            </div>
+            <div class="nx-stat-content">
+              <div class="nx-stat-value">4,892</div>
+              <div class="nx-stat-label">Total SKUs</div>
+            </div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-icon" style="background: var(--nx-success-bg); color: var(--nx-success);">
+              <i class="fa fa-cubes"></i>
+            </div>
+            <div class="nx-stat-content">
+              <div class="nx-stat-value">28,456</div>
+              <div class="nx-stat-label">Total Units</div>
+            </div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-icon" style="background: var(--nx-warning-bg); color: var(--nx-warning);">
+              <i class="fa fa-triangle-exclamation"></i>
+            </div>
+            <div class="nx-stat-content">
+              <div class="nx-stat-value">47</div>
+              <div class="nx-stat-label">Low Stock Items</div>
+            </div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-icon" style="background: var(--nx-danger-bg); color: var(--nx-danger);">
+              <i class="fa fa-ban"></i>
+            </div>
+            <div class="nx-stat-content">
+              <div class="nx-stat-value">12</div>
+              <div class="nx-stat-label">Out of Stock</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-action-row">
+          <button class="quick-action-btn" onclick="openReceiveModal()">
+            <i class="fa fa-truck-ramp-box"></i>
+            Receive Stock
+          </button>
+          <button class="quick-action-btn" onclick="openTransferModal()">
+            <i class="fa fa-arrow-right-arrow-left"></i>
+            Transfer Stock
+          </button>
+          <button class="quick-action-btn">
+            <i class="fa fa-clipboard-check"></i>
+            Stock Count
+          </button>
+          <button class="quick-action-btn">
+            <i class="fa fa-file-export"></i>
+            Generate Report
+          </button>
+        </div>
+        
+        <!-- Warehouse Tabs -->
+        <div class="warehouse-tabs">
+          <button class="warehouse-tab active">
+            All Warehouses
+            <span class="count">4,892</span>
+          </button>
+          <button class="warehouse-tab">
+            Main Warehouse
+            <span class="count">3,210</span>
+          </button>
+          <button class="warehouse-tab">
+            Store Front
+            <span class="count">1,452</span>
+          </button>
+          <button class="warehouse-tab">
+            Backup Storage
+            <span class="count">230</span>
+          </button>
+        </div>
+        
+        <div class="inventory-grid">
+          <!-- Stock Table -->
+          <div class="nx-card">
+            <div class="nx-card-header">
+              <span class="nx-card-title">Stock Levels</span>
+              <div style="display: flex; gap: var(--nx-space-2);">
+                <select class="nx-input nx-select" style="width: 140px; font-size: 12px;">
+                  <option>All Categories</option>
+                  <option>Electronics</option>
+                  <option>Clothing</option>
+                  <option>Home & Living</option>
+                </select>
+                <select class="nx-input nx-select" style="width: 120px; font-size: 12px;">
+                  <option>All Status</option>
+                  <option>In Stock</option>
+                  <option>Low Stock</option>
+                  <option>Out of Stock</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="nx-table-wrap">
+              <table class="nx-table">
+                <thead>
+                  <tr>
+                    <th style="width: 40px;">
+                      <input type="checkbox" class="nx-checkbox">
+                    </th>
+                    <th>Product</th>
+                    <th>SKU</th>
+                    <th>Warehouse</th>
+                    <th>Qty</th>
+                    <th>Stock Level</th>
+                    <th>Reorder Point</th>
+                    <th>Status</th>
+                    <th style="width: 60px;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input type="checkbox" class="nx-checkbox"></td>
+                    <td>
+                      <div class="nx-product-cell">
+                        <div class="nx-product-thumb" style="background: var(--nx-bg-tertiary);">
+                          <i class="fa fa-mobile-screen" style="color: var(--nx-text-tertiary);"></i>
+                        </div>
+                        <div class="nx-product-info">
+                          <span class="nx-product-name">iPhone 15 Pro Max</span>
+                          <span class="nx-product-meta">256GB / Natural Titanium</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td><code class="nx-code">IP15PM-256-NT</code></td>
+                    <td>Main Warehouse</td>
+                    <td><strong>145</strong></td>
+                    <td>
+                      <div class="stock-level-indicator">
+                        <div class="stock-bar">
+                          <div class="stock-bar-fill good"></div>
+                        </div>
+                        <span class="nx-caption">85%</span>
+                      </div>
+                    </td>
+                    <td>20</td>
+                    <td><span class="nx-badge nx-badge-success">In Stock</span></td>
+                    <td>
+                      <div class="nx-table-actions">
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="Adjust">
+                          <i class="fa fa-sliders"></i>
+                        </button>
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="History">
+                          <i class="fa fa-clock-rotate-left"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" class="nx-checkbox"></td>
+                    <td>
+                      <div class="nx-product-cell">
+                        <div class="nx-product-thumb" style="background: var(--nx-bg-tertiary);">
+                          <i class="fa fa-headphones" style="color: var(--nx-text-tertiary);"></i>
+                        </div>
+                        <div class="nx-product-info">
+                          <span class="nx-product-name">Sony WH-1000XM5</span>
+                          <span class="nx-product-meta">Black</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td><code class="nx-code">SONY-XM5-BLK</code></td>
+                    <td>Main Warehouse</td>
+                    <td><strong>8</strong></td>
+                    <td>
+                      <div class="stock-level-indicator">
+                        <div class="stock-bar">
+                          <div class="stock-bar-fill low"></div>
+                        </div>
+                        <span class="nx-caption">32%</span>
+                      </div>
+                    </td>
+                    <td>15</td>
+                    <td><span class="nx-badge nx-badge-warning">Low Stock</span></td>
+                    <td>
+                      <div class="nx-table-actions">
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="Adjust">
+                          <i class="fa fa-sliders"></i>
+                        </button>
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="History">
+                          <i class="fa fa-clock-rotate-left"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" class="nx-checkbox"></td>
+                    <td>
+                      <div class="nx-product-cell">
+                        <div class="nx-product-thumb" style="background: var(--nx-bg-tertiary);">
+                          <i class="fa fa-laptop" style="color: var(--nx-text-tertiary);"></i>
+                        </div>
+                        <div class="nx-product-info">
+                          <span class="nx-product-name">MacBook Pro 14"</span>
+                          <span class="nx-product-meta">M3 Pro / 18GB / 512GB</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td><code class="nx-code">MBP14-M3P-512</code></td>
+                    <td>Store Front</td>
+                    <td><strong>0</strong></td>
+                    <td>
+                      <div class="stock-level-indicator">
+                        <div class="stock-bar">
+                          <div class="stock-bar-fill critical" style="width: 0%;"></div>
+                        </div>
+                        <span class="nx-caption">0%</span>
+                      </div>
+                    </td>
+                    <td>5</td>
+                    <td><span class="nx-badge nx-badge-danger">Out of Stock</span></td>
+                    <td>
+                      <div class="nx-table-actions">
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="Adjust">
+                          <i class="fa fa-sliders"></i>
+                        </button>
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="History">
+                          <i class="fa fa-clock-rotate-left"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" class="nx-checkbox"></td>
+                    <td>
+                      <div class="nx-product-cell">
+                        <div class="nx-product-thumb" style="background: var(--nx-bg-tertiary);">
+                          <i class="fa fa-tv" style="color: var(--nx-text-tertiary);"></i>
+                        </div>
+                        <div class="nx-product-info">
+                          <span class="nx-product-name">Samsung 55" QLED TV</span>
+                          <span class="nx-product-meta">Q80C Series</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td><code class="nx-code">SAM-Q80C-55</code></td>
+                    <td>Main Warehouse</td>
+                    <td><strong>23</strong></td>
+                    <td>
+                      <div class="stock-level-indicator">
+                        <div class="stock-bar">
+                          <div class="stock-bar-fill medium"></div>
+                        </div>
+                        <span class="nx-caption">58%</span>
+                      </div>
+                    </td>
+                    <td>10</td>
+                    <td><span class="nx-badge nx-badge-success">In Stock</span></td>
+                    <td>
+                      <div class="nx-table-actions">
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="Adjust">
+                          <i class="fa fa-sliders"></i>
+                        </button>
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="History">
+                          <i class="fa fa-clock-rotate-left"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" class="nx-checkbox"></td>
+                    <td>
+                      <div class="nx-product-cell">
+                        <div class="nx-product-thumb" style="background: var(--nx-bg-tertiary);">
+                          <i class="fa fa-shirt" style="color: var(--nx-text-tertiary);"></i>
+                        </div>
+                        <div class="nx-product-info">
+                          <span class="nx-product-name">Nike Dri-FIT T-Shirt</span>
+                          <span class="nx-product-meta">Medium / Black</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td><code class="nx-code">NIKE-DRY-M-BLK</code></td>
+                    <td>Store Front</td>
+                    <td><strong>52</strong></td>
+                    <td>
+                      <div class="stock-level-indicator">
+                        <div class="stock-bar">
+                          <div class="stock-bar-fill full"></div>
+                        </div>
+                        <span class="nx-caption">100%</span>
+                      </div>
+                    </td>
+                    <td>25</td>
+                    <td><span class="nx-badge nx-badge-success">In Stock</span></td>
+                    <td>
+                      <div class="nx-table-actions">
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="Adjust">
+                          <i class="fa fa-sliders"></i>
+                        </button>
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" title="History">
+                          <i class="fa fa-clock-rotate-left"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="nx-table-footer">
+              <span class="nx-caption">Showing 1-5 of 4,892 items</span>
+              <div class="nx-pagination">
+                <button class="nx-pagination-btn" disabled>
+                  <i class="fa fa-chevron-left"></i>
+                </button>
+                <button class="nx-pagination-btn active">1</button>
+                <button class="nx-pagination-btn">2</button>
+                <button class="nx-pagination-btn">3</button>
+                <span class="nx-pagination-ellipsis">...</span>
+                <button class="nx-pagination-btn">979</button>
+                <button class="nx-pagination-btn">
+                  <i class="fa fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Sidebar Panels -->
+          <div style="display: flex; flex-direction: column; gap: var(--nx-space-4);">
+            <!-- Critical Alerts -->
+            <div class="alert-card critical">
+              <div class="alert-header">
+                <div class="alert-title">
+                  <i class="fa fa-circle-exclamation" style="color: var(--nx-danger);"></i>
+                  Out of Stock (12)
+                </div>
+                <button class="nx-btn nx-btn-sm nx-btn-ghost">View All</button>
+              </div>
+              <div class="alert-list">
+                <div class="alert-item">
+                  <span>MacBook Pro 14" M3 Pro</span>
+                  <span class="nx-badge nx-badge-danger">0 units</span>
+                </div>
+                <div class="alert-item">
+                  <span>iPad Air 5th Gen 256GB</span>
+                  <span class="nx-badge nx-badge-danger">0 units</span>
+                </div>
+                <div class="alert-item">
+                  <span>AirPods Pro 2nd Gen</span>
+                  <span class="nx-badge nx-badge-danger">0 units</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Low Stock Alerts -->
+            <div class="alert-card warning">
+              <div class="alert-header">
+                <div class="alert-title">
+                  <i class="fa fa-triangle-exclamation" style="color: var(--nx-warning);"></i>
+                  Low Stock (47)
+                </div>
+                <button class="nx-btn nx-btn-sm nx-btn-ghost">View All</button>
+              </div>
+              <div class="alert-list">
+                <div class="alert-item">
+                  <span>Sony WH-1000XM5</span>
+                  <span class="nx-badge nx-badge-warning">8 units</span>
+                </div>
+                <div class="alert-item">
+                  <span>Samsung Galaxy Buds2 Pro</span>
+                  <span class="nx-badge nx-badge-warning">5 units</span>
+                </div>
+                <div class="alert-item">
+                  <span>Anker 65W Charger</span>
+                  <span class="nx-badge nx-badge-warning">12 units</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Recent Movements -->
+            <div class="nx-card">
+              <div class="nx-card-header">
+                <span class="nx-card-title">Recent Movements</span>
+                <button class="nx-btn nx-btn-sm nx-btn-ghost">View All</button>
+              </div>
+              <div class="nx-card-body" style="padding: 0;">
+                <div style="padding: var(--nx-space-3) var(--nx-space-4); border-bottom: 1px solid var(--nx-border-subtle);">
+                  <div style="display: flex; align-items: center; gap: var(--nx-space-3);">
+                    <div class="movement-icon in">
+                      <i class="fa fa-arrow-down"></i>
+                    </div>
+                    <div style="flex: 1;">
+                      <div style="font-size: 12px; font-weight: 500;">Stock Received</div>
+                      <div class="nx-caption">iPhone 15 Pro Max × 50</div>
+                    </div>
+                    <span class="nx-caption">2h ago</span>
+                  </div>
+                </div>
+                <div style="padding: var(--nx-space-3) var(--nx-space-4); border-bottom: 1px solid var(--nx-border-subtle);">
+                  <div style="display: flex; align-items: center; gap: var(--nx-space-3);">
+                    <div class="movement-icon out">
+                      <i class="fa fa-arrow-up"></i>
+                    </div>
+                    <div style="flex: 1;">
+                      <div style="font-size: 12px; font-weight: 500;">Sold</div>
+                      <div class="nx-caption">Sony XM5 × 3</div>
+                    </div>
+                    <span class="nx-caption">3h ago</span>
+                  </div>
+                </div>
+                <div style="padding: var(--nx-space-3) var(--nx-space-4); border-bottom: 1px solid var(--nx-border-subtle);">
+                  <div style="display: flex; align-items: center; gap: var(--nx-space-3);">
+                    <div class="movement-icon transfer">
+                      <i class="fa fa-right-left"></i>
+                    </div>
+                    <div style="flex: 1;">
+                      <div style="font-size: 12px; font-weight: 500;">Transfer</div>
+                      <div class="nx-caption">Main → Store Front × 20</div>
+                    </div>
+                    <span class="nx-caption">5h ago</span>
+                  </div>
+                </div>
+                <div style="padding: var(--nx-space-3) var(--nx-space-4);">
+                  <div style="display: flex; align-items: center; gap: var(--nx-space-3);">
+                    <div class="movement-icon adjust">
+                      <i class="fa fa-pen"></i>
+                    </div>
+                    <div style="flex: 1;">
+                      <div style="font-size: 12px; font-weight: 500;">Adjustment</div>
+                      <div class="nx-caption">Damaged: Nike T-Shirt × 2</div>
+                    </div>
+                    <span class="nx-caption">1d ago</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Stock Adjustment Modal -->
+  <div class="nx-modal-backdrop" id="adjust-modal">
+    <div class="nx-modal" style="max-width: 500px;">
+      <div class="nx-modal-header">
+        <h2 class="nx-modal-title">Adjust Stock</h2>
+        <button class="nx-modal-close" onclick="closeAdjustModal()">×</button>
+      </div>
+      <div class="nx-modal-body">
+        <div class="nx-form-group">
+          <label class="nx-form-label required">Product</label>
+          <select class="nx-input nx-select">
+            <option>Select product...</option>
+            <option>iPhone 15 Pro Max - 256GB Natural</option>
+            <option>Sony WH-1000XM5 - Black</option>
+            <option>MacBook Pro 14" - M3 Pro</option>
+          </select>
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-form-label required">Warehouse</label>
+          <select class="nx-input nx-select">
+            <option>Main Warehouse</option>
+            <option>Store Front</option>
+            <option>Backup Storage</option>
+          </select>
+        </div>
+        
+        <div class="nx-form-row">
+          <div class="nx-form-group">
+            <label class="nx-form-label required">Adjustment Type</label>
+            <select class="nx-input nx-select">
+              <option>Add Stock</option>
+              <option>Remove Stock</option>
+              <option>Set Quantity</option>
+            </select>
+          </div>
+          <div class="nx-form-group">
+            <label class="nx-form-label required">Quantity</label>
+            <input type="number" class="nx-input" value="0" min="0">
+          </div>
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-form-label required">Reason</label>
+          <select class="nx-input nx-select">
+            <option>Received Shipment</option>
+            <option>Damaged</option>
+            <option>Lost</option>
+            <option>Stock Count Correction</option>
+            <option>Customer Return</option>
+            <option>Other</option>
+          </select>
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-form-label">Notes</label>
+          <textarea class="nx-input nx-textarea" rows="3" placeholder="Optional notes about this adjustment..."></textarea>
+        </div>
+      </div>
+      <div class="nx-modal-footer">
+        <button class="nx-btn nx-btn-secondary" onclick="closeAdjustModal()">Cancel</button>
+        <button class="nx-btn nx-btn-primary">
+          <i class="fa fa-check"></i> Apply Adjustment
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Transfer Stock Modal -->
+  <div class="nx-modal-backdrop" id="transfer-modal">
+    <div class="nx-modal" style="max-width: 500px;">
+      <div class="nx-modal-header">
+        <h2 class="nx-modal-title">Transfer Stock</h2>
+        <button class="nx-modal-close" onclick="closeTransferModal()">×</button>
+      </div>
+      <div class="nx-modal-body">
+        <div class="nx-form-group">
+          <label class="nx-form-label required">Product</label>
+          <select class="nx-input nx-select">
+            <option>Select product...</option>
+            <option>iPhone 15 Pro Max - 256GB Natural (145 in Main)</option>
+            <option>Sony WH-1000XM5 - Black (8 in Main)</option>
+          </select>
+        </div>
+        
+        <div class="nx-form-row">
+          <div class="nx-form-group">
+            <label class="nx-form-label required">From Warehouse</label>
+            <select class="nx-input nx-select">
+              <option>Main Warehouse</option>
+              <option>Store Front</option>
+              <option>Backup Storage</option>
+            </select>
+          </div>
+          <div class="nx-form-group" style="display: flex; align-items: center; justify-content: center; padding-top: 24px;">
+            <i class="fa fa-arrow-right" style="color: var(--nx-text-tertiary);"></i>
+          </div>
+          <div class="nx-form-group">
+            <label class="nx-form-label required">To Warehouse</label>
+            <select class="nx-input nx-select">
+              <option>Store Front</option>
+              <option>Main Warehouse</option>
+              <option>Backup Storage</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-form-label required">Quantity to Transfer</label>
+          <input type="number" class="nx-input" value="1" min="1">
+          <span class="nx-form-hint">Available: 145 units</span>
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-form-label">Notes</label>
+          <textarea class="nx-input nx-textarea" rows="2" placeholder="Transfer notes..."></textarea>
+        </div>
+      </div>
+      <div class="nx-modal-footer">
+        <button class="nx-btn nx-btn-secondary" onclick="closeTransferModal()">Cancel</button>
+        <button class="nx-btn nx-btn-primary">
+          <i class="fa fa-arrow-right-arrow-left"></i> Transfer Stock
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Receive Stock Modal -->
+  <div class="nx-modal-backdrop" id="receive-modal">
+    <div class="nx-modal" style="max-width: 600px;">
+      <div class="nx-modal-header">
+        <h2 class="nx-modal-title">Receive Stock</h2>
+        <button class="nx-modal-close" onclick="closeReceiveModal()">×</button>
+      </div>
+      <div class="nx-modal-body">
+        <div class="nx-form-row">
+          <div class="nx-form-group">
+            <label class="nx-form-label">Purchase Order</label>
+            <select class="nx-input nx-select">
+              <option>Select PO (optional)...</option>
+              <option>PO-2026-0145 - Apple Inc.</option>
+              <option>PO-2026-0144 - Sony Electronics</option>
+            </select>
+          </div>
+          <div class="nx-form-group">
+            <label class="nx-form-label required">Receiving Warehouse</label>
+            <select class="nx-input nx-select">
+              <option>Main Warehouse</option>
+              <option>Store Front</option>
+              <option>Backup Storage</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-form-label required">Supplier</label>
+          <select class="nx-input nx-select">
+            <option>Select supplier...</option>
+            <option>Apple Inc.</option>
+            <option>Sony Electronics</option>
+            <option>Samsung Bangladesh</option>
+            <option>Nike Distribution</option>
+          </select>
+        </div>
+        
+        <div style="margin-top: var(--nx-space-4);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--nx-space-3);">
+            <label class="nx-form-label" style="margin: 0;">Items to Receive</label>
+            <button class="nx-btn nx-btn-sm nx-btn-secondary">
+              <i class="fa fa-plus"></i> Add Item
+            </button>
+          </div>
+          
+          <div style="background: var(--nx-bg-tertiary); border-radius: var(--nx-radius-lg); padding: var(--nx-space-3);">
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: var(--nx-space-3); align-items: end; margin-bottom: var(--nx-space-3);">
+              <div>
+                <label class="nx-form-label" style="font-size: 10px;">Product</label>
+                <select class="nx-input nx-select" style="font-size: 12px;">
+                  <option>iPhone 15 Pro Max - 256GB Natural</option>
+                </select>
+              </div>
+              <div>
+                <label class="nx-form-label" style="font-size: 10px;">Expected</label>
+                <input type="number" class="nx-input" value="50" style="font-size: 12px;">
+              </div>
+              <div>
+                <label class="nx-form-label" style="font-size: 10px;">Received</label>
+                <input type="number" class="nx-input" value="50" style="font-size: 12px;">
+              </div>
+              <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" style="color: var(--nx-danger);">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: var(--nx-space-3); align-items: end;">
+              <div>
+                <select class="nx-input nx-select" style="font-size: 12px;">
+                  <option>Sony WH-1000XM5 - Black</option>
+                </select>
+              </div>
+              <div>
+                <input type="number" class="nx-input" value="20" style="font-size: 12px;">
+              </div>
+              <div>
+                <input type="number" class="nx-input" value="18" style="font-size: 12px; border-color: var(--nx-warning);">
+              </div>
+              <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost" style="color: var(--nx-danger);">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div style="margin-top: var(--nx-space-2); padding: var(--nx-space-2) var(--nx-space-3); background: var(--nx-warning-bg); border-radius: var(--nx-radius-md); display: flex; align-items: center; gap: var(--nx-space-2);">
+            <i class="fa fa-triangle-exclamation" style="color: var(--nx-warning); font-size: 12px;"></i>
+            <span style="font-size: 11px; color: var(--nx-warning);">2 units short for Sony WH-1000XM5</span>
+          </div>
+        </div>
+        
+        <div class="nx-form-group" style="margin-top: var(--nx-space-4);">
+          <label class="nx-form-label">Notes</label>
+          <textarea class="nx-input nx-textarea" rows="2" placeholder="Receiving notes..."></textarea>
+        </div>
+      </div>
+      <div class="nx-modal-footer">
+        <button class="nx-btn nx-btn-secondary" onclick="closeReceiveModal()">Cancel</button>
+        <button class="nx-btn nx-btn-primary">
+          <i class="fa fa-truck-ramp-box"></i> Confirm Receipt
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Modal functions
+    function openAdjustModal() {
+      document.getElementById('adjust-modal').classList.add('open');
+    }
+    function closeAdjustModal() {
+      document.getElementById('adjust-modal').classList.remove('open');
+    }
+    function openTransferModal() {
+      document.getElementById('transfer-modal').classList.add('open');
+    }
+    function closeTransferModal() {
+      document.getElementById('transfer-modal').classList.remove('open');
+    }
+    function openReceiveModal() {
+      document.getElementById('receive-modal').classList.add('open');
+    }
+    function closeReceiveModal() {
+      document.getElementById('receive-modal').classList.remove('open');
+    }
+    
+    // Warehouse tab switching
+    document.querySelectorAll('.warehouse-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.warehouse-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    // Close modals on backdrop click
+    document.querySelectorAll('.nx-modal-backdrop').forEach(backdrop => {
+      backdrop.addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.classList.remove('open');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

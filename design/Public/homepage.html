@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS Store — Premium Electronics</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --store-bg: #ffffff;
+      --store-surface: #f8f9fa;
+      --store-text: #1a1a2e;
+      --store-muted: #6b7280;
+      --store-border: #e5e7eb;
+      --store-accent: #6366f1;
+      --store-accent-hover: #5254c8;
+      --store-success: #22c55e;
+      --store-danger: #ef4444;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--store-bg);
+      color: var(--store-text);
+      line-height: 1.5;
+    }
+    
+    a { color: inherit; text-decoration: none; }
+    
+    /* Header */
+    .store-header {
+      background: var(--store-text);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header-top {
+      background: rgba(0,0,0,0.2);
+      padding: 8px 0;
+      font-size: 12px;
+    }
+    
+    .header-top .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .header-links {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .header-links a {
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    
+    .header-links a:hover { opacity: 1; }
+    
+    .header-main {
+      padding: 16px 0;
+    }
+    
+    .header-main .container {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--store-accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .search-bar {
+      flex: 1;
+      max-width: 600px;
+      display: flex;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .search-bar input {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: var(--store-text);
+    }
+    
+    .search-bar button {
+      padding: 0 20px;
+      background: var(--store-accent);
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-left: auto;
+    }
+    
+    .header-action {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      opacity: 0.9;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    .header-action:hover { opacity: 1; }
+    
+    .header-action i {
+      font-size: 20px;
+    }
+    
+    .cart-badge {
+      position: relative;
+    }
+    
+    .cart-badge .count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--store-accent);
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Navigation */
+    .nav-bar {
+      background: rgba(255,255,255,0.05);
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .nav-bar .container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .nav-item {
+      padding: 14px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.85;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .nav-item:hover {
+      opacity: 1;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .nav-item.active {
+      opacity: 1;
+      border-bottom-color: var(--store-accent);
+    }
+    
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+      color: white;
+      padding: 60px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(135deg, var(--store-accent), #a855f7);
+      border-radius: 50%;
+      opacity: 0.1;
+    }
+    
+    .hero .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+      position: relative;
+    }
+    
+    .hero-content h1 {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    
+    .hero-content p {
+      font-size: 18px;
+      opacity: 0.8;
+      margin-bottom: 32px;
+      max-width: 400px;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    
+    .btn-primary {
+      background: var(--store-accent);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--store-accent-hover);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.5);
+    }
+    
+    .hero-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 200px;
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
+    }
+    
+    /* Flash Deals */
+    .section {
+      padding: 48px 0;
+    }
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    
+    .section-title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .section-link {
+      color: var(--store-accent);
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .flash-deals {
+      background: var(--store-surface);
+    }
+    
+    .flash-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .flash-timer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--store-danger);
+      font-weight: 600;
+    }
+    
+    .timer-box {
+      background: var(--store-danger);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+    }
+    
+    @media (max-width: 1200px) {
+      .product-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    
+    @media (max-width: 900px) {
+      .product-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    
+    @media (max-width: 600px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    
+    .product-card {
+      background: white;
+      border: 1px solid var(--store-border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .product-card:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      transform: translateY(-4px);
+    }
+    
+    .product-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 10px;
+      background: var(--store-danger);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+    }
+    
+    .product-wishlist {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      background: white;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      color: var(--store-muted);
+      transition: all 0.2s;
+    }
+    
+    .product-wishlist:hover {
+      color: var(--store-danger);
+    }
+    
+    .product-image {
+      aspect-ratio: 1;
+      background: var(--store-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      padding: 20px;
+    }
+    
+    .product-info {
+      padding: 16px;
+    }
+    
+    .product-brand {
+      font-size: 11px;
+      color: var(--store-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    
+    .product-name {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .product-rating {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    
+    .stars {
+      color: #fbbf24;
+    }
+    
+    .rating-count {
+      color: var(--store-muted);
+    }
+    
+    .product-price {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    
+    .price-current {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--store-danger);
+    }
+    
+    .price-original {
+      font-size: 13px;
+      color: var(--store-muted);
+      text-decoration: line-through;
+    }
+    
+    /* Categories */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+    }
+    
+    .category-card {
+      background: var(--store-surface);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .category-card:hover {
+      background: var(--store-accent);
+      color: white;
+    }
+    
+    .category-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+    
+    .category-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    /* Banner Grid */
+    .banner-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .banner {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+      border-radius: 16px;
+      padding: 32px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 200px;
+    }
+    
+    .banner.accent {
+      background: linear-gradient(135deg, var(--store-accent) 0%, #a855f7 100%);
+    }
+    
+    .banner.teal {
+      background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+    }
+    
+    .banner-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .banner-subtitle {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 16px;
+    }
+    
+    .banner-image {
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      font-size: 80px;
+      opacity: 0.3;
+    }
+    
+    /* Footer */
+    .footer {
+      background: var(--store-text);
+      color: white;
+      padding: 60px 0 24px;
+      margin-top: 48px;
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    
+    .footer-brand {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    
+    .footer-desc {
+      font-size: 13px;
+      opacity: 0.7;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+    
+    .footer-social {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .social-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .social-icon:hover {
+      background: var(--store-accent);
+    }
+    
+    .footer-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    
+    .footer-links {
+      list-style: none;
+    }
+    
+    .footer-links li {
+      margin-bottom: 12px;
+    }
+    
+    .footer-links a {
+      font-size: 13px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    
+    .footer-links a:hover {
+      opacity: 1;
+    }
+    
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      opacity: 0.6;
+    }
+    
+    .payment-methods {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .payment-icon {
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="store-header">
+    <div class="header-top">
+      <div class="container">
+        <div class="header-links">
+          <a href="#">Track Order</a>
+          <a href="#">Help Center</a>
+          <a href="#">Sell on NEXUS</a>
+        </div>
+        <div class="header-links">
+          <a href="#">Download App</a>
+          <a href="#">বাংলা</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="header-main">
+      <div class="container">
+        <a href="#" class="logo">
+          <div class="logo-icon">N</div>
+          NEXUS
+        </a>
+        
+        <div class="search-bar">
+          <input type="text" placeholder="Search for products, brands, and more...">
+          <button><i class="fa fa-search"></i></button>
+        </div>
+        
+        <div class="header-actions">
+          <a href="#" class="header-action">
+            <i class="fa fa-user"></i>
+            <span>Account</span>
+          </a>
+          <a href="#" class="header-action">
+            <i class="fa fa-heart"></i>
+            <span>Wishlist</span>
+          </a>
+          <a href="#" class="header-action cart-badge">
+            <i class="fa fa-shopping-cart"></i>
+            <span class="count">3</span>
+            <span>Cart</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="nav-bar">
+      <div class="container">
+        <a href="#" class="nav-item active">Home</a>
+        <a href="#" class="nav-item">Smartphones</a>
+        <a href="#" class="nav-item">Laptops</a>
+        <a href="#" class="nav-item">Audio</a>
+        <a href="#" class="nav-item">Wearables</a>
+        <a href="#" class="nav-item">Gaming</a>
+        <a href="#" class="nav-item">Accessories</a>
+        <a href="#" class="nav-item" style="color:var(--store-danger)">
+          <i class="fa fa-bolt"></i> Flash Deals
+        </a>
+      </div>
+    </nav>
+  </header>
+  
+  <!-- Hero Banner -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>iPhone 15 Pro Max</h1>
+        <p>Titanium. So strong. So light. So Pro. The most advanced iPhone ever.</p>
+        <div class="hero-buttons">
+          <button class="btn btn-primary">Shop Now</button>
+          <button class="btn btn-outline">Learn More</button>
+        </div>
+      </div>
+      <div class="hero-image">📱</div>
+    </div>
+  </section>
+  
+  <!-- Flash Deals -->
+  <section class="section flash-deals">
+    <div class="container">
+      <div class="section-header">
+        <div class="flash-header">
+          <h2 class="section-title">⚡ Flash Deals</h2>
+          <div class="flash-timer">
+            <span>Ends in:</span>
+            <span class="timer-box">02</span>:
+            <span class="timer-box">45</span>:
+            <span class="timer-box">18</span>
+          </div>
+        </div>
+        <a href="#" class="section-link">View All <i class="fa fa-arrow-right"></i></a>
+      </div>
+      
+      <div class="product-grid">
+        <div class="product-card">
+          <span class="product-badge">-15%</span>
+          <button class="product-wishlist"><i class="fa fa-heart"></i></button>
+          <div class="product-image">📱</div>
+          <div class="product-info">
+            <div class="product-brand">Apple</div>
+            <div class="product-name">iPhone 15 Pro Max 256GB</div>
+            <div class="product-rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-count">(128)</span>
+            </div>
+            <div class="product-price">
+              <span class="price-current">৳189,900</span>
+              <span class="price-original">৳199,900</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <span class="product-badge">-20%</span>
+          <button class="product-wishlist"><i class="fa fa-heart"></i></button>
+          <div class="product-image">🎧</div>
+          <div class="product-info">
+            <div class="product-brand">Apple</div>
+            <div class="product-name">AirPods Pro 2nd Generation</div>
+            <div class="product-rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-count">(256)</span>
+            </div>
+            <div class="product-price">
+              <span class="price-current">৳39,900</span>
+              <span class="price-original">৳44,900</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <span class="product-badge">-10%</span>
+          <button class="product-wishlist"><i class="fa fa-heart"></i></button>
+          <div class="product-image">💻</div>
+          <div class="product-info">
+            <div class="product-brand">Apple</div>
+            <div class="product-name">MacBook Air M3 15" 256GB</div>
+            <div class="product-rating">
+              <span class="stars">★★★★☆</span>
+              <span class="rating-count">(89)</span>
+            </div>
+            <div class="product-price">
+              <span class="price-current">৳184,900</span>
+              <span class="price-original">৳194,900</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <span class="product-badge">-25%</span>
+          <button class="product-wishlist"><i class="fa fa-heart"></i></button>
+          <div class="product-image">⌚</div>
+          <div class="product-info">
+            <div class="product-brand">Samsung</div>
+            <div class="product-name">Galaxy Watch 6 Classic 47mm</div>
+            <div class="product-rating">
+              <span class="stars">★★★★☆</span>
+              <span class="rating-count">(67)</span>
+            </div>
+            <div class="product-price">
+              <span class="price-current">৳44,900</span>
+              <span class="price-original">৳54,900</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <span class="product-badge">-30%</span>
+          <button class="product-wishlist"><i class="fa fa-heart"></i></button>
+          <div class="product-image">🎧</div>
+          <div class="product-info">
+            <div class="product-brand">Sony</div>
+            <div class="product-name">WH-1000XM5 Wireless</div>
+            <div class="product-rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-count">(312)</span>
+            </div>
+            <div class="product-price">
+              <span class="price-current">৳44,900</span>
+              <span class="price-original">৳54,900</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Categories -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Shop by Category</h2>
+        <a href="#" class="section-link">All Categories <i class="fa fa-arrow-right"></i></a>
+      </div>
+      
+      <div class="category-grid">
+        <div class="category-card">
+          <div class="category-icon">📱</div>
+          <div class="category-name">Smartphones</div>
+        </div>
+        <div class="category-card">
+          <div class="category-icon">💻</div>
+          <div class="category-name">Laptops</div>
+        </div>
+        <div class="category-card">
+          <div class="category-icon">🎧</div>
+          <div class="category-name">Audio</div>
+        </div>
+        <div class="category-card">
+          <div class="category-icon">⌚</div>
+          <div class="category-name">Wearables</div>
+        </div>
+        <div class="category-card">
+          <div class="category-icon">🎮</div>
+          <div class="category-name">Gaming</div>
+        </div>
+        <div class="category-card">
+          <div class="category-icon">📷</div>
+          <div class="category-name">Cameras</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Banners -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="banner-grid">
+        <div class="banner">
+          <div class="banner-title">Samsung Galaxy S24 Ultra</div>
+          <div class="banner-subtitle">The ultimate smartphone experience with AI</div>
+          <button class="btn btn-primary" style="width:fit-content">Shop Now</button>
+          <div class="banner-image">📱</div>
+        </div>
+        <div class="banner accent">
+          <div class="banner-title">AirPods Pro</div>
+          <div class="banner-subtitle">Immersive sound</div>
+          <a href="#" style="font-size:13px;font-weight:500">Shop Now →</a>
+          <div class="banner-image">🎧</div>
+        </div>
+        <div class="banner teal">
+          <div class="banner-title">Smart Watches</div>
+          <div class="banner-subtitle">Track your fitness</div>
+          <a href="#" style="font-size:13px;font-weight:500">Shop Now →</a>
+          <div class="banner-image">⌚</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- New Arrivals -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">New Arrivals</h2>
+        <a href="#" class="section-link">View All <i class="fa fa-arrow-right"></i></a>
+      </div>
+      
+      <div class="product-grid">
+        <div class="product-card">
+          <button class="product-wishlist"><i class="fa fa-heart"></i></button>
+          <div class="product-image">📱</div>
+          <div class="product-info">
+            <div class="product-brand">Samsung</div>
+            <div class="product-name">Galaxy S24 Ultra 256GB</div>
+            <div class="product-rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-count">(45)</span>
+            </div>
+            <div class="product-price">
+              <span class="price-current">৳169,900</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <button class="product-wishlist"><i class="fa fa-heart"></i></button>
+          <div class="product-image">💻</div>
+          <div class="product-info">
+            <div class="product-brand">Apple</div>
+            <div class="product-name">MacBook Pro M3 Pro 14"</div>
+            <div class="product-rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-count">(28)</span>
+            </div>
+            <div class="product-price">
+              <span class="price-current">৳289,900</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <button class="product-wishlist"><i class="fa fa-heart"></i></button>
+          <div class="product-image">🎧</div>
+          <div class="product-info">
+            <div class="product-brand">Samsung</div>
+            <div class="product-name">Galaxy Buds3 Pro</div>
+            <div class="product-rating">
+              <span class="stars">★★★★☆</span>
+              <span class="rating-count">(56)</span>
+            </div>
+            <div class="product-price">
+              <span class="price-current">৳29,900</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <button class="product-wishlist"><i class="fa fa-heart"></i></button>
+          <div class="product-image">⌚</div>
+          <div class="product-info">
+            <div class="product-brand">Apple</div>
+            <div class="product-name">Apple Watch Ultra 2</div>
+            <div class="product-rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-count">(34)</span>
+            </div>
+            <div class="product-price">
+              <span class="price-current">৳129,900</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <button class="product-wishlist"><i class="fa fa-heart"></i></button>
+          <div class="product-image">🎮</div>
+          <div class="product-info">
+            <div class="product-brand">Sony</div>
+            <div class="product-name">PlayStation 5 Slim</div>
+            <div class="product-rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-count">(189)</span>
+            </div>
+            <div class="product-price">
+              <span class="price-current">৳74,900</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">NEXUS</div>
+          <p class="footer-desc">Your one-stop shop for premium electronics. We offer the latest gadgets at competitive prices with fast delivery across Bangladesh.</p>
+          <div class="footer-social">
+            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <div class="footer-title">Customer Service</div>
+          <ul class="footer-links">
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Track Order</a></li>
+            <li><a href="#">Returns & Refunds</a></li>
+            <li><a href="#">Shipping Info</a></li>
+            <li><a href="#">Contact Us</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <div class="footer-title">About NEXUS</div>
+          <ul class="footer-links">
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Press</a></li>
+            <li><a href="#">Affiliates</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <div class="footer-title">Policies</div>
+          <ul class="footer-links">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Return Policy</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <div class="footer-title">Contact</div>
+          <ul class="footer-links">
+            <li><i class="fa fa-phone" style="margin-right:8px"></i> 16XXX</li>
+            <li><i class="fa fa-envelope" style="margin-right:8px"></i> help@nexus.com.bd</li>
+            <li><i class="fa fa-map-marker" style="margin-right:8px"></i> Dhaka, Bangladesh</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <span>© 2026 NEXUS. All rights reserved.</span>
+        <div class="payment-methods">
+          <span class="payment-icon">bKash</span>
+          <span class="payment-icon">Nagad</span>
+          <span class="payment-icon">Visa</span>
+          <span class="payment-icon">Mastercard</span>
+          <span class="payment-icon">COD</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

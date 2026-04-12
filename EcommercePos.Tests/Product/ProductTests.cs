@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Application.Features.Product.Commands;
-using EcommercePos.Application.Features.Product.Queries;
+using EcommercePos.Application.Features.Product;
 using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Tests.Product;

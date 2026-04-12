@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — NEXUS Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/nexus-design-system.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* Dashboard specific styles */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--nx-space-5);
+    }
+    
+    @media (max-width: 1200px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .chart-container {
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-lg);
+      color: var(--nx-text-tertiary);
+    }
+    
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--nx-space-3);
+      margin-bottom: var(--nx-space-5);
+    }
+    
+    .quick-action-card {
+      background: var(--nx-bg-secondary);
+      border: 1px solid var(--nx-border-default);
+      border-radius: var(--nx-radius-lg);
+      padding: var(--nx-space-4);
+      cursor: pointer;
+      transition: all var(--nx-transition-fast);
+      text-align: center;
+    }
+    
+    .quick-action-card:hover {
+      border-color: var(--nx-accent-primary);
+      transform: translateY(-2px);
+    }
+    
+    .quick-action-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--nx-radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--nx-space-3);
+      font-size: 16px;
+    }
+    
+    .quick-action-icon.purple { background: var(--nx-purple-bg); color: var(--nx-purple); }
+    .quick-action-icon.teal { background: var(--nx-teal-bg); color: var(--nx-teal); }
+    .quick-action-icon.warning { background: var(--nx-warning-bg); color: var(--nx-warning); }
+    .quick-action-icon.info { background: var(--nx-info-bg); color: var(--nx-info); }
+    
+    .recent-orders-table td {
+      padding: var(--nx-space-3) var(--nx-space-4);
+    }
+    
+    .order-customer {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-3);
+    }
+    
+    .low-stock-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--nx-space-3);
+      border-bottom: 1px solid var(--nx-border-subtle);
+    }
+    
+    .low-stock-item:last-child {
+      border-bottom: none;
+    }
+    
+    .stock-bar {
+      width: 60px;
+      height: 6px;
+      background: var(--nx-bg-hover);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .stock-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+    
+    .stock-bar-fill.critical { background: var(--nx-danger); }
+    .stock-bar-fill.low { background: var(--nx-warning); }
+    .stock-bar-fill.ok { background: var(--nx-success); }
+    
+    .activity-item {
+      display: flex;
+      gap: var(--nx-space-3);
+      padding: var(--nx-space-3) 0;
+      border-bottom: 1px solid var(--nx-border-subtle);
+    }
+    
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+    
+    .activity-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    
+    .activity-icon.order { background: var(--nx-success-bg); color: var(--nx-success); }
+    .activity-icon.product { background: var(--nx-info-bg); color: var(--nx-info); }
+    .activity-icon.customer { background: var(--nx-purple-bg); color: var(--nx-purple); }
+    .activity-icon.payment { background: var(--nx-teal-bg); color: var(--nx-teal); }
+  </style>
+</head>
+<body>
+  <div class="nx-shell">
+    <!-- Sidebar -->
+    <aside class="nx-sidebar">
+      <div class="nx-sidebar-header">
+        <div class="nx-sidebar-logo">N</div>
+        <div class="nx-sidebar-brand">
+          <span class="nx-sidebar-title">NEXUS</span>
+          <span class="nx-sidebar-subtitle">Admin Portal</span>
+        </div>
+      </div>
+      
+      <div class="nx-sidebar-search">
+        <input type="text" placeholder="Search...">
+      </div>
+      
+      <nav class="nx-sidebar-nav">
+        <!-- Dashboard -->
+        <a href="dashboard.html" class="nx-nav-item active">
+          <i class="fa fa-gauge-high nx-icon"></i>
+          <span>Dashboard</span>
+        </a>
+        
+        <!-- Catalog Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header open" onclick="toggleSection(this)">
+            <span><i class="fa fa-layer-group" style="opacity:0.5;margin-right:8px"></i>Catalog</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children open">
+            <a href="products.html" class="nx-nav-item">Products</a>
+            <a href="variants.html" class="nx-nav-item">Variants</a>
+            <a href="categories.html" class="nx-nav-item">Categories</a>
+            <a href="brands.html" class="nx-nav-item">Brands</a>
+            <a href="attributes.html" class="nx-nav-item">Attributes</a>
+            <a href="tags.html" class="nx-nav-item">Tags</a>
+            <a href="reviews.html" class="nx-nav-item">Reviews</a>
+            <a href="collections.html" class="nx-nav-item">Collections</a>
+          </div>
+        </div>
+        
+        <!-- Sales Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header" onclick="toggleSection(this)">
+            <span><i class="fa fa-cart-shopping" style="opacity:0.5;margin-right:8px"></i>Sales</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children">
+            <a href="orders.html" class="nx-nav-item">Orders</a>
+            <a href="invoices.html" class="nx-nav-item">Invoices</a>
+            <a href="payments.html" class="nx-nav-item">Payments</a>
+            <a href="shipments.html" class="nx-nav-item">Shipments</a>
+            <a href="returns.html" class="nx-nav-item">Returns</a>
+            <a href="refunds.html" class="nx-nav-item">Refunds</a>
+            <a href="quotes.html" class="nx-nav-item">Quotes</a>
+            <a href="carts.html" class="nx-nav-item">Abandoned Carts</a>
+          </div>
+        </div>
+        
+        <!-- POS Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header" onclick="toggleSection(this)">
+            <span><i class="fa fa-cash-register" style="opacity:0.5;margin-right:8px"></i>POS</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children">
+            <a href="../pos/terminal.html" class="nx-nav-item">POS Terminal</a>
+            <a href="pos-transactions.html" class="nx-nav-item">Transactions</a>
+            <a href="pos-shifts.html" class="nx-nav-item">Cash Shifts</a>
+            <a href="pos-returns.html" class="nx-nav-item">POS Returns</a>
+            <a href="pos-counters.html" class="nx-nav-item">Counters</a>
+            <a href="pos-terminals.html" class="nx-nav-item">Terminals</a>
+            <a href="day-end.html" class="nx-nav-item">Day End</a>
+            <a href="expenses.html" class="nx-nav-item">Expenses</a>
+          </div>
+        </div>
+        
+        <!-- Inventory Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header" onclick="toggleSection(this)">
+            <span><i class="fa fa-warehouse" style="opacity:0.5;margin-right:8px"></i>Inventory</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children">
+            <a href="stock.html" class="nx-nav-item">Stock Items</a>
+            <a href="movements.html" class="nx-nav-item">Movements</a>
+            <a href="adjustments.html" class="nx-nav-item">Adjustments</a>
+            <a href="transfers.html" class="nx-nav-item">Transfers</a>
+            <a href="reorder-rules.html" class="nx-nav-item">Reorder Rules</a>
+            <a href="batches.html" class="nx-nav-item">Batches</a>
+          </div>
+        </div>
+        
+        <!-- Procurement Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header" onclick="toggleSection(this)">
+            <span><i class="fa fa-truck-ramp-box" style="opacity:0.5;margin-right:8px"></i>Procurement</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children">
+            <a href="purchase-orders.html" class="nx-nav-item">Purchase Orders</a>
+            <a href="suppliers.html" class="nx-nav-item">Suppliers</a>
+            <a href="goods-receipts.html" class="nx-nav-item">Goods Receipts</a>
+            <a href="purchase-returns.html" class="nx-nav-item">Purchase Returns</a>
+          </div>
+        </div>
+        
+        <!-- Customers Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header" onclick="toggleSection(this)">
+            <span><i class="fa fa-users" style="opacity:0.5;margin-right:8px"></i>Customers</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children">
+            <a href="customers.html" class="nx-nav-item">All Customers</a>
+            <a href="customer-profiles.html" class="nx-nav-item">Profiles</a>
+            <a href="addresses.html" class="nx-nav-item">Addresses</a>
+            <a href="wallets.html" class="nx-nav-item">Wallets</a>
+            <a href="loyalty.html" class="nx-nav-item">Loyalty</a>
+          </div>
+        </div>
+        
+        <!-- Marketing Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header" onclick="toggleSection(this)">
+            <span><i class="fa fa-bullhorn" style="opacity:0.5;margin-right:8px"></i>Marketing</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children">
+            <a href="discounts.html" class="nx-nav-item">Discounts</a>
+            <a href="flash-deals.html" class="nx-nav-item">Flash Deals</a>
+            <a href="price-lists.html" class="nx-nav-item">Price Lists</a>
+            <a href="newsletter.html" class="nx-nav-item">Newsletter</a>
+            <a href="notifications.html" class="nx-nav-item">Notifications</a>
+          </div>
+        </div>
+        
+        <!-- Reports Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header" onclick="toggleSection(this)">
+            <span><i class="fa fa-chart-bar" style="opacity:0.5;margin-right:8px"></i>Reports</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children">
+            <a href="reports-sales.html" class="nx-nav-item">Sales Report</a>
+            <a href="reports-inventory.html" class="nx-nav-item">Inventory Report</a>
+            <a href="reports-customers.html" class="nx-nav-item">Customer Report</a>
+            <a href="reports-finance.html" class="nx-nav-item">Finance Report</a>
+            <a href="reports-pos.html" class="nx-nav-item">POS Summary</a>
+            <a href="reports-purchases.html" class="nx-nav-item">Purchase Report</a>
+            <a href="reports-audit.html" class="nx-nav-item">Audit Trail</a>
+          </div>
+        </div>
+        
+        <!-- CMS Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header" onclick="toggleSection(this)">
+            <span><i class="fa fa-file-lines" style="opacity:0.5;margin-right:8px"></i>CMS</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children">
+            <a href="blogs.html" class="nx-nav-item">Blog Posts</a>
+            <a href="pages.html" class="nx-nav-item">Static Pages</a>
+            <a href="email-templates.html" class="nx-nav-item">Email Templates</a>
+            <a href="media.html" class="nx-nav-item">Media Library</a>
+            <a href="messages.html" class="nx-nav-item">Contact Messages</a>
+            <a href="tickets.html" class="nx-nav-item">Support Tickets</a>
+          </div>
+        </div>
+        
+        <!-- Settings Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header" onclick="toggleSection(this)">
+            <span><i class="fa fa-gear" style="opacity:0.5;margin-right:8px"></i>Settings</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children">
+            <a href="settings-general.html" class="nx-nav-item">General</a>
+            <a href="settings-warehouses.html" class="nx-nav-item">Warehouses</a>
+            <a href="settings-taxes.html" class="nx-nav-item">Tax Rates</a>
+            <a href="settings-currencies.html" class="nx-nav-item">Currencies</a>
+            <a href="settings-shipping.html" class="nx-nav-item">Shipping</a>
+            <a href="settings-payment.html" class="nx-nav-item">Payment Gateways</a>
+            <a href="settings-units.html" class="nx-nav-item">Units</a>
+          </div>
+        </div>
+        
+        <!-- System Section -->
+        <div class="nx-nav-section">
+          <div class="nx-nav-section-header" onclick="toggleSection(this)">
+            <span><i class="fa fa-server" style="opacity:0.5;margin-right:8px"></i>System</span>
+            <span class="nx-caret">▶</span>
+          </div>
+          <div class="nx-nav-children">
+            <a href="users.html" class="nx-nav-item">Users</a>
+            <a href="roles.html" class="nx-nav-item">Roles</a>
+            <a href="permissions.html" class="nx-nav-item">Permissions</a>
+            <a href="menus.html" class="nx-nav-item">Menu Manager</a>
+            <a href="employees.html" class="nx-nav-item">Employees</a>
+            <a href="app-settings.html" class="nx-nav-item">App Settings</a>
+            <a href="activity-logs.html" class="nx-nav-item">Activity Logs</a>
+            <a href="audit-logs.html" class="nx-nav-item">Audit Logs</a>
+          </div>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="nx-main">
+      <!-- Topbar -->
+      <header class="nx-topbar">
+        <div class="nx-breadcrumb">
+          <span>Home</span>
+          <span class="nx-breadcrumb-separator">/</span>
+          <span class="nx-breadcrumb-current">Dashboard</span>
+        </div>
+        
+        <div class="nx-topbar-search">
+          <i class="fa fa-search" style="color:var(--nx-text-tertiary);font-size:12px"></i>
+          <input type="text" placeholder="Search anything...">
+          <span style="font-size:10px;color:var(--nx-text-tertiary);background:var(--nx-bg-hover);padding:2px 6px;border-radius:3px">⌘K</span>
+        </div>
+        
+        <div class="nx-topbar-actions">
+          <button class="nx-topbar-btn" title="Notifications">
+            <i class="fa fa-bell"></i>
+            <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--nx-danger);border-radius:50%"></span>
+          </button>
+          <button class="nx-topbar-btn" title="Messages">
+            <i class="fa fa-envelope"></i>
+          </button>
+          <button class="nx-topbar-btn" title="Settings">
+            <i class="fa fa-cog"></i>
+          </button>
+          <div class="nx-topbar-avatar" title="Admin User">AU</div>
+        </div>
+      </header>
+      
+      <!-- Page Content -->
+      <div class="nx-content">
+        <!-- Page Header -->
+        <div class="nx-page-header">
+          <div>
+            <h1 class="nx-page-title">Dashboard</h1>
+            <p class="nx-page-subtitle">Welcome back! Here's what's happening with your store today.</p>
+          </div>
+          <div class="nx-page-actions">
+            <button class="nx-btn nx-btn-secondary">
+              <i class="fa fa-download"></i>
+              Export Report
+            </button>
+            <button class="nx-btn nx-btn-primary">
+              <i class="fa fa-plus"></i>
+              New Order
+            </button>
+          </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="nx-stats-grid">
+          <div class="nx-stat-card">
+            <div class="nx-stat-value">৳245,890</div>
+            <div class="nx-stat-label">Today's Revenue</div>
+            <div class="nx-stat-trend up">
+              <i class="fa fa-arrow-up"></i>
+              12.5% from yesterday
+            </div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value success">156</div>
+            <div class="nx-stat-label">Orders Today</div>
+            <div class="nx-stat-trend up">
+              <i class="fa fa-arrow-up"></i>
+              8.2% from yesterday
+            </div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value info">2,847</div>
+            <div class="nx-stat-label">Total Customers</div>
+            <div class="nx-stat-trend up">
+              <i class="fa fa-arrow-up"></i>
+              23 new this week
+            </div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value warning">18</div>
+            <div class="nx-stat-label">Low Stock Items</div>
+            <div class="nx-stat-trend down">
+              <i class="fa fa-arrow-down"></i>
+              5 critical
+            </div>
+          </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <div class="quick-action-card" onclick="location.href='../pos/terminal.html'">
+            <div class="quick-action-icon purple">
+              <i class="fa fa-cash-register"></i>
+            </div>
+            <div class="nx-text-sm nx-font-medium">Open POS</div>
+          </div>
+          <div class="quick-action-card" onclick="location.href='products.html'">
+            <div class="quick-action-icon teal">
+              <i class="fa fa-box"></i>
+            </div>
+            <div class="nx-text-sm nx-font-medium">Add Product</div>
+          </div>
+          <div class="quick-action-card" onclick="location.href='orders.html'">
+            <div class="quick-action-icon warning">
+              <i class="fa fa-truck"></i>
+            </div>
+            <div class="nx-text-sm nx-font-medium">Process Orders</div>
+          </div>
+          <div class="quick-action-card" onclick="location.href='reports-sales.html'">
+            <div class="quick-action-icon info">
+              <i class="fa fa-chart-line"></i>
+            </div>
+            <div class="nx-text-sm nx-font-medium">View Reports</div>
+          </div>
+        </div>
+        
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+          <!-- Left Column -->
+          <div>
+            <!-- Sales Chart -->
+            <div class="nx-card nx-mb-4">
+              <div class="nx-card-header">
+                <span class="nx-card-title">Sales Overview</span>
+                <div class="nx-flex nx-gap-2">
+                  <button class="nx-btn nx-btn-sm nx-btn-secondary">This Week</button>
+                  <button class="nx-btn nx-btn-sm nx-btn-ghost">This Month</button>
+                </div>
+              </div>
+              <div class="nx-card-body">
+                <div class="chart-container">
+                  <span>📊 Chart.js / Recharts integration here</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Recent Orders -->
+            <div class="nx-card">
+              <div class="nx-card-header">
+                <span class="nx-card-title">Recent Orders</span>
+                <a href="orders.html" class="nx-btn nx-btn-sm nx-btn-ghost">View All →</a>
+              </div>
+              <div class="nx-table-wrap">
+                <table class="nx-table recent-orders-table">
+                  <thead>
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Customer</th>
+                      <th>Items</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="nx-mono">#ORD-2024-001</span></td>
+                      <td>
+                        <div class="order-customer">
+                          <div class="nx-avatar nx-avatar-sm">RA</div>
+                          <span>Rahim Ahmed</span>
+                        </div>
+                      </td>
+                      <td>3 items</td>
+                      <td class="nx-font-medium">৳4,560</td>
+                      <td><span class="nx-badge nx-badge-warning">Processing</span></td>
+                      <td><button class="nx-btn nx-btn-sm nx-btn-secondary">View</button></td>
+                    </tr>
+                    <tr>
+                      <td><span class="nx-mono">#ORD-2024-002</span></td>
+                      <td>
+                        <div class="order-customer">
+                          <div class="nx-avatar nx-avatar-sm">FK</div>
+                          <span>Fatima Khan</span>
+                        </div>
+                      </td>
+                      <td>1 item</td>
+                      <td class="nx-font-medium">৳1,299</td>
+                      <td><span class="nx-badge nx-badge-success">Delivered</span></td>
+                      <td><button class="nx-btn nx-btn-sm nx-btn-secondary">View</button></td>
+                    </tr>
+                    <tr>
+                      <td><span class="nx-mono">#ORD-2024-003</span></td>
+                      <td>
+                        <div class="order-customer">
+                          <div class="nx-avatar nx-avatar-sm">KH</div>
+                          <span>Kamal Hossain</span>
+                        </div>
+                      </td>
+                      <td>5 items</td>
+                      <td class="nx-font-medium">৳12,450</td>
+                      <td><span class="nx-badge nx-badge-info">Confirmed</span></td>
+                      <td><button class="nx-btn nx-btn-sm nx-btn-secondary">View</button></td>
+                    </tr>
+                    <tr>
+                      <td><span class="nx-mono">#ORD-2024-004</span></td>
+                      <td>
+                        <div class="order-customer">
+                          <div class="nx-avatar nx-avatar-sm">NI</div>
+                          <span>Nusrat Islam</span>
+                        </div>
+                      </td>
+                      <td>2 items</td>
+                      <td class="nx-font-medium">৳3,890</td>
+                      <td><span class="nx-badge nx-badge-primary">Pending</span></td>
+                      <td><button class="nx-btn nx-btn-sm nx-btn-secondary">View</button></td>
+                    </tr>
+                    <tr>
+                      <td><span class="nx-mono">#ORD-2024-005</span></td>
+                      <td>
+                        <div class="order-customer">
+                          <div class="nx-avatar nx-avatar-sm">SB</div>
+                          <span>Shakil Bhuiyan</span>
+                        </div>
+                      </td>
+                      <td>4 items</td>
+                      <td class="nx-font-medium">৳8,120</td>
+                      <td><span class="nx-badge nx-badge-danger">Cancelled</span></td>
+                      <td><button class="nx-btn nx-btn-sm nx-btn-secondary">View</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="nx-card-footer">
+                <span class="nx-caption">Showing 5 of 156 orders</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Column -->
+          <div>
+            <!-- Low Stock Alert -->
+            <div class="nx-card nx-mb-4">
+              <div class="nx-card-header">
+                <span class="nx-card-title">Low Stock Alert</span>
+                <span class="nx-badge nx-badge-danger">18 items</span>
+              </div>
+              <div class="nx-card-body" style="padding:0">
+                <div class="low-stock-item">
+                  <div>
+                    <div class="nx-font-medium nx-text-sm">iPhone 15 Pro Max</div>
+                    <div class="nx-caption">SKU: IPH15PM-256</div>
+                  </div>
+                  <div class="nx-flex nx-items-center nx-gap-3">
+                    <span class="nx-text-danger nx-font-medium">2</span>
+                    <div class="stock-bar">
+                      <div class="stock-bar-fill critical" style="width:10%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="low-stock-item">
+                  <div>
+                    <div class="nx-font-medium nx-text-sm">Samsung Galaxy S24</div>
+                    <div class="nx-caption">SKU: SGS24-128</div>
+                  </div>
+                  <div class="nx-flex nx-items-center nx-gap-3">
+                    <span class="nx-text-warning nx-font-medium">5</span>
+                    <div class="stock-bar">
+                      <div class="stock-bar-fill low" style="width:25%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="low-stock-item">
+                  <div>
+                    <div class="nx-font-medium nx-text-sm">AirPods Pro 2nd Gen</div>
+                    <div class="nx-caption">SKU: APP2-WHT</div>
+                  </div>
+                  <div class="nx-flex nx-items-center nx-gap-3">
+                    <span class="nx-text-danger nx-font-medium">1</span>
+                    <div class="stock-bar">
+                      <div class="stock-bar-fill critical" style="width:5%"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="low-stock-item">
+                  <div>
+                    <div class="nx-font-medium nx-text-sm">MacBook Air M3</div>
+                    <div class="nx-caption">SKU: MBA-M3-256</div>
+                  </div>
+                  <div class="nx-flex nx-items-center nx-gap-3">
+                    <span class="nx-text-warning nx-font-medium">4</span>
+                    <div class="stock-bar">
+                      <div class="stock-bar-fill low" style="width:20%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="nx-card-footer">
+                <a href="stock.html" class="nx-btn nx-btn-sm nx-btn-ghost">View all low stock →</a>
+              </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="nx-card">
+              <div class="nx-card-header">
+                <span class="nx-card-title">Recent Activity</span>
+              </div>
+              <div class="nx-card-body" style="padding:var(--nx-space-3) var(--nx-space-4)">
+                <div class="activity-item">
+                  <div class="activity-icon order">
+                    <i class="fa fa-shopping-bag"></i>
+                  </div>
+                  <div class="nx-flex-1">
+                    <div class="nx-text-sm">New order <strong>#ORD-2024-001</strong> placed</div>
+                    <div class="nx-caption">2 minutes ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon payment">
+                    <i class="fa fa-credit-card"></i>
+                  </div>
+                  <div class="nx-flex-1">
+                    <div class="nx-text-sm">Payment received for <strong>#ORD-2024-098</strong></div>
+                    <div class="nx-caption">15 minutes ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon customer">
+                    <i class="fa fa-user-plus"></i>
+                  </div>
+                  <div class="nx-flex-1">
+                    <div class="nx-text-sm">New customer <strong>Tanvir Rahman</strong> registered</div>
+                    <div class="nx-caption">32 minutes ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon product">
+                    <i class="fa fa-box"></i>
+                  </div>
+                  <div class="nx-flex-1">
+                    <div class="nx-text-sm">Product <strong>iPhone 15 Pro</strong> updated</div>
+                    <div class="nx-caption">1 hour ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-icon order">
+                    <i class="fa fa-truck"></i>
+                  </div>
+                  <div class="nx-flex-1">
+                    <div class="nx-text-sm">Order <strong>#ORD-2024-095</strong> shipped</div>
+                    <div class="nx-caption">2 hours ago</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script>
+    function toggleSection(header) {
+      header.classList.toggle('open');
+      const children = header.nextElementSibling;
+      children.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>

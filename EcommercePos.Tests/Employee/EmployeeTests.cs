@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Application.Features.Employee.Commands;
-using EcommercePos.Application.Features.Employee.Queries;
+using EcommercePos.Application.Features.Employee;
 using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Tests.Employee;
@@ -84,7 +83,7 @@ public class CreateEmployeeTests : IDisposable
     public async Task Handle_ValidRequest_CreatesEmployee()
     {
         var handler = new CreateEmployee.Handler(_context);
-        var command = new CreateEmployee.Command("EMP-001", "John", "Doe", null, null, "john@example.com", null, null, null, null, null, "Developer", "IT", null, 50000, null, null, null, null, null, true);
+        var command = new CreateEmployee.Command("John", null, "Doe", null, null, "john@example.com", null, null, null, null, "Developer", "IT", null, 50000, null, null, null, null, null);
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.True(result.IsSuccess);

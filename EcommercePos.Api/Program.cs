@@ -9,6 +9,7 @@ using EcommercePos.Api.Middleware;
 using EcommercePos.Api.Services;
 using EcommercePos.Application.DependencyInjection;
 using EcommercePos.Shared.Common;
+using EcommercePos.Shared.Cryptography;
 using EcommercePos.Persistence.Interceptors;
 using EcommercePos.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +35,9 @@ builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
 builder.Services.AddApplicationServices();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+// Add password hashing service (secure Bcrypt)
+builder.Services.AddScoped<IPasswordService, BcryptPasswordService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = System.Text.Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
@@ -86,8 +90,21 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    context.Database.EnsureCreated();
+    try
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        // Use migrations instead of EnsureCreated for production-ready database management
+        context.Database.Migrate();
+
+        // Optional: Seed data if needed
+        // await SeedDataAsync(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Database migration failed. Please ensure migrations are applied.");
+        throw;
+    }
 }
 
 app.UseGlobalExceptionHandler();

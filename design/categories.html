@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categories — NEXUS Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/nexus-design-system.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* Categories specific styles */
+    .categories-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: var(--nx-space-5);
+      height: calc(100vh - 180px);
+    }
+    
+    @media (max-width: 1000px) {
+      .categories-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+    
+    /* Category Tree */
+    .category-tree {
+      background: var(--nx-bg-secondary);
+      border: 1px solid var(--nx-border-default);
+      border-radius: var(--nx-radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .tree-header {
+      padding: var(--nx-space-4);
+      border-bottom: 1px solid var(--nx-border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .tree-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    
+    .tree-search {
+      padding: var(--nx-space-3) var(--nx-space-4);
+      border-bottom: 1px solid var(--nx-border-default);
+    }
+    
+    .tree-search input {
+      width: 100%;
+      padding: var(--nx-space-2) var(--nx-space-3);
+      background: var(--nx-bg-tertiary);
+      border: 1px solid var(--nx-border-default);
+      border-radius: var(--nx-radius-md);
+      color: var(--nx-text-primary);
+      font-size: 12px;
+    }
+    
+    .tree-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--nx-space-2);
+    }
+    
+    .tree-item {
+      display: flex;
+      align-items: center;
+      padding: var(--nx-space-2) var(--nx-space-3);
+      border-radius: var(--nx-radius-md);
+      cursor: pointer;
+      transition: all var(--nx-transition-fast);
+      margin-bottom: 2px;
+    }
+    
+    .tree-item:hover {
+      background: var(--nx-bg-elevated);
+    }
+    
+    .tree-item.active {
+      background: var(--nx-accent-primary-bg);
+      color: var(--nx-accent-primary);
+    }
+    
+    .tree-item.active .tree-item-count {
+      background: var(--nx-accent-primary);
+      color: white;
+    }
+    
+    .tree-toggle {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--nx-text-tertiary);
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+    
+    .tree-toggle.empty {
+      visibility: hidden;
+    }
+    
+    .tree-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--nx-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: var(--nx-space-2);
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    
+    .tree-item-name {
+      flex: 1;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .tree-item-count {
+      padding: 2px 8px;
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-full);
+      font-size: 10px;
+      color: var(--nx-text-secondary);
+    }
+    
+    .tree-children {
+      padding-left: 20px;
+    }
+    
+    .tree-children.collapsed {
+      display: none;
+    }
+    
+    /* Category Detail Panel */
+    .category-detail {
+      background: var(--nx-bg-secondary);
+      border: 1px solid var(--nx-border-default);
+      border-radius: var(--nx-radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .detail-header {
+      padding: var(--nx-space-4) var(--nx-space-5);
+      border-bottom: 1px solid var(--nx-border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .detail-title-row {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-3);
+    }
+    
+    .detail-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--nx-radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    
+    .detail-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .detail-subtitle {
+      font-size: 12px;
+      color: var(--nx-text-secondary);
+      margin-top: 2px;
+    }
+    
+    .detail-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--nx-space-5);
+    }
+    
+    .detail-section {
+      margin-bottom: var(--nx-space-6);
+    }
+    
+    .detail-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .detail-section-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--nx-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: var(--nx-space-4);
+    }
+    
+    .stats-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--nx-space-3);
+    }
+    
+    .stat-mini {
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-lg);
+      padding: var(--nx-space-4);
+      text-align: center;
+    }
+    
+    .stat-mini-value {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: var(--nx-space-1);
+    }
+    
+    .stat-mini-label {
+      font-size: 11px;
+      color: var(--nx-text-secondary);
+    }
+    
+    .subcategory-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--nx-space-2);
+    }
+    
+    .subcategory-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--nx-space-3);
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-md);
+    }
+    
+    .subcategory-item:hover {
+      background: var(--nx-bg-elevated);
+    }
+    
+    .subcategory-info {
+      display: flex;
+      align-items: center;
+      gap: var(--nx-space-3);
+    }
+    
+    .subcategory-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--nx-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    
+    .subcategory-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    .subcategory-count {
+      font-size: 11px;
+      color: var(--nx-text-secondary);
+    }
+    
+    /* Image upload area */
+    .image-upload-area {
+      border: 2px dashed var(--nx-border-default);
+      border-radius: var(--nx-radius-lg);
+      padding: var(--nx-space-6);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--nx-transition-fast);
+    }
+    
+    .image-upload-area:hover {
+      border-color: var(--nx-accent-primary);
+      background: var(--nx-accent-primary-bg);
+    }
+    
+    .image-upload-icon {
+      font-size: 32px;
+      color: var(--nx-text-tertiary);
+      margin-bottom: var(--nx-space-3);
+    }
+    
+    .image-upload-text {
+      font-size: 13px;
+      color: var(--nx-text-secondary);
+    }
+    
+    .image-upload-hint {
+      font-size: 11px;
+      color: var(--nx-text-tertiary);
+      margin-top: var(--nx-space-1);
+    }
+    
+    /* Category colors */
+    .cat-electronics { background: var(--nx-info-bg); color: var(--nx-info); }
+    .cat-clothing { background: var(--nx-purple-bg); color: var(--nx-purple); }
+    .cat-home { background: var(--nx-warning-bg); color: var(--nx-warning); }
+    .cat-beauty { background: var(--nx-pink-bg); color: var(--nx-pink); }
+    .cat-sports { background: var(--nx-success-bg); color: var(--nx-success); }
+    .cat-food { background: var(--nx-teal-bg); color: var(--nx-teal); }
+    
+    /* Empty state */
+    .empty-detail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--nx-text-tertiary);
+    }
+    
+    .empty-detail i {
+      font-size: 48px;
+      margin-bottom: var(--nx-space-4);
+    }
+    
+    .empty-detail-text {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="nx-shell">
+    <!-- Sidebar -->
+    <aside class="nx-sidebar">
+      <div class="nx-sidebar-header">
+        <div class="nx-sidebar-logo">N</div>
+        <div class="nx-sidebar-brand">
+          <span class="nx-sidebar-title">NEXUS</span>
+          <span class="nx-sidebar-subtitle">Admin Portal</span>
+        </div>
+      </div>
+      
+      <nav class="nx-sidebar-nav">
+        <a href="dashboard.html" class="nx-nav-item">
+          <i class="fa fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-label">Catalog</div>
+          <a href="products.html" class="nx-nav-item">
+            <i class="fa fa-box"></i>
+            <span>Products</span>
+          </a>
+          <a href="categories.html" class="nx-nav-item active">
+            <i class="fa fa-folder-tree"></i>
+            <span>Categories</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-tags"></i>
+            <span>Brands</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-swatchbook"></i>
+            <span>Attributes</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-label">Sales</div>
+          <a href="orders.html" class="nx-nav-item">
+            <i class="fa fa-shopping-bag"></i>
+            <span>Orders</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-label">Inventory</div>
+          <a href="inventory.html" class="nx-nav-item">
+            <i class="fa fa-warehouse"></i>
+            <span>Stock Levels</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-label">Customers</div>
+          <a href="customers.html" class="nx-nav-item">
+            <i class="fa fa-users"></i>
+            <span>All Customers</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-label">System</div>
+          <a href="settings.html" class="nx-nav-item">
+            <i class="fa fa-gear"></i>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+      
+      <div class="nx-sidebar-footer">
+        <div class="nx-sidebar-user">
+          <div class="nx-avatar nx-avatar-sm">AR</div>
+          <div class="nx-sidebar-user-info">
+            <span class="nx-sidebar-user-name">Admin User</span>
+            <span class="nx-sidebar-user-role">Super Admin</span>
+          </div>
+          <button class="nx-btn nx-btn-icon nx-btn-ghost nx-btn-sm">
+            <i class="fa fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="nx-main">
+      <!-- Topbar -->
+      <header class="nx-topbar">
+        <div class="nx-topbar-left">
+          <button class="nx-btn nx-btn-icon nx-btn-ghost nx-sidebar-toggle">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="nx-breadcrumb">
+            <a href="#">Catalog</a>
+            <span class="nx-breadcrumb-sep">/</span>
+            <span>Categories</span>
+          </div>
+        </div>
+        <div class="nx-topbar-right">
+          <button class="nx-btn nx-btn-icon nx-btn-ghost">
+            <i class="fa fa-bell"></i>
+          </button>
+        </div>
+      </header>
+      
+      <!-- Page Content -->
+      <div class="nx-content">
+        <!-- Page Header -->
+        <div class="nx-page-header">
+          <div class="nx-page-header-left">
+            <h1 class="nx-page-title">Categories</h1>
+            <p class="nx-page-subtitle">Organize your product catalog with hierarchical categories</p>
+          </div>
+          <div class="nx-page-header-actions">
+            <button class="nx-btn nx-btn-secondary">
+              <i class="fa fa-arrows-up-down"></i> Reorder
+            </button>
+            <button class="nx-btn nx-btn-primary" onclick="openCategoryModal()">
+              <i class="fa fa-plus"></i> Add Category
+            </button>
+          </div>
+        </div>
+        
+        <!-- Categories Layout -->
+        <div class="categories-layout">
+          <!-- Category Tree -->
+          <div class="category-tree">
+            <div class="tree-header">
+              <span class="tree-title">Category Tree</span>
+              <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                <i class="fa fa-expand"></i>
+              </button>
+            </div>
+            <div class="tree-search">
+              <input type="text" placeholder="Search categories...">
+            </div>
+            <div class="tree-content">
+              <!-- Electronics -->
+              <div class="tree-item active" onclick="selectCategory(this, 'electronics')">
+                <span class="tree-toggle"><i class="fa fa-chevron-down"></i></span>
+                <div class="tree-icon cat-electronics"><i class="fa fa-microchip"></i></div>
+                <span class="tree-item-name">Electronics</span>
+                <span class="tree-item-count">1,245</span>
+              </div>
+              <div class="tree-children">
+                <div class="tree-item" onclick="selectCategory(this, 'phones')">
+                  <span class="tree-toggle"><i class="fa fa-chevron-right"></i></span>
+                  <div class="tree-icon cat-electronics"><i class="fa fa-mobile-screen"></i></div>
+                  <span class="tree-item-name">Smartphones</span>
+                  <span class="tree-item-count">342</span>
+                </div>
+                <div class="tree-item" onclick="selectCategory(this, 'laptops')">
+                  <span class="tree-toggle empty"></span>
+                  <div class="tree-icon cat-electronics"><i class="fa fa-laptop"></i></div>
+                  <span class="tree-item-name">Laptops</span>
+                  <span class="tree-item-count">156</span>
+                </div>
+                <div class="tree-item" onclick="selectCategory(this, 'audio')">
+                  <span class="tree-toggle"><i class="fa fa-chevron-right"></i></span>
+                  <div class="tree-icon cat-electronics"><i class="fa fa-headphones"></i></div>
+                  <span class="tree-item-name">Audio</span>
+                  <span class="tree-item-count">289</span>
+                </div>
+                <div class="tree-item" onclick="selectCategory(this, 'tvs')">
+                  <span class="tree-toggle empty"></span>
+                  <div class="tree-icon cat-electronics"><i class="fa fa-tv"></i></div>
+                  <span class="tree-item-name">TVs & Displays</span>
+                  <span class="tree-item-count">98</span>
+                </div>
+                <div class="tree-item" onclick="selectCategory(this, 'accessories')">
+                  <span class="tree-toggle empty"></span>
+                  <div class="tree-icon cat-electronics"><i class="fa fa-plug"></i></div>
+                  <span class="tree-item-name">Accessories</span>
+                  <span class="tree-item-count">360</span>
+                </div>
+              </div>
+              
+              <!-- Clothing -->
+              <div class="tree-item" onclick="selectCategory(this, 'clothing')">
+                <span class="tree-toggle"><i class="fa fa-chevron-right"></i></span>
+                <div class="tree-icon cat-clothing"><i class="fa fa-shirt"></i></div>
+                <span class="tree-item-name">Clothing</span>
+                <span class="tree-item-count">2,890</span>
+              </div>
+              <div class="tree-children collapsed">
+                <div class="tree-item">
+                  <span class="tree-toggle empty"></span>
+                  <div class="tree-icon cat-clothing"><i class="fa fa-person"></i></div>
+                  <span class="tree-item-name">Men's Wear</span>
+                  <span class="tree-item-count">1,120</span>
+                </div>
+                <div class="tree-item">
+                  <span class="tree-toggle empty"></span>
+                  <div class="tree-icon cat-clothing"><i class="fa fa-person-dress"></i></div>
+                  <span class="tree-item-name">Women's Wear</span>
+                  <span class="tree-item-count">1,450</span>
+                </div>
+                <div class="tree-item">
+                  <span class="tree-toggle empty"></span>
+                  <div class="tree-icon cat-clothing"><i class="fa fa-child"></i></div>
+                  <span class="tree-item-name">Kids</span>
+                  <span class="tree-item-count">320</span>
+                </div>
+              </div>
+              
+              <!-- Home & Living -->
+              <div class="tree-item" onclick="selectCategory(this, 'home')">
+                <span class="tree-toggle"><i class="fa fa-chevron-right"></i></span>
+                <div class="tree-icon cat-home"><i class="fa fa-couch"></i></div>
+                <span class="tree-item-name">Home & Living</span>
+                <span class="tree-item-count">876</span>
+              </div>
+              <div class="tree-children collapsed">
+                <div class="tree-item">
+                  <span class="tree-toggle empty"></span>
+                  <div class="tree-icon cat-home"><i class="fa fa-bed"></i></div>
+                  <span class="tree-item-name">Furniture</span>
+                  <span class="tree-item-count">234</span>
+                </div>
+                <div class="tree-item">
+                  <span class="tree-toggle empty"></span>
+                  <div class="tree-icon cat-home"><i class="fa fa-kitchen-set"></i></div>
+                  <span class="tree-item-name">Kitchen</span>
+                  <span class="tree-item-count">456</span>
+                </div>
+              </div>
+              
+              <!-- Beauty -->
+              <div class="tree-item" onclick="selectCategory(this, 'beauty')">
+                <span class="tree-toggle"><i class="fa fa-chevron-right"></i></span>
+                <div class="tree-icon cat-beauty"><i class="fa fa-spray-can-sparkles"></i></div>
+                <span class="tree-item-name">Beauty & Personal Care</span>
+                <span class="tree-item-count">654</span>
+              </div>
+              <div class="tree-children collapsed"></div>
+              
+              <!-- Sports -->
+              <div class="tree-item" onclick="selectCategory(this, 'sports')">
+                <span class="tree-toggle"><i class="fa fa-chevron-right"></i></span>
+                <div class="tree-icon cat-sports"><i class="fa fa-futbol"></i></div>
+                <span class="tree-item-name">Sports & Outdoors</span>
+                <span class="tree-item-count">432</span>
+              </div>
+              <div class="tree-children collapsed"></div>
+              
+              <!-- Food -->
+              <div class="tree-item" onclick="selectCategory(this, 'food')">
+                <span class="tree-toggle"><i class="fa fa-chevron-right"></i></span>
+                <div class="tree-icon cat-food"><i class="fa fa-utensils"></i></div>
+                <span class="tree-item-name">Food & Beverages</span>
+                <span class="tree-item-count">198</span>
+              </div>
+              <div class="tree-children collapsed"></div>
+            </div>
+          </div>
+          
+          <!-- Category Detail Panel -->
+          <div class="category-detail">
+            <div class="detail-header">
+              <div class="detail-title-row">
+                <div class="detail-icon cat-electronics">
+                  <i class="fa fa-microchip"></i>
+                </div>
+                <div>
+                  <div class="detail-title">Electronics</div>
+                  <div class="detail-subtitle">Root category • 5 subcategories</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: var(--nx-space-2);">
+                <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                  <i class="fa fa-pen"></i> Edit
+                </button>
+                <button class="nx-btn nx-btn-sm nx-btn-ghost" style="color: var(--nx-danger);">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="detail-content">
+              <!-- Stats -->
+              <div class="detail-section">
+                <div class="detail-section-title">Overview</div>
+                <div class="stats-mini-grid">
+                  <div class="stat-mini">
+                    <div class="stat-mini-value" style="color: var(--nx-info);">1,245</div>
+                    <div class="stat-mini-label">Products</div>
+                  </div>
+                  <div class="stat-mini">
+                    <div class="stat-mini-value" style="color: var(--nx-success);">৳12.5M</div>
+                    <div class="stat-mini-label">Revenue (30d)</div>
+                  </div>
+                  <div class="stat-mini">
+                    <div class="stat-mini-value" style="color: var(--nx-purple);">2,340</div>
+                    <div class="stat-mini-label">Orders (30d)</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Subcategories -->
+              <div class="detail-section">
+                <div class="detail-section-title">Subcategories (5)</div>
+                <div class="subcategory-list">
+                  <div class="subcategory-item">
+                    <div class="subcategory-info">
+                      <div class="subcategory-icon cat-electronics"><i class="fa fa-mobile-screen"></i></div>
+                      <div>
+                        <div class="subcategory-name">Smartphones</div>
+                        <div class="subcategory-count">342 products</div>
+                      </div>
+                    </div>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                      <i class="fa fa-chevron-right"></i>
+                    </button>
+                  </div>
+                  <div class="subcategory-item">
+                    <div class="subcategory-info">
+                      <div class="subcategory-icon cat-electronics"><i class="fa fa-laptop"></i></div>
+                      <div>
+                        <div class="subcategory-name">Laptops</div>
+                        <div class="subcategory-count">156 products</div>
+                      </div>
+                    </div>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                      <i class="fa fa-chevron-right"></i>
+                    </button>
+                  </div>
+                  <div class="subcategory-item">
+                    <div class="subcategory-info">
+                      <div class="subcategory-icon cat-electronics"><i class="fa fa-headphones"></i></div>
+                      <div>
+                        <div class="subcategory-name">Audio</div>
+                        <div class="subcategory-count">289 products</div>
+                      </div>
+                    </div>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                      <i class="fa fa-chevron-right"></i>
+                    </button>
+                  </div>
+                  <div class="subcategory-item">
+                    <div class="subcategory-info">
+                      <div class="subcategory-icon cat-electronics"><i class="fa fa-tv"></i></div>
+                      <div>
+                        <div class="subcategory-name">TVs & Displays</div>
+                        <div class="subcategory-count">98 products</div>
+                      </div>
+                    </div>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                      <i class="fa fa-chevron-right"></i>
+                    </button>
+                  </div>
+                  <div class="subcategory-item">
+                    <div class="subcategory-info">
+                      <div class="subcategory-icon cat-electronics"><i class="fa fa-plug"></i></div>
+                      <div>
+                        <div class="subcategory-name">Accessories</div>
+                        <div class="subcategory-count">360 products</div>
+                      </div>
+                    </div>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                      <i class="fa fa-chevron-right"></i>
+                    </button>
+                  </div>
+                </div>
+                <button class="nx-btn nx-btn-sm nx-btn-secondary" style="width: 100%; margin-top: var(--nx-space-3);">
+                  <i class="fa fa-plus"></i> Add Subcategory
+                </button>
+              </div>
+              
+              <!-- Category Info -->
+              <div class="detail-section">
+                <div class="detail-section-title">Details</div>
+                <div style="display: flex; flex-direction: column; gap: var(--nx-space-3);">
+                  <div style="display: flex; justify-content: space-between;">
+                    <span class="nx-caption">Slug</span>
+                    <code class="nx-code">electronics</code>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span class="nx-caption">Display Order</span>
+                    <span>1</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span class="nx-caption">Status</span>
+                    <span class="nx-badge nx-badge-success">Active</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span class="nx-caption">Show on Homepage</span>
+                    <span class="nx-badge nx-badge-info">Yes</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;">
+                    <span class="nx-caption">Created</span>
+                    <span class="nx-caption">Jan 15, 2024</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- SEO -->
+              <div class="detail-section">
+                <div class="detail-section-title">SEO</div>
+                <div style="background: var(--nx-bg-tertiary); border-radius: var(--nx-radius-lg); padding: var(--nx-space-4);">
+                  <div style="font-size: 14px; color: var(--nx-info); margin-bottom: var(--nx-space-1);">
+                    Electronics - Buy Electronics Online | NEXUS
+                  </div>
+                  <div style="font-size: 12px; color: var(--nx-success); margin-bottom: var(--nx-space-2);">
+                    https://nexus.com/categories/electronics
+                  </div>
+                  <div style="font-size: 11px; color: var(--nx-text-secondary); line-height: 1.5;">
+                    Shop the latest electronics including smartphones, laptops, TVs, and accessories. Best prices in Bangladesh with fast delivery.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Add/Edit Category Modal -->
+  <div class="nx-modal-backdrop" id="category-modal">
+    <div class="nx-modal" style="max-width: 600px;">
+      <div class="nx-modal-header">
+        <h2 class="nx-modal-title">Add Category</h2>
+        <button class="nx-modal-close" onclick="closeCategoryModal()">×</button>
+      </div>
+      <div class="nx-modal-body">
+        <div class="nx-tabs" style="margin-bottom: var(--nx-space-4);">
+          <button class="nx-tab active">Basic Info</button>
+          <button class="nx-tab">SEO</button>
+          <button class="nx-tab">Display</button>
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-form-label required">Category Name</label>
+          <input type="text" class="nx-input" placeholder="e.g., Smartphones">
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-form-label">Parent Category</label>
+          <select class="nx-input nx-select">
+            <option>None (Root Category)</option>
+            <option>Electronics</option>
+            <option>├── Smartphones</option>
+            <option>├── Laptops</option>
+            <option>├── Audio</option>
+            <option>Clothing</option>
+            <option>├── Men's Wear</option>
+            <option>├── Women's Wear</option>
+            <option>Home & Living</option>
+          </select>
+        </div>
+        
+        <div class="nx-form-row">
+          <div class="nx-form-group">
+            <label class="nx-form-label">Slug</label>
+            <input type="text" class="nx-input" placeholder="auto-generated">
+            <span class="nx-form-hint">URL-friendly identifier</span>
+          </div>
+          <div class="nx-form-group">
+            <label class="nx-form-label">Display Order</label>
+            <input type="number" class="nx-input" value="0" min="0">
+          </div>
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-form-label">Description</label>
+          <textarea class="nx-input nx-textarea" rows="3" placeholder="Category description..."></textarea>
+        </div>
+        
+        <div class="nx-form-group">
+          <label class="nx-form-label">Category Image</label>
+          <div class="image-upload-area">
+            <div class="image-upload-icon"><i class="fa fa-cloud-upload"></i></div>
+            <div class="image-upload-text">Click or drag image to upload</div>
+            <div class="image-upload-hint">PNG, JPG up to 2MB</div>
+          </div>
+        </div>
+        
+        <div class="nx-form-row">
+          <div class="nx-form-group">
+            <label class="nx-form-label">Icon</label>
+            <div style="display: flex; gap: var(--nx-space-2);">
+              <select class="nx-input nx-select" style="flex: 1;">
+                <option>fa-microchip</option>
+                <option>fa-mobile-screen</option>
+                <option>fa-laptop</option>
+                <option>fa-headphones</option>
+                <option>fa-shirt</option>
+                <option>fa-couch</option>
+              </select>
+              <div style="width: 40px; height: 40px; background: var(--nx-info-bg); color: var(--nx-info); border-radius: var(--nx-radius-md); display: flex; align-items: center; justify-content: center;">
+                <i class="fa fa-microchip"></i>
+              </div>
+            </div>
+          </div>
+          <div class="nx-form-group">
+            <label class="nx-form-label">Color</label>
+            <div style="display: flex; gap: var(--nx-space-2);">
+              <input type="text" class="nx-input" value="#3b82f6" style="flex: 1;">
+              <input type="color" value="#3b82f6" style="width: 40px; height: 40px; border: none; border-radius: var(--nx-radius-md); cursor: pointer;">
+            </div>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: var(--nx-space-4); margin-top: var(--nx-space-4);">
+          <label class="nx-checkbox-wrap">
+            <input type="checkbox" class="nx-checkbox" checked>
+            <span>Active</span>
+          </label>
+          <label class="nx-checkbox-wrap">
+            <input type="checkbox" class="nx-checkbox" checked>
+            <span>Show on Homepage</span>
+          </label>
+          <label class="nx-checkbox-wrap">
+            <input type="checkbox" class="nx-checkbox">
+            <span>Show in Navigation</span>
+          </label>
+        </div>
+      </div>
+      <div class="nx-modal-footer">
+        <button class="nx-btn nx-btn-secondary" onclick="closeCategoryModal()">Cancel</button>
+        <button class="nx-btn nx-btn-primary">
+          <i class="fa fa-check"></i> Save Category
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Modal functions
+    function openCategoryModal() {
+      document.getElementById('category-modal').classList.add('open');
+    }
+    function closeCategoryModal() {
+      document.getElementById('category-modal').classList.remove('open');
+    }
+    
+    // Category selection
+    function selectCategory(element, categoryId) {
+      document.querySelectorAll('.tree-item').forEach(item => item.classList.remove('active'));
+      element.classList.add('active');
+      // Update detail panel based on categoryId
+    }
+    
+    // Toggle tree children
+    document.querySelectorAll('.tree-toggle').forEach(toggle => {
+      toggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const treeItem = this.closest('.tree-item');
+        const children = treeItem.nextElementSibling;
+        if (children && children.classList.contains('tree-children')) {
+          children.classList.toggle('collapsed');
+          const icon = this.querySelector('i');
+          if (children.classList.contains('collapsed')) {
+            icon.className = 'fa fa-chevron-right';
+          } else {
+            icon.className = 'fa fa-chevron-down';
+          }
+        }
+      });
+    });
+    
+    // Tab switching
+    document.querySelectorAll('.nx-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.nx-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    // Close modal on backdrop click
+    document.querySelectorAll('.nx-modal-backdrop').forEach(backdrop => {
+      backdrop.addEventListener('click', function(e) {
+        if (e.target === this) {
+          this.classList.remove('open');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

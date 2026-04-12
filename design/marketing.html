@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketing — NEXUS Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/nexus-design-system.css">
+  <style>
+    /* Marketing Tabs */
+    .marketing-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--nx-bg-secondary);
+      padding: 4px;
+      border-radius: var(--nx-radius-md);
+      margin-bottom: 24px;
+    }
+    
+    .marketing-tab {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--nx-text-secondary);
+      background: transparent;
+      border: none;
+      border-radius: var(--nx-radius-sm);
+      cursor: pointer;
+      transition: all var(--nx-transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .marketing-tab:hover {
+      color: var(--nx-text-primary);
+      background: var(--nx-bg-tertiary);
+    }
+    
+    .marketing-tab.active {
+      background: var(--nx-accent-primary);
+      color: white;
+    }
+    
+    .marketing-tab .count {
+      background: rgba(255,255,255,0.2);
+      padding: 2px 8px;
+      border-radius: var(--nx-radius-full);
+      font-size: 11px;
+    }
+    
+    .marketing-tab.active .count {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    /* Discount Card */
+    .discount-card {
+      padding: 20px;
+      background: var(--nx-bg-secondary);
+      border-radius: var(--nx-radius-lg);
+      border: 1px solid var(--nx-border-subtle);
+      margin-bottom: 16px;
+      transition: all var(--nx-transition-fast);
+    }
+    
+    .discount-card:hover {
+      border-color: var(--nx-border-strong);
+    }
+    
+    .discount-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .discount-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--nx-radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    
+    .discount-icon.percent { background: var(--nx-accent-bg); color: var(--nx-accent-primary); }
+    .discount-icon.fixed { background: var(--nx-success-bg); color: var(--nx-success); }
+    .discount-icon.bogo { background: var(--nx-purple-bg); color: var(--nx-purple); }
+    .discount-icon.shipping { background: var(--nx-teal-bg); color: var(--nx-teal); }
+    
+    .discount-info {
+      flex: 1;
+    }
+    
+    .discount-info h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--nx-text-primary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .discount-code {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-sm);
+      font-family: var(--nx-font-mono);
+      font-size: 12px;
+      color: var(--nx-accent-secondary);
+    }
+    
+    .discount-code i {
+      font-size: 10px;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+    
+    .discount-code i:hover { opacity: 1; }
+    
+    .discount-info p {
+      font-size: 12px;
+      color: var(--nx-text-secondary);
+    }
+    
+    .discount-meta {
+      display: flex;
+      gap: 24px;
+      margin-top: 14px;
+    }
+    
+    .discount-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--nx-text-secondary);
+    }
+    
+    .discount-meta-item i {
+      font-size: 11px;
+    }
+    
+    .discount-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    /* Usage Progress */
+    .usage-progress {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--nx-border-subtle);
+    }
+    
+    .usage-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .usage-header span {
+      font-size: 11px;
+      color: var(--nx-text-secondary);
+    }
+    
+    .usage-header strong {
+      font-weight: 600;
+      color: var(--nx-text-primary);
+    }
+    
+    .usage-bar {
+      height: 6px;
+      background: var(--nx-bg-tertiary);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .usage-bar-fill {
+      height: 100%;
+      background: var(--nx-accent-primary);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    
+    /* Flash Deal Card */
+    .flash-deal-card {
+      background: linear-gradient(135deg, var(--nx-bg-secondary) 0%, var(--nx-bg-tertiary) 100%);
+      border: 1px solid var(--nx-danger);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .flash-deal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: var(--nx-danger);
+      opacity: 0.1;
+      border-radius: 0 0 0 100%;
+    }
+    
+    .flash-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: var(--nx-danger);
+      color: white;
+      padding: 4px 12px;
+      border-radius: var(--nx-radius-full);
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .countdown {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    
+    .countdown-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 14px;
+      background: var(--nx-bg-primary);
+      border-radius: var(--nx-radius-md);
+    }
+    
+    .countdown-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--nx-text-primary);
+    }
+    
+    .countdown-label {
+      font-size: 10px;
+      color: var(--nx-text-secondary);
+      text-transform: uppercase;
+    }
+    
+    /* Collection Grid */
+    .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    
+    .collection-card {
+      background: var(--nx-bg-secondary);
+      border-radius: var(--nx-radius-lg);
+      border: 1px solid var(--nx-border-subtle);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all var(--nx-transition-fast);
+    }
+    
+    .collection-card:hover {
+      border-color: var(--nx-accent-primary);
+      transform: translateY(-2px);
+    }
+    
+    .collection-image {
+      height: 140px;
+      background: linear-gradient(135deg, var(--nx-bg-tertiary) 0%, var(--nx-bg-elevated) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: var(--nx-text-tertiary);
+    }
+    
+    .collection-content {
+      padding: 16px;
+    }
+    
+    .collection-content h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--nx-text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .collection-content p {
+      font-size: 12px;
+      color: var(--nx-text-secondary);
+    }
+    
+    .collection-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--nx-bg-tertiary);
+      border-top: 1px solid var(--nx-border-subtle);
+    }
+    
+    .collection-footer span {
+      font-size: 11px;
+      color: var(--nx-text-secondary);
+    }
+    
+    /* Create Discount Modal */
+    .discount-type-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .discount-type-option {
+      padding: 20px 16px;
+      background: var(--nx-bg-tertiary);
+      border: 2px solid var(--nx-border-subtle);
+      border-radius: var(--nx-radius-lg);
+      cursor: pointer;
+      transition: all var(--nx-transition-fast);
+      text-align: center;
+    }
+    
+    .discount-type-option:hover {
+      border-color: var(--nx-accent-primary);
+    }
+    
+    .discount-type-option.selected {
+      border-color: var(--nx-accent-primary);
+      background: var(--nx-accent-bg);
+    }
+    
+    .discount-type-option i {
+      font-size: 24px;
+      color: var(--nx-accent-primary);
+      margin-bottom: 10px;
+    }
+    
+    .discount-type-option h5 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--nx-text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .discount-type-option p {
+      font-size: 11px;
+      color: var(--nx-text-secondary);
+    }
+    
+    /* Form Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+  </style>
+</head>
+<body>
+  <div class="nx-shell">
+    <!-- Sidebar -->
+    <aside class="nx-sidebar">
+      <div class="nx-sidebar-header">
+        <div class="nx-logo">
+          <div class="nx-logo-icon">
+            <i class="fa fa-bolt"></i>
+          </div>
+          <span class="nx-logo-text">NEXUS</span>
+        </div>
+      </div>
+      
+      <nav class="nx-sidebar-nav">
+        <a href="dashboard.html" class="nx-nav-item">
+          <i class="fa fa-grid-2"></i>
+          <span>Dashboard</span>
+        </a>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-title">Catalog</div>
+          <a href="products.html" class="nx-nav-item">
+            <i class="fa fa-box"></i>
+            <span>Products</span>
+          </a>
+          <a href="categories.html" class="nx-nav-item">
+            <i class="fa fa-folder-tree"></i>
+            <span>Categories</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-title">Sales</div>
+          <a href="orders.html" class="nx-nav-item">
+            <i class="fa fa-shopping-bag"></i>
+            <span>Orders</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-title">Marketing</div>
+          <a href="marketing.html" class="nx-nav-item active">
+            <i class="fa fa-bullhorn"></i>
+            <span>Promotions</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-bolt"></i>
+            <span>Flash Deals</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-layer-group"></i>
+            <span>Collections</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-title">System</div>
+          <a href="settings.html" class="nx-nav-item">
+            <i class="fa fa-gear"></i>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="nx-main">
+      <!-- Topbar -->
+      <header class="nx-topbar">
+        <div class="nx-topbar-left">
+          <button class="nx-btn nx-btn-icon nx-btn-ghost nx-sidebar-toggle">
+            <i class="fa fa-bars"></i>
+          </button>
+          <nav class="nx-breadcrumb">
+            <a href="dashboard.html">Home</a>
+            <i class="fa fa-chevron-right"></i>
+            <span>Marketing</span>
+          </nav>
+        </div>
+        
+        <div class="nx-topbar-right">
+          <button class="nx-btn nx-btn-icon nx-btn-ghost">
+            <i class="fa fa-bell"></i>
+          </button>
+          <div class="nx-avatar">
+            <span>JD</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Page Content -->
+      <div class="nx-content">
+        <!-- Page Header -->
+        <div class="nx-page-header">
+          <div>
+            <h1 class="nx-page-title">Marketing & Promotions</h1>
+            <p class="nx-page-subtitle">Manage discounts, coupons, and campaigns</p>
+          </div>
+          <div class="nx-page-actions">
+            <button class="nx-btn nx-btn-primary" onclick="openModal('createDiscountModal')">
+              <i class="fa fa-plus"></i> Create Promotion
+            </button>
+          </div>
+        </div>
+        
+        <!-- Marketing Tabs -->
+        <div class="marketing-tabs">
+          <button class="marketing-tab active">
+            <i class="fa fa-tag"></i> Discounts
+            <span class="count">8</span>
+          </button>
+          <button class="marketing-tab">
+            <i class="fa fa-ticket"></i> Coupons
+            <span class="count">12</span>
+          </button>
+          <button class="marketing-tab">
+            <i class="fa fa-bolt"></i> Flash Deals
+            <span class="count">3</span>
+          </button>
+          <button class="marketing-tab">
+            <i class="fa fa-layer-group"></i> Collections
+            <span class="count">6</span>
+          </button>
+        </div>
+        
+        <!-- Stats Row -->
+        <div class="nx-stats-grid" style="margin-bottom: 24px;">
+          <div class="nx-stat-card">
+            <div class="nx-stat-value">৳1,24,500</div>
+            <div class="nx-stat-label">Discount Value Given</div>
+            <div class="nx-stat-trend up">
+              <i class="fa fa-arrow-up"></i> This month
+            </div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value">847</div>
+            <div class="nx-stat-label">Coupons Used</div>
+            <div class="nx-stat-trend up">
+              <i class="fa fa-arrow-up"></i> 12.3% vs last month
+            </div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value">8</div>
+            <div class="nx-stat-label">Active Promotions</div>
+            <div class="nx-stat-trend">
+              <i class="fa fa-clock"></i> 3 ending soon
+            </div>
+          </div>
+          <div class="nx-stat-card">
+            <div class="nx-stat-value">23.4%</div>
+            <div class="nx-stat-label">Conversion Rate</div>
+            <div class="nx-stat-trend up">
+              <i class="fa fa-arrow-up"></i> 2.1% increase
+            </div>
+          </div>
+        </div>
+        
+        <!-- Active Discounts -->
+        <div class="nx-card" style="margin-bottom: 24px;">
+          <div class="nx-card-header">
+            <span class="nx-card-title">
+              <i class="fa fa-tag" style="margin-right: 8px; color: var(--nx-accent-primary);"></i>
+              Active Discounts
+            </span>
+            <div style="display: flex; gap: 8px;">
+              <div class="nx-search" style="width: 240px;">
+                <i class="fa fa-search nx-search-icon"></i>
+                <input type="text" class="nx-search-input" placeholder="Search discounts...">
+              </div>
+              <select class="nx-input nx-select" style="width: 140px;">
+                <option>All Types</option>
+                <option>Percentage</option>
+                <option>Fixed Amount</option>
+                <option>Buy X Get Y</option>
+                <option>Free Shipping</option>
+              </select>
+            </div>
+          </div>
+          <div class="nx-card-body">
+            <!-- Flash Deal Card -->
+            <div class="discount-card flash-deal-card">
+              <div class="flash-badge">
+                <i class="fa fa-bolt"></i> Flash Deal
+              </div>
+              <div class="discount-card-header">
+                <div class="discount-icon" style="background: var(--nx-danger-bg); color: var(--nx-danger);">
+                  <i class="fa fa-fire"></i>
+                </div>
+                <div class="discount-info">
+                  <h3>
+                    Weekend Electronics Blowout
+                    <span class="nx-badge nx-badge-success">Active</span>
+                  </h3>
+                  <p>Up to 40% off on selected electronics — Limited time only!</p>
+                  <div class="countdown">
+                    <div class="countdown-item">
+                      <span class="countdown-value">01</span>
+                      <span class="countdown-label">Days</span>
+                    </div>
+                    <div class="countdown-item">
+                      <span class="countdown-value">14</span>
+                      <span class="countdown-label">Hours</span>
+                    </div>
+                    <div class="countdown-item">
+                      <span class="countdown-value">32</span>
+                      <span class="countdown-label">Mins</span>
+                    </div>
+                    <div class="countdown-item">
+                      <span class="countdown-value">45</span>
+                      <span class="countdown-label">Secs</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="discount-actions">
+                  <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                    <i class="fa fa-edit"></i> Edit
+                  </button>
+                  <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                    <i class="fa fa-pause"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="usage-progress">
+                <div class="usage-header">
+                  <span>Products sold: <strong>127 / 500</strong></span>
+                  <span>25.4% used</span>
+                </div>
+                <div class="usage-bar">
+                  <div class="usage-bar-fill" style="width: 25.4%; background: var(--nx-danger);"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Percentage Discount -->
+            <div class="discount-card">
+              <div class="discount-card-header">
+                <div class="discount-icon percent">
+                  <i class="fa fa-percent"></i>
+                </div>
+                <div class="discount-info">
+                  <h3>
+                    New Customer Welcome
+                    <span class="discount-code">WELCOME15 <i class="fa fa-copy"></i></span>
+                    <span class="nx-badge nx-badge-success">Active</span>
+                  </h3>
+                  <p>15% off on first purchase — New customers only</p>
+                  <div class="discount-meta">
+                    <div class="discount-meta-item">
+                      <i class="fa fa-calendar"></i>
+                      Valid until Dec 31, 2026
+                    </div>
+                    <div class="discount-meta-item">
+                      <i class="fa fa-user"></i>
+                      1 use per customer
+                    </div>
+                    <div class="discount-meta-item">
+                      <i class="fa fa-tag"></i>
+                      Max ৳2,000 discount
+                    </div>
+                  </div>
+                </div>
+                <div class="discount-actions">
+                  <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                    <i class="fa fa-edit"></i> Edit
+                  </button>
+                  <button class="nx-btn nx-btn-sm nx-btn-icon nx-btn-ghost">
+                    <i class="fa fa-ellipsis-v"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="usage-progress">
+                <div class="usage-header">
+                  <span>Used: <strong>234 / Unlimited</strong></span>
+                  <span>৳42,800 discount given</span>
+                </div>
+                <div class="usage-bar">
+                  <div class="usage-bar-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Fixed Amount Discount -->
+            <div class="discount-card">
+              <div class="discount-card-header">
+                <div class="discount-icon fixed">
+                  <i class="fa fa-bangladeshi-taka-sign"></i>
+                </div>
+                <div class="discount-info">
+                  <h3>
+                    ৳500 Off on ৳5,000+
+                    <span class="discount-code">SAVE500 <i class="fa fa-copy"></i></span>
+                    <span class="nx-badge nx-badge-success">Active</span>
+                  </h3>
+                  <p>৳500 off when you spend ৳5,000 or more</p>
+                  <div class="discount-meta">
+                    <div class="discount-meta-item">
+                      <i class="fa fa-calendar"></i>
+                      Apr 1 - Apr 30, 2026
+                    </div>
+                    <div class="discount-meta-item">
+                      <i class="fa fa-repeat"></i>
+                      3 uses per customer
+                    </div>
+                    <div class="discount-meta-item">
+                      <i class="fa fa-shopping-cart"></i>
+                      Min order ৳5,000
+                    </div>
+                  </div>
+                </div>
+                <div class="discount-actions">
+                  <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                    <i class="fa fa-edit"></i> Edit
+                  </button>
+                  <button class="nx-btn nx-btn-sm nx-btn-icon nx-btn-ghost">
+                    <i class="fa fa-ellipsis-v"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="usage-progress">
+                <div class="usage-header">
+                  <span>Used: <strong>89 / 500</strong></span>
+                  <span>17.8% used</span>
+                </div>
+                <div class="usage-bar">
+                  <div class="usage-bar-fill" style="width: 17.8%;"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- BOGO Discount -->
+            <div class="discount-card">
+              <div class="discount-card-header">
+                <div class="discount-icon bogo">
+                  <i class="fa fa-gift"></i>
+                </div>
+                <div class="discount-info">
+                  <h3>
+                    Buy 2 Accessories, Get 1 Free
+                    <span class="nx-badge nx-badge-success">Active</span>
+                  </h3>
+                  <p>Buy any 2 accessories and get the cheapest one free</p>
+                  <div class="discount-meta">
+                    <div class="discount-meta-item">
+                      <i class="fa fa-folder"></i>
+                      Accessories category
+                    </div>
+                    <div class="discount-meta-item">
+                      <i class="fa fa-calendar"></i>
+                      Ongoing
+                    </div>
+                    <div class="discount-meta-item">
+                      <i class="fa fa-check-circle"></i>
+                      Auto-applied
+                    </div>
+                  </div>
+                </div>
+                <div class="discount-actions">
+                  <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                    <i class="fa fa-edit"></i> Edit
+                  </button>
+                  <button class="nx-btn nx-btn-sm nx-btn-icon nx-btn-ghost">
+                    <i class="fa fa-ellipsis-v"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="usage-progress">
+                <div class="usage-header">
+                  <span>Used: <strong>156 times</strong></span>
+                  <span>৳28,400 discount value</span>
+                </div>
+                <div class="usage-bar">
+                  <div class="usage-bar-fill" style="width: 100%; background: var(--nx-purple);"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Free Shipping -->
+            <div class="discount-card">
+              <div class="discount-card-header">
+                <div class="discount-icon shipping">
+                  <i class="fa fa-truck"></i>
+                </div>
+                <div class="discount-info">
+                  <h3>
+                    Free Shipping on ৳3,000+
+                    <span class="discount-code">FREESHIP <i class="fa fa-copy"></i></span>
+                    <span class="nx-badge nx-badge-warning">Ending Soon</span>
+                  </h3>
+                  <p>Free delivery for orders over ৳3,000 — Dhaka only</p>
+                  <div class="discount-meta">
+                    <div class="discount-meta-item">
+                      <i class="fa fa-calendar"></i>
+                      Ends Apr 7, 2026
+                    </div>
+                    <div class="discount-meta-item">
+                      <i class="fa fa-map-marker-alt"></i>
+                      Dhaka metro only
+                    </div>
+                    <div class="discount-meta-item">
+                      <i class="fa fa-shopping-cart"></i>
+                      Min order ৳3,000
+                    </div>
+                  </div>
+                </div>
+                <div class="discount-actions">
+                  <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                    <i class="fa fa-edit"></i> Edit
+                  </button>
+                  <button class="nx-btn nx-btn-sm nx-btn-icon nx-btn-ghost">
+                    <i class="fa fa-ellipsis-v"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="usage-progress">
+                <div class="usage-header">
+                  <span>Used: <strong>412 times</strong></span>
+                  <span>৳24,720 shipping waived</span>
+                </div>
+                <div class="usage-bar">
+                  <div class="usage-bar-fill" style="width: 100%; background: var(--nx-teal);"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Collections Section -->
+        <div class="nx-card">
+          <div class="nx-card-header">
+            <span class="nx-card-title">
+              <i class="fa fa-layer-group" style="margin-right: 8px; color: var(--nx-purple);"></i>
+              Product Collections
+            </span>
+            <button class="nx-btn nx-btn-sm nx-btn-secondary">
+              <i class="fa fa-plus"></i> New Collection
+            </button>
+          </div>
+          <div class="nx-card-body">
+            <div class="collection-grid">
+              <div class="collection-card">
+                <div class="collection-image">
+                  <i class="fa fa-star"></i>
+                </div>
+                <div class="collection-content">
+                  <h4>Best Sellers</h4>
+                  <p>Top performing products based on sales</p>
+                </div>
+                <div class="collection-footer">
+                  <span>24 products</span>
+                  <span class="nx-badge nx-badge-success">Active</span>
+                </div>
+              </div>
+              
+              <div class="collection-card">
+                <div class="collection-image">
+                  <i class="fa fa-sparkles"></i>
+                </div>
+                <div class="collection-content">
+                  <h4>New Arrivals</h4>
+                  <p>Recently added products</p>
+                </div>
+                <div class="collection-footer">
+                  <span>18 products</span>
+                  <span class="nx-badge nx-badge-success">Active</span>
+                </div>
+              </div>
+              
+              <div class="collection-card">
+                <div class="collection-image">
+                  <i class="fa fa-fire"></i>
+                </div>
+                <div class="collection-content">
+                  <h4>Trending Now</h4>
+                  <p>Hot products this week</p>
+                </div>
+                <div class="collection-footer">
+                  <span>12 products</span>
+                  <span class="nx-badge nx-badge-success">Active</span>
+                </div>
+              </div>
+              
+              <div class="collection-card">
+                <div class="collection-image">
+                  <i class="fa fa-mobile-alt"></i>
+                </div>
+                <div class="collection-content">
+                  <h4>Premium Phones</h4>
+                  <p>Flagship smartphones collection</p>
+                </div>
+                <div class="collection-footer">
+                  <span>8 products</span>
+                  <span class="nx-badge nx-badge-success">Active</span>
+                </div>
+              </div>
+              
+              <div class="collection-card">
+                <div class="collection-image">
+                  <i class="fa fa-gamepad"></i>
+                </div>
+                <div class="collection-content">
+                  <h4>Gaming Zone</h4>
+                  <p>Gaming accessories and gear</p>
+                </div>
+                <div class="collection-footer">
+                  <span>32 products</span>
+                  <span class="nx-badge nx-badge-success">Active</span>
+                </div>
+              </div>
+              
+              <div class="collection-card">
+                <div class="collection-image">
+                  <i class="fa fa-briefcase"></i>
+                </div>
+                <div class="collection-content">
+                  <h4>Work From Home</h4>
+                  <p>Home office essentials</p>
+                </div>
+                <div class="collection-footer">
+                  <span>15 products</span>
+                  <span class="nx-badge nx-badge-default">Draft</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Create Discount Modal -->
+  <div class="nx-modal-backdrop" id="createDiscountModal">
+    <div class="nx-modal" style="max-width: 700px;">
+      <div class="nx-modal-header">
+        <h3 class="nx-modal-title">Create New Promotion</h3>
+        <button class="nx-btn nx-btn-icon nx-btn-ghost" onclick="closeModal('createDiscountModal')">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+      <div class="nx-modal-body">
+        <!-- Discount Type Selection -->
+        <div class="nx-form-group">
+          <label class="nx-form-label">Select Promotion Type</label>
+          <div class="discount-type-grid">
+            <div class="discount-type-option selected">
+              <i class="fa fa-percent"></i>
+              <h5>Percentage</h5>
+              <p>% off order</p>
+            </div>
+            <div class="discount-type-option">
+              <i class="fa fa-bangladeshi-taka-sign"></i>
+              <h5>Fixed Amount</h5>
+              <p>৳ off order</p>
+            </div>
+            <div class="discount-type-option">
+              <i class="fa fa-gift"></i>
+              <h5>Buy X Get Y</h5>
+              <p>BOGO deals</p>
+            </div>
+            <div class="discount-type-option">
+              <i class="fa fa-truck"></i>
+              <h5>Free Shipping</h5>
+              <p>Waive delivery</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Discount Details -->
+        <div class="form-grid">
+          <div class="nx-form-group full">
+            <label class="nx-form-label required">Promotion Name</label>
+            <input type="text" class="nx-input" placeholder="e.g., Summer Sale 20% Off">
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Discount Code</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" class="nx-input" placeholder="e.g., SUMMER20" style="flex: 1; text-transform: uppercase;">
+              <button class="nx-btn nx-btn-secondary">Generate</button>
+            </div>
+            <span class="nx-form-hint">Leave empty for auto-applied discount</span>
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label required">Discount Value</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="number" class="nx-input" placeholder="20" style="width: 100px;">
+              <select class="nx-input nx-select" style="width: 100px;">
+                <option>%</option>
+                <option>৳</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Start Date</label>
+            <input type="date" class="nx-input" value="2026-04-05">
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">End Date</label>
+            <input type="date" class="nx-input" value="2026-04-30">
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Minimum Order</label>
+            <input type="number" class="nx-input" placeholder="৳0">
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Maximum Discount</label>
+            <input type="number" class="nx-input" placeholder="No limit">
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Usage Limit</label>
+            <input type="number" class="nx-input" placeholder="Unlimited">
+          </div>
+          
+          <div class="nx-form-group">
+            <label class="nx-form-label">Per Customer Limit</label>
+            <input type="number" class="nx-input" placeholder="Unlimited">
+          </div>
+          
+          <div class="nx-form-group full">
+            <label class="nx-form-label">Applies To</label>
+            <select class="nx-input nx-select">
+              <option>All Products</option>
+              <option>Specific Categories</option>
+              <option>Specific Products</option>
+              <option>Specific Brands</option>
+            </select>
+          </div>
+          
+          <div class="nx-form-group full">
+            <label class="nx-form-label">Customer Eligibility</label>
+            <select class="nx-input nx-select">
+              <option>All Customers</option>
+              <option>New Customers Only</option>
+              <option>Specific Loyalty Tiers</option>
+              <option>Specific Customer Groups</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="nx-modal-footer">
+        <button class="nx-btn nx-btn-secondary" onclick="closeModal('createDiscountModal')">Cancel</button>
+        <button class="nx-btn nx-btn-primary">
+          <i class="fa fa-check"></i> Create Promotion
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function openModal(id) {
+      document.getElementById(id).classList.add('show');
+    }
+    
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+    
+    // Discount type selection
+    document.querySelectorAll('.discount-type-option').forEach(option => {
+      option.addEventListener('click', function() {
+        document.querySelectorAll('.discount-type-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+  </script>
+</body>
+</html>

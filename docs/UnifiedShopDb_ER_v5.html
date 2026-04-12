@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>UnifiedShopDb v5 — ER Diagram</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0f1117;color:#e2e8f0;height:100vh;overflow:hidden}
+#tb{position:fixed;top:0;left:0;right:0;height:48px;background:#1e2130;border-bottom:1px solid #2d3352;display:flex;align-items:center;gap:6px;padding:0 10px;z-index:100}
+#tb h1{font-size:13px;font-weight:700;color:#7c8cf8;white-space:nowrap;margin-right:6px}
+.btn{background:#2d3352;border:1px solid #3d4472;color:#cdd6f4;padding:4px 9px;border-radius:5px;cursor:pointer;font-size:11px;white-space:nowrap}
+.btn:hover{background:#3d4472}
+#srch{background:#2d3352;border:1px solid #3d4472;color:#cdd6f4;padding:4px 9px;border-radius:5px;font-size:11px;width:150px}
+#srch::placeholder{color:#6c7a9c}
+#sf{appearance:auto;background:#2d3352;border:1px solid #3d4472;color:#cdd6f4;padding:4px 9px;border-radius:5px;font-size:11px}
+#inf{font-size:10px;color:#6c7a9c;margin-left:auto;white-space:nowrap}
+#cw{position:fixed;top:48px;left:0;right:0;bottom:0;overflow:hidden;cursor:grab}
+#cw.dr{cursor:grabbing}
+svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.tn{position:absolute;background:#1a1d2e;border:1px solid #2d3352;border-radius:7px;min-width:190px;max-width:260px;box-shadow:0 3px 16px rgba(0,0,0,.4);cursor:pointer;user-select:none;transition:border-color .12s,box-shadow .12s}
+.tn:hover,.tn.sel{border-color:#7c8cf8;box-shadow:0 3px 20px rgba(124,140,248,.22)}
+.tn.hi{border-color:#f59e0b;box-shadow:0 3px 20px rgba(245,158,11,.28)}
+.tn.dim{opacity:.2}
+.th{padding:6px 9px;border-radius:6px 6px 0 0;font-size:11px;font-weight:700;letter-spacing:.3px}
+.s0{background:#1e3a5f}.s1{background:#2d1e5f}.s2{background:#1e4a3a}
+.s3{background:#3a2a1e}.s4{background:#1e2a4a}.s5{background:#3a1e2a}
+.s6{background:#2a3a1e}.s7{background:#3a3a1e}.s8{background:#1e3a3a}
+.s9{background:#2a1e3a}
+.tc{padding:3px 0;border-top:1px solid #2d3352}
+.cr{padding:2px 9px;font-size:10px;display:flex;align-items:center;gap:4px;color:#9098b8;line-height:1.5}
+.cr.pk{color:#fbbf24}.cr.fk{color:#7dd3fc}
+.bpk{font-size:9px;background:#78350f;color:#fbbf24;border-radius:2px;padding:0 3px;flex-shrink:0}
+.bfk{font-size:9px;background:#0c3457;color:#7dd3fc;border-radius:2px;padding:0 3px;flex-shrink:0}
+.cm{padding:2px 9px 4px;font-size:9px;color:#4c5899;cursor:pointer}
+.cm:hover{color:#7c8cf8}
+#dp{position:fixed;right:0;top:48px;bottom:0;width:290px;background:#1a1d2e;border-left:1px solid #2d3352;overflow-y:auto;padding:14px;display:none;z-index:50}
+#dp h2{font-size:13px;font-weight:700;color:#7c8cf8;margin-bottom:10px;word-break:break-all}
+.dc{padding:4px 0;border-bottom:1px solid #1e2130}
+.dc .cn{font-size:11px;font-weight:600;color:#e2e8f0}
+.dc .ct{font-size:10px;color:#6c7a9c;margin-top:1px}
+.xb{float:right;background:none;border:none;color:#6c7a9c;cursor:pointer;font-size:15px}
+#mm{position:fixed;bottom:14px;left:14px;width:150px;height:90px;background:#1a1d2e;border:1px solid #2d3352;border-radius:5px;overflow:hidden;z-index:99}
+#lg{position:fixed;bottom:14px;right:14px;background:#1a1d2e;border:1px solid #2d3352;border-radius:5px;padding:8px;font-size:10px;z-index:99}
+#lg h4{color:#7c8cf8;margin-bottom:5px;font-size:11px}
+.lr{display:flex;align-items:center;gap:5px;margin:2px 0;color:#9098b8}
+.ld{width:11px;height:11px;border-radius:2px;flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="tb">
+  <h1>🗄 UnifiedShopDb v5</h1>
+  <input id="srch" placeholder="Search tables…" oninput="filterTables(this.value)">
+  <button class="btn" onclick="resetView()">⊞ Reset</button>
+  <button class="btn" onclick="zoomIn()">＋ Zoom</button>
+  <button class="btn" onclick="zoomOut()">－ Zoom</button>
+  <select id="sf" onchange="filterSection(this.value)">
+    <option value="">All Sections</option>
+    <option value="0">Lookup/Enum</option>
+    <option value="1">Identity/Auth</option>
+    <option value="2">RBAC</option>
+    <option value="3">Finance</option>
+    <option value="4">Warehouse/POS</option>
+    <option value="5">Catalog</option>
+    <option value="6">Discounts/Pricing</option>
+    <option value="7">Products</option>
+    <option value="8">Inventory</option>
+    <option value="9">Orders/Customers</option>
+  </select>
+  <button class="btn" id="rb" onclick="toggleRels()">Hide Relations</button>
+  <span id="inf">115 tables · 4 views · GUID PKs · SQL Server 2019+</span>
+</div>
+<div id="cw"><svg id="sv"></svg></div>
+<div id="dp">
+  <button class="xb" onclick="closeDP()">✕</button>
+  <h2 id="dpt"></h2>
+  <div id="dpc"></div>
+</div>
+<div id="mm"><canvas id="mc" width="150" height="90"></canvas></div>
+<div id="lg">
+  <h4>Sections</h4>
+  <div class="lr"><div class="ld" style="background:#1e3a5f"></div>Lookup / Enum</div>
+  <div class="lr"><div class="ld" style="background:#2d1e5f"></div>Identity / Auth</div>
+  <div class="lr"><div class="ld" style="background:#1e4a3a"></div>RBAC / Security</div>
+  <div class="lr"><div class="ld" style="background:#3a2a1e"></div>Finance / Payment</div>
+  <div class="lr"><div class="ld" style="background:#1e2a4a"></div>Warehouse / POS</div>
+  <div class="lr"><div class="ld" style="background:#3a1e2a"></div>Catalog</div>
+  <div class="lr"><div class="ld" style="background:#2a3a1e"></div>Discounts / Pricing</div>
+  <div class="lr"><div class="ld" style="background:#3a3a1e"></div>Products</div>
+  <div class="lr"><div class="ld" style="background:#1e3a3a"></div>Inventory</div>
+  <div class="lr"><div class="ld" style="background:#2a1e3a"></div>Orders / Customers</div>
+  <hr style="border-color:#2d3352;margin:5px 0">
+  <div class="lr"><span style="color:#fbbf24;font-size:10px">PK</span> Primary Key</div>
+  <div class="lr"><span style="color:#7dd3fc;font-size:10px">FK</span> Foreign Key</div>
+</div>
+<script>
+const T=[
+// s0 Lookup
+{n:"OrderStatuses",s:0,c:[{n:"StatusCode",t:"NVARCHAR(30)",pk:1},{n:"DisplayName",t:"NVARCHAR(80)"},{n:"IsTerminal",t:"BIT"}]},
+{n:"PaymentStatuses",s:0,c:[{n:"StatusCode",t:"NVARCHAR(30)",pk:1},{n:"DisplayName",t:"NVARCHAR(80)"}]},
+{n:"PaymentMethods",s:0,c:[{n:"MethodCode",t:"NVARCHAR(40)",pk:1},{n:"DisplayName",t:"NVARCHAR(80)"},{n:"IsOnline",t:"BIT"},{n:"IsActive",t:"BIT"}]},
+{n:"ShipmentStatuses",s:0,c:[{n:"StatusCode",t:"NVARCHAR(30)",pk:1},{n:"DisplayName",t:"NVARCHAR(80)"}]},
+{n:"ReturnStatuses",s:0,c:[{n:"StatusCode",t:"NVARCHAR(30)",pk:1},{n:"DisplayName",t:"NVARCHAR(80)"}]},
+{n:"StockMovementTypes",s:0,c:[{n:"TypeCode",t:"NVARCHAR(30)",pk:1},{n:"DisplayName",t:"NVARCHAR(80)"},{n:"IsInbound",t:"BIT"}]},
+{n:"DiscountTypes",s:0,c:[{n:"TypeCode",t:"NVARCHAR(30)",pk:1},{n:"DisplayName",t:"NVARCHAR(80)"}]},
+{n:"CustomerTiers",s:0,c:[{n:"TierCode",t:"NVARCHAR(20)",pk:1},{n:"MinLifetimeSpend",t:"DECIMAL(18,2)"},{n:"PointsMultiplier",t:"DECIMAL(5,2)"}]},
+{n:"ProductConditions",s:0,c:[{n:"ConditionCode",t:"NVARCHAR(20)",pk:1},{n:"DisplayName",t:"NVARCHAR(50)"}]},
+{n:"WishlistTypes",s:0,c:[{n:"TypeCode",t:"NVARCHAR(20)",pk:1},{n:"DisplayName",t:"NVARCHAR(50)"}]},
+// s1 Identity
+{n:"Users",s:1,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"UserName",t:"NVARCHAR(256)"},{n:"Email",t:"NVARCHAR(256)"},{n:"PasswordHash",t:"NVARCHAR(MAX)"},{n:"FirstName",t:"NVARCHAR(100)"},{n:"LastName",t:"NVARCHAR(100)"},{n:"IsActive",t:"BIT"}]},
+{n:"Roles",s:1,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(256)"},{n:"Description",t:"NVARCHAR(255)"},{n:"IsActive",t:"BIT"}]},
+{n:"UserRoles",s:1,c:[{n:"UserId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Users"},{n:"RoleId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Roles"}]},
+{n:"UserClaims",s:1,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"ClaimType",t:"NVARCHAR(MAX)"}]},
+{n:"RoleClaims",s:1,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"RoleId",t:"UNIQUEIDENTIFIER",fk:"Roles"},{n:"ClaimType",t:"NVARCHAR(MAX)"}]},
+{n:"UserLogins",s:1,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"LoginProvider",t:"NVARCHAR(128)"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"}]},
+{n:"UserTokens",s:1,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"Name",t:"NVARCHAR(128)"}]},
+// s2 RBAC
+{n:"Permissions",s:2,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PermissionCode",t:"NVARCHAR(100)"},{n:"Name",t:"NVARCHAR(150)"},{n:"Module",t:"NVARCHAR(100)"}]},
+{n:"RolePermissions",s:2,c:[{n:"RoleId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Roles"},{n:"PermissionId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Permissions"},{n:"IsGranted",t:"BIT"}]},
+{n:"Menus",s:2,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ParentMenuId",t:"UNIQUEIDENTIFIER",fk:"Menus"},{n:"MenuCode",t:"NVARCHAR(50)"},{n:"DisplayName",t:"NVARCHAR(150)"}]},
+{n:"RoleMenus",s:2,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"RoleId",t:"UNIQUEIDENTIFIER",fk:"Roles"},{n:"MenuId",t:"UNIQUEIDENTIFIER",fk:"Menus"},{n:"CanView",t:"BIT"},{n:"CanAdd",t:"BIT"},{n:"CanEdit",t:"BIT"},{n:"CanDelete",t:"BIT"}]},
+{n:"UserRefreshTokens",s:2,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"Token",t:"NVARCHAR(500)"},{n:"ExpiresAt",t:"DATETIME2"},{n:"RevokedAt",t:"DATETIME2"}]},
+// s3 Finance
+{n:"Currencies",s:3,c:[{n:"CurrencyCode",t:"NCHAR(3)",pk:1},{n:"Symbol",t:"NVARCHAR(5)"},{n:"ExchangeRate",t:"DECIMAL(18,6)"},{n:"IsBaseCurrency",t:"BIT"}]},
+{n:"TaxRates",s:3,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"TaxCode",t:"NVARCHAR(50)"},{n:"Rate",t:"DECIMAL(9,4)"},{n:"IsInclusive",t:"BIT"}]},
+{n:"CustomerWallets",s:3,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"CurrencyCode",t:"NCHAR(3)",fk:"Currencies"},{n:"Balance",t:"DECIMAL(18,2)"}]},
+{n:"WalletTransactions",s:3,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"WalletId",t:"UNIQUEIDENTIFIER",fk:"CustomerWallets"},{n:"Amount",t:"DECIMAL(18,2)"},{n:"TransactionType",t:"NVARCHAR(30)"}]},
+{n:"PaymentGateways",s:3,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"MethodCode",t:"NVARCHAR(40)",fk:"PaymentMethods"},{n:"Provider",t:"NVARCHAR(80)"},{n:"IsLiveMode",t:"BIT"}]},
+{n:"Payments",s:3,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders"},{n:"MethodCode",t:"NVARCHAR(40)",fk:"PaymentMethods"},{n:"StatusCode",t:"NVARCHAR(30)",fk:"PaymentStatuses"},{n:"Amount",t:"DECIMAL(18,2)"},{n:"PaidAt",t:"DATETIME2"}]},
+// s4 Warehouse/POS
+{n:"Warehouses",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Code",t:"NVARCHAR(50)"},{n:"Name",t:"NVARCHAR(150)"},{n:"SiteType",t:"NVARCHAR(20)"},{n:"IsDefault",t:"BIT"}]},
+{n:"Employees",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"EmployeeCode",t:"NVARCHAR(50)"},{n:"FirstName",t:"NVARCHAR(100)"}]},
+{n:"PosCounters",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"CounterCode",t:"NVARCHAR(50)"},{n:"CounterName",t:"NVARCHAR(100)"}]},
+{n:"PosTerminals",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PosCounterId",t:"UNIQUEIDENTIFIER",fk:"PosCounters"},{n:"TerminalCode",t:"NVARCHAR(50)"},{n:"IPAddress",t:"NVARCHAR(50)"}]},
+{n:"CashShifts",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"PosCounterId",t:"UNIQUEIDENTIFIER",fk:"PosCounters"},{n:"OpeningCash",t:"DECIMAL(18,2)"},{n:"ClosingCash",t:"DECIMAL(18,2)"},{n:"Status",t:"NVARCHAR(20)"}]},
+{n:"PosTransactions",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ReceiptNumber",t:"NVARCHAR(50)"},{n:"CashShiftId",t:"UNIQUEIDENTIFIER",fk:"CashShifts"},{n:"CashierId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"GrandTotal",t:"DECIMAL(18,2)"},{n:"Status",t:"NVARCHAR(20)"}]},
+{n:"PosTransactionLines",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"TransactionId",t:"UNIQUEIDENTIFIER",fk:"PosTransactions"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"},{n:"Quantity",t:"DECIMAL(18,2)"},{n:"UnitPrice",t:"DECIMAL(18,2)"},{n:"LineTotal",t:"DECIMAL(18,2)"}]},
+{n:"PosTransactionLineTaxes",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PosTransactionLineId",t:"UNIQUEIDENTIFIER",fk:"PosTransactionLines"},{n:"TaxRateId",t:"UNIQUEIDENTIFIER",fk:"TaxRates"},{n:"TaxAmount",t:"DECIMAL(18,2)"}]},
+{n:"PosPaymentTenders",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"TransactionId",t:"UNIQUEIDENTIFIER",fk:"PosTransactions"},{n:"MethodCode",t:"NVARCHAR(40)",fk:"PaymentMethods"},{n:"Amount",t:"DECIMAL(18,2)"}]},
+{n:"PosTransactionBundleSelections",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PosTransactionLineId",t:"UNIQUEIDENTIFIER",fk:"PosTransactionLines"},{n:"GroupId",t:"UNIQUEIDENTIFIER",fk:"BundleOptionGroups"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"}]},
+{n:"CashDrawerEvents",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"CashShiftId",t:"UNIQUEIDENTIFIER",fk:"CashShifts"},{n:"EventType",t:"NVARCHAR(25)"},{n:"Amount",t:"DECIMAL(18,2)"}]},
+{n:"DayEndSummaries",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"SummaryDate",t:"DATE"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"TotalSalesAmount",t:"DECIMAL(18,2)"},{n:"Status",t:"NVARCHAR(20)"}]},
+{n:"ExpenseCategories",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(100)"},{n:"IsActive",t:"BIT"}]},
+{n:"Expenses",s:4,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"ExpenseCategoryId",t:"UNIQUEIDENTIFIER",fk:"ExpenseCategories"},{n:"Amount",t:"DECIMAL(18,2)"}]},
+// s5 Catalog
+{n:"Brands",s:5,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(100)"},{n:"Slug",t:"NVARCHAR(100)"},{n:"IsFeatured",t:"BIT"}]},
+{n:"Categories",s:5,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ParentCategoryId",t:"UNIQUEIDENTIFIER",fk:"Categories"},{n:"Name",t:"NVARCHAR(100)"},{n:"Slug",t:"NVARCHAR(100)"}]},
+{n:"Suppliers",s:5,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"SupplierCode",t:"NVARCHAR(50)"},{n:"Name",t:"NVARCHAR(200)"},{n:"Balance",t:"DECIMAL(18,2)"}]},
+{n:"Colors",s:5,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(80)"},{n:"HexCode",t:"NCHAR(7)"}]},
+{n:"Units",s:5,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(50)"},{n:"ShortName",t:"NVARCHAR(20)"},{n:"BaseUnitId",t:"UNIQUEIDENTIFIER",fk:"Units"}]},
+{n:"Tags",s:5,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(50)"},{n:"Slug",t:"NVARCHAR(50)"}]},
+{n:"BrandCategories",s:5,c:[{n:"BrandId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Brands"},{n:"CategoryId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Categories"}]},
+// s6 Discounts/Pricing
+{n:"Discounts",s:6,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Code",t:"NVARCHAR(60)"},{n:"DiscountTypeCode",t:"NVARCHAR(30)",fk:"DiscountTypes"},{n:"DiscountValue",t:"DECIMAL(18,2)"},{n:"StartDate",t:"DATETIME2"},{n:"EndDate",t:"DATETIME2"}]},
+{n:"DiscountApplicability",s:6,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"DiscountId",t:"UNIQUEIDENTIFIER",fk:"Discounts"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"CategoryId",t:"UNIQUEIDENTIFIER",fk:"Categories"}]},
+{n:"DiscountUsageLog",s:6,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"DiscountId",t:"UNIQUEIDENTIFIER",fk:"Discounts"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"DiscountAmount",t:"DECIMAL(18,2)"}]},
+{n:"PriceLists",s:6,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(150)"},{n:"TierCode",t:"NVARCHAR(20)",fk:"CustomerTiers"},{n:"StartDate",t:"DATETIME2"}]},
+{n:"PriceListItems",s:6,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PriceListId",t:"UNIQUEIDENTIFIER",fk:"PriceLists"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"SalePrice",t:"DECIMAL(18,2)"}]},
+{n:"FlashDeals",s:6,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Title",t:"NVARCHAR(200)"},{n:"StartDate",t:"DATETIME2"},{n:"EndDate",t:"DATETIME2"},{n:"IsActive",t:"BIT"}]},
+{n:"FlashDealProducts",s:6,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"FlashDealId",t:"UNIQUEIDENTIFIER",fk:"FlashDeals"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"DiscountPercent",t:"DECIMAL(5,2)"}]},
+// s7 Products
+{n:"AttributeTypes",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(80)"},{n:"UiType",t:"NVARCHAR(20)"},{n:"AffectsPrice",t:"BIT"},{n:"AffectsStock",t:"BIT"},{n:"AffectsImage",t:"BIT"}]},
+{n:"AttributeOptions",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"AttributeTypeId",t:"UNIQUEIDENTIFIER",fk:"AttributeTypes"},{n:"ColorId",t:"UNIQUEIDENTIFIER",fk:"Colors"},{n:"Value",t:"NVARCHAR(120)"}]},
+{n:"Products",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"CategoryId",t:"UNIQUEIDENTIFIER",fk:"Categories"},{n:"BrandId",t:"UNIQUEIDENTIFIER",fk:"Brands"},{n:"Name",t:"NVARCHAR(200)"},{n:"SKU",t:"NVARCHAR(50)"},{n:"SalePrice",t:"DECIMAL(18,2)"},{n:"CostPrice",t:"DECIMAL(18,2)"},{n:"ProductType",t:"NVARCHAR(20)"},{n:"IsActive",t:"BIT"}]},
+{n:"ProductVariants",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"Name",t:"NVARCHAR(100)"},{n:"SKU",t:"NVARCHAR(50)"},{n:"PriceModifier",t:"DECIMAL(18,2)"},{n:"IsDefault",t:"BIT"}]},
+{n:"ProductSupplierLinks",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"SupplierId",t:"UNIQUEIDENTIFIER",fk:"Suppliers"},{n:"UnitCost",t:"DECIMAL(18,2)"},{n:"IsPreferred",t:"BIT"}]},
+{n:"ProductPriceHistories",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"OldSalePrice",t:"DECIMAL(18,2)"},{n:"NewSalePrice",t:"DECIMAL(18,2)"},{n:"EffectiveFrom",t:"DATETIME2"}]},
+{n:"ProductBatches",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"BatchNo",t:"NVARCHAR(100)"},{n:"ExpiryDate",t:"DATETIME2"}]},
+{n:"ProductAttributeLinks",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"AttributeTypeId",t:"UNIQUEIDENTIFIER",fk:"AttributeTypes"}]},
+{n:"VariantAttributeOptions",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"},{n:"OptionId",t:"UNIQUEIDENTIFIER",fk:"AttributeOptions"}]},
+{n:"VariantAttributeMatrix",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"},{n:"AttributeCombination",t:"NVARCHAR(MAX)"}]},
+{n:"ProductSpecifications",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"SpecName",t:"NVARCHAR(100)"}]},
+{n:"ProductSpecificationValues",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"SpecId",t:"UNIQUEIDENTIFIER",fk:"ProductSpecifications"},{n:"Value",t:"NVARCHAR(MAX)"}]},
+{n:"ProductImages",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"},{n:"ImageUrl",t:"NVARCHAR(500)"},{n:"IsPrimary",t:"BIT"}]},
+{n:"ProductTaxRates",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"TaxRateId",t:"UNIQUEIDENTIFIER",fk:"TaxRates"}]},
+{n:"ProductTags",s:7,c:[{n:"ProductId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Products"},{n:"TagId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Tags"}]},
+{n:"MediaAssets",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"FileName",t:"NVARCHAR(260)"},{n:"ContentType",t:"NVARCHAR(80)"},{n:"FileSizeBytes",t:"BIGINT"}]},
+{n:"ProductMedia",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"},{n:"FileName",t:"NVARCHAR(260)"},{n:"IsPrimary",t:"BIT"}]},
+{n:"ProductMediaBlob",s:7,c:[{n:"MediaId",t:"UNIQUEIDENTIFIER",pk:1,fk:"ProductMedia"},{n:"Data",t:"VARBINARY(MAX)"},{n:"WebpData",t:"VARBINARY(MAX)"}]},
+{n:"AttributeOptionMedia",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OptionId",t:"UNIQUEIDENTIFIER",fk:"AttributeOptions"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"}]},
+{n:"AttributeOptionMediaBlob",s:7,c:[{n:"MediaId",t:"UNIQUEIDENTIFIER",pk:1,fk:"AttributeOptionMedia"},{n:"Data",t:"VARBINARY(MAX)"}]},
+{n:"BundleComponents",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"BundleProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"ComponentVariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"},{n:"Quantity",t:"DECIMAL(18,2)"}]},
+{n:"BundleOptionGroups",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"BundleProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"GroupName",t:"NVARCHAR(100)"},{n:"IsRequired",t:"BIT"}]},
+{n:"BundleOptionItems",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"GroupId",t:"UNIQUEIDENTIFIER",fk:"BundleOptionGroups"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"},{n:"IsDefault",t:"BIT"}]},
+{n:"ProductCollections",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(150)"},{n:"Slug",t:"NVARCHAR(150)"},{n:"IsActive",t:"BIT"}]},
+{n:"ProductCollectionItems",s:7,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductCollectionId",t:"UNIQUEIDENTIFIER",fk:"ProductCollections"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"DisplayOrder",t:"INT"}]},
+// s8 Inventory
+{n:"StockItems",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"QuantityOnHand",t:"DECIMAL(18,2)"},{n:"ReservedQuantity",t:"DECIMAL(18,2)"},{n:"AverageCostPrice",t:"DECIMAL(18,4)"}]},
+{n:"StockMovements",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"MovementTypeCode",t:"NVARCHAR(30)",fk:"StockMovementTypes"},{n:"QuantityIn",t:"DECIMAL(18,2)"},{n:"QuantityOut",t:"DECIMAL(18,2)"},{n:"BalanceAfter",t:"DECIMAL(18,2)"}]},
+{n:"InventoryAdjustments",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"AdjustmentNo",t:"NVARCHAR(50)"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"AdjustmentType",t:"NVARCHAR(30)"},{n:"Reason",t:"NVARCHAR(200)"}]},
+{n:"InventoryAdjustmentLines",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"InventoryAdjustmentId",t:"UNIQUEIDENTIFIER",fk:"InventoryAdjustments"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"SystemQuantity",t:"DECIMAL(18,2)"},{n:"CountedQuantity",t:"DECIMAL(18,2)"}]},
+{n:"StockTransfers",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"TransferNo",t:"NVARCHAR(50)"},{n:"FromWarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"ToWarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"Status",t:"NVARCHAR(20)"}]},
+{n:"StockTransferLines",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"TransferId",t:"UNIQUEIDENTIFIER",fk:"StockTransfers"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"Quantity",t:"DECIMAL(18,2)"}]},
+{n:"ReorderRules",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"ReorderLevel",t:"DECIMAL(18,2)"},{n:"ReorderQuantity",t:"DECIMAL(18,2)"}]},
+{n:"PurchaseOrders",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OrderNumber",t:"NVARCHAR(50)"},{n:"SupplierId",t:"UNIQUEIDENTIFIER",fk:"Suppliers"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"Status",t:"NVARCHAR(25)"},{n:"GrandTotal",t:"DECIMAL(18,2)"}]},
+{n:"PurchaseOrderLines",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PurchaseOrderId",t:"UNIQUEIDENTIFIER",fk:"PurchaseOrders"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"Quantity",t:"DECIMAL(18,2)"},{n:"UnitPrice",t:"DECIMAL(18,2)"}]},
+{n:"PurchaseOrderLineTaxes",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PurchaseOrderLineId",t:"UNIQUEIDENTIFIER",fk:"PurchaseOrderLines"},{n:"TaxRateId",t:"UNIQUEIDENTIFIER",fk:"TaxRates"},{n:"TaxAmount",t:"DECIMAL(18,2)"}]},
+{n:"PurchaseReturns",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PurchaseOrderId",t:"UNIQUEIDENTIFIER",fk:"PurchaseOrders"},{n:"ReturnNo",t:"NVARCHAR(50)"},{n:"SupplierId",t:"UNIQUEIDENTIFIER",fk:"Suppliers"}]},
+{n:"PurchaseReturnLines",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PurchaseReturnId",t:"UNIQUEIDENTIFIER",fk:"PurchaseReturns"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"Quantity",t:"DECIMAL(18,2)"}]},
+{n:"GoodsReceipts",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PurchaseOrderId",t:"UNIQUEIDENTIFIER",fk:"PurchaseOrders"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"ReceiptNumber",t:"NVARCHAR(50)"},{n:"ReceiptDate",t:"DATETIME2"}]},
+{n:"GoodsReceiptLines",s:8,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"GoodsReceiptId",t:"UNIQUEIDENTIFIER",fk:"GoodsReceipts"},{n:"PurchaseOrderLineId",t:"UNIQUEIDENTIFIER",fk:"PurchaseOrderLines"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"Quantity",t:"DECIMAL(18,2)"}]},
+// s9 Orders/Customers
+{n:"Customers",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"CustomerCode",t:"NVARCHAR(50)"},{n:"CustomerType",t:"NVARCHAR(30)"},{n:"Phone",t:"NVARCHAR(30)"},{n:"Balance",t:"DECIMAL(18,2)"},{n:"LoyaltyPoints",t:"INT"}]},
+{n:"CustomerProfiles",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"TierCode",t:"NVARCHAR(20)",fk:"CustomerTiers"},{n:"NewsletterOptIn",t:"BIT"}]},
+{n:"LoyaltyTransactions",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders"},{n:"TransactionType",t:"NVARCHAR(20)"},{n:"Points",t:"INT"}]},
+{n:"Sellers",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"StoreName",t:"NVARCHAR(200)"},{n:"CommissionRate",t:"DECIMAL(5,2)"},{n:"IsApproved",t:"BIT"}]},
+{n:"CustomerAddresses",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"AddressType",t:"NVARCHAR(20)"},{n:"FullName",t:"NVARCHAR(120)"},{n:"AddressLine1",t:"NVARCHAR(500)"},{n:"City",t:"NVARCHAR(100)"}]},
+{n:"Carts",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"SubTotal",t:"DECIMAL(18,2)"},{n:"Total",t:"DECIMAL(18,2)"}]},
+{n:"CartItems",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"CartId",t:"UNIQUEIDENTIFIER",fk:"Carts"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"},{n:"Quantity",t:"DECIMAL(18,2)"},{n:"UnitPrice",t:"DECIMAL(18,2)"}]},
+{n:"Quotes",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"QuoteNo",t:"NVARCHAR(50)"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"GrandTotal",t:"DECIMAL(18,2)"},{n:"Status",t:"NVARCHAR(20)"}]},
+{n:"QuoteItems",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"QuoteId",t:"UNIQUEIDENTIFIER",fk:"Quotes"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"Quantity",t:"DECIMAL(18,2)"},{n:"UnitPrice",t:"DECIMAL(18,2)"}]},
+{n:"Orders",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OrderNumber",t:"NVARCHAR(50)"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"StatusCode",t:"NVARCHAR(30)",fk:"OrderStatuses"},{n:"TotalAmount",t:"DECIMAL(18,2)"}]},
+{n:"OrderItems",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"},{n:"Quantity",t:"DECIMAL(18,2)"},{n:"UnitPrice",t:"DECIMAL(18,2)"}]},
+{n:"OrderItemTaxes",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OrderItemId",t:"UNIQUEIDENTIFIER",fk:"OrderItems"},{n:"TaxRateId",t:"UNIQUEIDENTIFIER",fk:"TaxRates"},{n:"TaxAmount",t:"DECIMAL(18,2)"}]},
+{n:"OrderBundleSelections",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OrderItemId",t:"UNIQUEIDENTIFIER",fk:"OrderItems"},{n:"GroupId",t:"UNIQUEIDENTIFIER",fk:"BundleOptionGroups"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"}]},
+{n:"Invoices",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders"},{n:"InvoiceNumber",t:"NVARCHAR(50)"},{n:"TotalAmount",t:"DECIMAL(18,2)"},{n:"AmountDue",t:"DECIMAL(18,2)"}]},
+{n:"ShippingMethods",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(100)"},{n:"BaseCost",t:"DECIMAL(18,2)"},{n:"IsFreeShipping",t:"BIT"}]},
+{n:"ShippingCarriers",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(100)"},{n:"TrackingUrlPrefix",t:"NVARCHAR(MAX)"},{n:"IsActive",t:"BIT"}]},
+{n:"DeliveryZones",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(120)"},{n:"BaseDeliveryCost",t:"DECIMAL(18,2)"},{n:"IsActive",t:"BIT"}]},
+{n:"DeliveryZoneRegions",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"DeliveryZoneId",t:"UNIQUEIDENTIFIER",fk:"DeliveryZones"},{n:"Country",t:"NCHAR(2)"},{n:"City",t:"NVARCHAR(100)"}]},
+{n:"PickupPoints",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"Name",t:"NVARCHAR(150)"},{n:"AddressLine1",t:"NVARCHAR(200)"}]},
+{n:"Shipments",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders"},{n:"ShippingMethodId",t:"UNIQUEIDENTIFIER",fk:"ShippingMethods"},{n:"CarrierId",t:"UNIQUEIDENTIFIER",fk:"ShippingCarriers"},{n:"TrackingNumber",t:"NVARCHAR(120)"},{n:"StatusCode",t:"NVARCHAR(30)",fk:"ShipmentStatuses"}]},
+{n:"Returns",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders"},{n:"ReturnNumber",t:"NVARCHAR(50)"},{n:"StatusCode",t:"NVARCHAR(30)",fk:"ReturnStatuses"}]},
+{n:"OrderReturnItems",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ReturnId",t:"UNIQUEIDENTIFIER",fk:"Returns"},{n:"OrderItemId",t:"UNIQUEIDENTIFIER",fk:"OrderItems"},{n:"Quantity",t:"DECIMAL(18,2)"}]},
+{n:"PosTransactionReturns",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ReturnNo",t:"NVARCHAR(50)"},{n:"WarehouseId",t:"UNIQUEIDENTIFIER",fk:"Warehouses"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"SaleId",t:"UNIQUEIDENTIFIER",fk:"PosTransactions"}]},
+{n:"PosTransactionReturnLines",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"PosTransactionReturnId",t:"UNIQUEIDENTIFIER",fk:"PosTransactionReturns"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"Quantity",t:"DECIMAL(18,2)"}]},
+{n:"RefundRequests",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"RefundAmount",t:"DECIMAL(18,2)"},{n:"StatusCode",t:"NVARCHAR(25)"}]},
+{n:"Reviews",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"Rating",t:"TINYINT"},{n:"IsVerifiedPurchase",t:"BIT"},{n:"IsApproved",t:"BIT"}]},
+{n:"ReviewHelpfulness",s:9,c:[{n:"ReviewId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Reviews"},{n:"UserId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Users"},{n:"IsHelpful",t:"BIT"}]},
+{n:"Wishlists",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"Name",t:"NVARCHAR(100)"},{n:"IsPublic",t:"BIT"}]},
+{n:"WishlistItems",s:9,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"WishlistId",t:"UNIQUEIDENTIFIER",fk:"Wishlists"},{n:"ProductId",t:"UNIQUEIDENTIFIER",fk:"Products"},{n:"VariantId",t:"UNIQUEIDENTIFIER",fk:"ProductVariants"}]},
+// CMS + System
+{n:"BlogCategories",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(100)"},{n:"Slug",t:"NVARCHAR(100)"}]},
+{n:"Blogs",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"CategoryId",t:"UNIQUEIDENTIFIER",fk:"BlogCategories"},{n:"AuthorId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"Title",t:"NVARCHAR(300)"},{n:"IsPublished",t:"BIT"}]},
+{n:"BlogTags",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(80)"},{n:"Slug",t:"NVARCHAR(80)"}]},
+{n:"BlogPostTags",s:0,c:[{n:"BlogId",t:"UNIQUEIDENTIFIER",pk:1,fk:"Blogs"},{n:"BlogTagId",t:"UNIQUEIDENTIFIER",pk:1,fk:"BlogTags"}]},
+{n:"BlogComments",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"BlogId",t:"UNIQUEIDENTIFIER",fk:"Blogs"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"Content",t:"NVARCHAR(MAX)"}]},
+{n:"StaticPages",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Title",t:"NVARCHAR(200)"},{n:"Slug",t:"NVARCHAR(200)"},{n:"IsPublished",t:"BIT"}]},
+{n:"AppSettings",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Key",t:"NVARCHAR(120)"},{n:"Value",t:"NVARCHAR(MAX)"},{n:"Category",t:"NVARCHAR(60)"}]},
+{n:"EmailTemplates",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(120)"},{n:"TemplateType",t:"NVARCHAR(60)"},{n:"IsActive",t:"BIT"}]},
+{n:"ContactMessages",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Name",t:"NVARCHAR(120)"},{n:"Email",t:"NVARCHAR(256)"},{n:"Subject",t:"NVARCHAR(200)"}]},
+{n:"NewsletterSubscribers",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Email",t:"NVARCHAR(256)"},{n:"CustomerId",t:"UNIQUEIDENTIFIER",fk:"Customers"},{n:"IsActive",t:"BIT"}]},
+{n:"SearchKeywords",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"Keyword",t:"NVARCHAR(200)"},{n:"SearchCount",t:"INT"},{n:"LastSearchedAt",t:"DATETIME2"}]},
+{n:"Notifications",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"Title",t:"NVARCHAR(200)"},{n:"Type",t:"NVARCHAR(50)"},{n:"IsRead",t:"BIT"}]},
+{n:"ActivityLogs",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"ActivityType",t:"NVARCHAR(80)"},{n:"OccurredAt",t:"DATETIME2"}]},
+{n:"AuditLogs",s:0,c:[{n:"Id",t:"BIGINT IDENTITY",pk:1},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"Action",t:"NVARCHAR(120)"},{n:"EntityName",t:"NVARCHAR(100)"},{n:"OccurredAt",t:"DATETIME2"}]},
+{n:"SupportTickets",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"TicketNumber",t:"NVARCHAR(30)"},{n:"UserId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"OrderId",t:"UNIQUEIDENTIFIER",fk:"Orders"},{n:"Priority",t:"NVARCHAR(20)"},{n:"Status",t:"NVARCHAR(20)"}]},
+{n:"SupportTicketMessages",s:0,c:[{n:"Id",t:"UNIQUEIDENTIFIER",pk:1},{n:"SupportTicketId",t:"UNIQUEIDENTIFIER",fk:"SupportTickets"},{n:"SenderId",t:"UNIQUEIDENTIFIER",fk:"Users"},{n:"Message",t:"NVARCHAR(MAX)"}]},
+];
+
+// cluster layout
+const CP={
+  0:{x:2900,y:20},1:{x:0,y:20},2:{x:490,y:20},3:{x:980,y:20},
+  4:{x:1470,y:20},5:{x:0,y:700},6:{x:980,y:700},7:{x:490,y:700},
+  8:{x:1470,y:700},9:{x:2050,y:20}
+};
+const grps={};
+T.forEach(t=>{if(!grps[t.s])grps[t.s]=[];grps[t.s].push(t);});
+const pos={};
+T.forEach(t=>{
+  const g=grps[t.s],i=g.indexOf(t),cp=CP[t.s];
+  pos[t.n]={x:cp.x+(i%3)*245,y:cp.y+Math.floor(i/3)*290};
+});
+
+const cw=document.getElementById('cw'),sv=document.getElementById('sv');
+let sc=0.25,tx=50,ty=40,drag=false,lx,ly,showR=true,sel=null;
+
+const RELS=[];
+T.forEach(t=>t.c.forEach(c=>{if(c.fk&&T.find(x=>x.n===c.fk))RELS.push({from:t.n,to:c.fk,col:c.n});}));
+
+function buildNode(t){
+  const p=pos[t.n];
+  const d=document.createElement('div');
+  d.className='tn s'+t.s;d.id='t-'+t.n;d.dataset.t=t.n;
+  d.style.left=p.x+'px';d.style.top=p.y+'px';
+  const h=document.createElement('div');h.className='th s'+t.s;
+  h.innerHTML=`<span>📋 ${t.n}</span>`;d.appendChild(h);
+  const tc=document.createElement('div');tc.className='tc';
+  const MAX=7;
+  t.c.forEach((c,i)=>{
+    if(i>=MAX)return;
+    const r=document.createElement('div');
+    r.className='cr'+(c.pk?' pk':'')+(c.fk&&!c.pk?' fk':'');
+    const b=c.pk?'<span class="bpk">PK</span>':(c.fk?'<span class="bfk">FK</span>':'');
+    r.innerHTML=b+`<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.n}</span><span style="font-size:9px;color:#4c5899;flex-shrink:0;margin-left:4px">${c.t.split('(')[0]}</span>`;
+    tc.appendChild(r);
+  });
+  if(t.c.length>MAX){const m=document.createElement('div');m.className='cm';m.textContent=`+${t.c.length-MAX} more`;tc.appendChild(m);}
+  d.appendChild(tc);
+  d.addEventListener('click',e=>{e.stopPropagation();selectT(t.n);});
+  cw.appendChild(d);
+}
+T.forEach(buildNode);
+
+function scCoord(name){
+  const p=pos[name];if(!p)return null;
+  const el=document.getElementById('t-'+name);if(!el)return null;
+  const w=el.offsetWidth||200,h=el.offsetHeight||120;
+  return{x:p.x*sc+tx+w*sc/2,y:p.y*sc+ty+h*sc/2,w:w*sc,h:h*sc};
+}
+function drawRels(filter){
+  sv.innerHTML='';if(!showR)return;
+  RELS.forEach(r=>{
+    if(filter&&r.from!==filter&&r.to!==filter)return;
+    const a=scCoord(r.from),b=scCoord(r.to);if(!a||!b)return;
+    const dx=b.x-a.x,cx1=a.x+dx*.5,cy1=a.y,cx2=b.x-dx*.5,cy2=b.y;
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M${a.x},${a.y} C${cx1},${cy1} ${cx2},${cy2} ${b.x},${b.y}`);
+    path.setAttribute('stroke',filter?'#7c8cf8':'#2d3352');
+    path.setAttribute('stroke-width',filter?'1.5':'0.8');
+    path.setAttribute('fill','none');
+    path.setAttribute('opacity',filter?'0.9':'0.4');
+    sv.appendChild(path);
+  });
+}
+function applyT(){
+  document.querySelectorAll('.tn').forEach(n=>{
+    const p=pos[n.dataset.t];
+    n.style.transform=`translate(${p.x*sc+tx}px,${p.y*sc+ty}px) scale(${sc})`;
+    n.style.left='0';n.style.top='0';n.style.transformOrigin='0 0';
+  });
+  sv.setAttribute('viewBox',`0 0 ${cw.offsetWidth} ${cw.offsetHeight}`);
+  drawRels(sel);updateMM();
+}
+function resetView(){sc=0.25;tx=50;ty=40;applyT();}
+function zoomIn(){sc=Math.min(sc*1.2,2);applyT();}
+function zoomOut(){sc=Math.max(sc/1.2,0.07);applyT();}
+cw.addEventListener('mousedown',e=>{if(e.target.closest('.tn'))return;drag=true;lx=e.clientX;ly=e.clientY;cw.classList.add('dr');});
+window.addEventListener('mousemove',e=>{if(!drag)return;tx+=e.clientX-lx;ty+=e.clientY-ly;lx=e.clientX;ly=e.clientY;applyT();});
+window.addEventListener('mouseup',()=>{drag=false;cw.classList.remove('dr');});
+cw.addEventListener('wheel',e=>{e.preventDefault();sc=Math.min(Math.max(sc*(e.deltaY<0?1.1:.9),.07),2);applyT();},{passive:false});
+function selectT(name){
+  const related=new Set([name]);
+  RELS.forEach(r=>{if(r.from===name)related.add(r.to);if(r.to===name)related.add(r.from);});
+  document.querySelectorAll('.tn').forEach(n=>{
+    n.classList.remove('sel','hi','dim');
+    if(n.dataset.t===name)n.classList.add('sel');
+    else if(related.has(n.dataset.t))n.classList.add('hi');
+    else n.classList.add('dim');
+  });
+  sel=name;drawRels(name);showDP(name);
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.tn')&&!e.target.closest('#dp')){
+    document.querySelectorAll('.tn').forEach(n=>n.classList.remove('sel','hi','dim'));
+    sel=null;closeDP();drawRels(null);
+  }
+});
+function showDP(name){
+  const t=T.find(x=>x.n===name);if(!t)return;
+  document.getElementById('dpt').textContent=name;
+  const dc=document.getElementById('dpc');dc.innerHTML='';
+  t.c.forEach(c=>{
+    const d=document.createElement('div');d.className='dc';
+    d.innerHTML=`<div class="cn">${c.pk?'🔑 ':''}${c.fk?'🔗 ':''}<b>${c.n}</b></div><div class="ct">${c.t}${c.pk?' · PK':''}${c.fk?' · FK → '+c.fk:''}</div>`;
+    dc.appendChild(d);
+  });
+  document.getElementById('dp').style.display='block';
+}
+function closeDP(){document.getElementById('dp').style.display='none';}
+function filterTables(q){q=q.toLowerCase();document.querySelectorAll('.tn').forEach(n=>{n.style.display=(!q||n.dataset.t.toLowerCase().includes(q))?'':'none';});}
+function filterSection(v){document.querySelectorAll('.tn').forEach(n=>{const t=T.find(x=>x.n===n.dataset.t);n.style.display=(!v||String(t.s)===v)?'':'none';});}
+function toggleRels(){showR=!showR;document.getElementById('rb').textContent=showR?'Hide Relations':'Show Relations';drawRels(sel);}
+function updateMM(){
+  const c=document.getElementById('mc'),ctx=c.getContext('2d');
+  ctx.clearRect(0,0,150,90);
+  const bnd={minX:Infinity,minY:Infinity,maxX:-Infinity,maxY:-Infinity};
+  T.forEach(t=>{const p=pos[t.n];bnd.minX=Math.min(bnd.minX,p.x);bnd.minY=Math.min(bnd.minY,p.y);bnd.maxX=Math.max(bnd.maxX,p.x+230);bnd.maxY=Math.max(bnd.maxY,p.y+180);});
+  const ms=Math.min(148/(bnd.maxX-bnd.minX),88/(bnd.maxY-bnd.minY));
+  const cols=['#1e3a5f','#2d1e5f','#1e4a3a','#3a2a1e','#1e2a4a','#3a1e2a','#2a3a1e','#3a3a1e','#1e3a3a','#2a1e3a'];
+  T.forEach(t=>{const p=pos[t.n];ctx.fillStyle=cols[t.s];ctx.fillRect((p.x-bnd.minX)*ms+1,(p.y-bnd.minY)*ms+1,14,7);});
+  const vx=(-tx/sc-bnd.minX)*ms,vy=(-ty/sc-bnd.minY)*ms;
+  const vw=(cw.offsetWidth/sc)*ms,vh=(cw.offsetHeight/sc)*ms;
+  ctx.strokeStyle='#7c8cf8';ctx.lineWidth=1;ctx.strokeRect(vx,vy,vw,vh);
+}
+setTimeout(()=>{applyT();},100);
+window.addEventListener('resize',applyT);
+</script>
+</body>
+</html>

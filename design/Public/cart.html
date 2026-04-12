@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart — NEXUS Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --store-bg: #ffffff;
+      --store-surface: #f8f9fa;
+      --store-text: #1a1a2e;
+      --store-muted: #6b7280;
+      --store-border: #e5e7eb;
+      --store-accent: #6366f1;
+      --store-accent-hover: #5254c8;
+      --store-success: #22c55e;
+      --store-danger: #ef4444;
+      --store-warning: #f59e0b;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--store-surface);
+      color: var(--store-text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    
+    a { color: inherit; text-decoration: none; }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    /* Header */
+    .store-header {
+      background: var(--store-text);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .header-main {
+      padding: 16px 0;
+    }
+    
+    .header-main .container {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--store-accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-left: auto;
+    }
+    
+    .header-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      opacity: 0.9;
+      transition: opacity 0.2s;
+    }
+    
+    .header-link:hover { opacity: 1; }
+    
+    /* Breadcrumb */
+    .breadcrumb {
+      padding: 16px 0;
+      font-size: 13px;
+      color: var(--store-muted);
+    }
+    
+    .breadcrumb a { color: var(--store-accent); }
+    .breadcrumb span { margin: 0 8px; }
+    
+    /* Page Layout */
+    .cart-page {
+      padding: 24px 0 60px;
+    }
+    
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .cart-count {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--store-muted);
+    }
+    
+    .cart-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 32px;
+      align-items: start;
+    }
+    
+    @media (max-width: 900px) {
+      .cart-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Cart Items */
+    .cart-items {
+      background: var(--store-bg);
+      border-radius: 12px;
+      border: 1px solid var(--store-border);
+    }
+    
+    .cart-header {
+      display: grid;
+      grid-template-columns: 3fr 1fr 1fr 1fr auto;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--store-border);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--store-muted);
+    }
+    
+    .cart-item {
+      display: grid;
+      grid-template-columns: 3fr 1fr 1fr 1fr auto;
+      gap: 16px;
+      padding: 20px;
+      border-bottom: 1px solid var(--store-border);
+      align-items: center;
+    }
+    
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+    
+    .item-product {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    
+    .item-image {
+      width: 80px;
+      height: 80px;
+      background: var(--store-surface);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--store-muted);
+      font-size: 24px;
+    }
+    
+    .item-details h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .item-variant {
+      font-size: 12px;
+      color: var(--store-muted);
+      margin-bottom: 6px;
+    }
+    
+    .item-sku {
+      font-size: 11px;
+      color: var(--store-muted);
+      font-family: monospace;
+    }
+    
+    .item-price {
+      font-weight: 600;
+    }
+    
+    .item-quantity {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .qty-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--store-border);
+      background: var(--store-bg);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .qty-btn:hover {
+      border-color: var(--store-accent);
+      color: var(--store-accent);
+    }
+    
+    .qty-value {
+      width: 40px;
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .item-subtotal {
+      font-weight: 700;
+      color: var(--store-accent);
+    }
+    
+    .item-remove {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: none;
+      color: var(--store-muted);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    
+    .item-remove:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--store-danger);
+    }
+    
+    /* Cart Actions */
+    .cart-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--store-surface);
+      border-radius: 0 0 12px 12px;
+    }
+    
+    .continue-shopping {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--store-accent);
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .clear-cart {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--store-danger);
+      font-size: 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    
+    /* Order Summary */
+    .order-summary {
+      background: var(--store-bg);
+      border-radius: 12px;
+      border: 1px solid var(--store-border);
+      padding: 24px;
+      position: sticky;
+      top: 100px;
+    }
+    
+    .summary-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--store-border);
+    }
+    
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+    }
+    
+    .summary-row.total {
+      border-top: 2px solid var(--store-text);
+      margin-top: 12px;
+      padding-top: 16px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    
+    .summary-label {
+      color: var(--store-muted);
+    }
+    
+    .summary-value {
+      font-weight: 600;
+    }
+    
+    .summary-value.discount {
+      color: var(--store-success);
+    }
+    
+    /* Coupon */
+    .coupon-form {
+      display: flex;
+      gap: 8px;
+      margin: 20px 0;
+    }
+    
+    .coupon-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--store-border);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    
+    .coupon-input:focus {
+      outline: none;
+      border-color: var(--store-accent);
+    }
+    
+    .coupon-btn {
+      padding: 12px 20px;
+      background: var(--store-text);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .coupon-btn:hover {
+      background: #333;
+    }
+    
+    .applied-coupon {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(34, 197, 94, 0.1);
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .coupon-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--store-success);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    
+    .coupon-remove {
+      background: none;
+      border: none;
+      color: var(--store-muted);
+      cursor: pointer;
+    }
+    
+    /* Checkout Button */
+    .checkout-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--store-accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .checkout-btn:hover {
+      background: var(--store-accent-hover);
+    }
+    
+    /* Payment Methods */
+    .payment-methods {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--store-border);
+    }
+    
+    .payment-icon {
+      height: 28px;
+      opacity: 0.6;
+    }
+    
+    /* Shipping Estimate */
+    .shipping-estimate {
+      padding: 16px;
+      background: var(--store-surface);
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .estimate-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    
+    .estimate-options label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--store-border);
+      border-radius: 6px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .estimate-options label:hover {
+      border-color: var(--store-accent);
+    }
+    
+    .estimate-options input[type="radio"] {
+      accent-color: var(--store-accent);
+    }
+    
+    .shipping-info {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+    
+    .shipping-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    .shipping-time {
+      font-size: 11px;
+      color: var(--store-muted);
+    }
+    
+    .shipping-price {
+      font-weight: 600;
+      font-size: 13px;
+    }
+    
+    .shipping-price.free {
+      color: var(--store-success);
+    }
+    
+    /* Trust Badges */
+    .trust-badges {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--store-border);
+    }
+    
+    .trust-badge {
+      text-align: center;
+      padding: 12px 8px;
+    }
+    
+    .trust-badge i {
+      font-size: 20px;
+      color: var(--store-accent);
+      margin-bottom: 6px;
+      display: block;
+    }
+    
+    .trust-badge span {
+      font-size: 10px;
+      color: var(--store-muted);
+      display: block;
+    }
+    
+    /* Empty Cart */
+    .empty-cart {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .empty-cart i {
+      font-size: 64px;
+      color: var(--store-border);
+      margin-bottom: 24px;
+    }
+    
+    .empty-cart h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    
+    .empty-cart p {
+      color: var(--store-muted);
+      margin-bottom: 24px;
+    }
+    
+    .shop-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--store-accent);
+      color: white;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+    
+    /* Footer */
+    .store-footer {
+      background: var(--store-text);
+      color: white;
+      padding: 60px 0 24px;
+      margin-top: 60px;
+    }
+    
+    .footer-bottom {
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 13px;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="store-header">
+    <div class="header-main">
+      <div class="container">
+        <a href="homepage.html" class="logo">
+          <span class="logo-icon"><i class="fa fa-bolt"></i></span>
+          NEXUS
+        </a>
+        <div class="header-actions">
+          <a href="#" class="header-link">
+            <i class="fa fa-user"></i> Account
+          </a>
+          <a href="cart.html" class="header-link">
+            <i class="fa fa-shopping-cart"></i> Cart (3)
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Breadcrumb -->
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="homepage.html">Home</a>
+      <span>›</span>
+      Shopping Cart
+    </div>
+  </div>
+  
+  <!-- Cart Page -->
+  <main class="cart-page">
+    <div class="container">
+      <h1 class="page-title">
+        Shopping Cart
+        <span class="cart-count">(3 items)</span>
+      </h1>
+      
+      <div class="cart-grid">
+        <!-- Cart Items -->
+        <div class="cart-items">
+          <div class="cart-header">
+            <div>Product</div>
+            <div>Price</div>
+            <div>Quantity</div>
+            <div>Subtotal</div>
+            <div></div>
+          </div>
+          
+          <!-- Item 1 -->
+          <div class="cart-item">
+            <div class="item-product">
+              <div class="item-image">
+                <i class="fa fa-headphones"></i>
+              </div>
+              <div class="item-details">
+                <h4>Sony WH-1000XM5 Wireless Headphones</h4>
+                <div class="item-variant">Color: Black</div>
+                <div class="item-sku">SKU: SONY-WH1000-BLK</div>
+              </div>
+            </div>
+            <div class="item-price">৳42,990</div>
+            <div class="item-quantity">
+              <button class="qty-btn"><i class="fa fa-minus"></i></button>
+              <span class="qty-value">1</span>
+              <button class="qty-btn"><i class="fa fa-plus"></i></button>
+            </div>
+            <div class="item-subtotal">৳42,990</div>
+            <button class="item-remove"><i class="fa fa-trash"></i></button>
+          </div>
+          
+          <!-- Item 2 -->
+          <div class="cart-item">
+            <div class="item-product">
+              <div class="item-image">
+                <i class="fa fa-keyboard"></i>
+              </div>
+              <div class="item-details">
+                <h4>Keychron K2 Wireless Mechanical Keyboard</h4>
+                <div class="item-variant">Switch: Gateron Red | Layout: US ANSI</div>
+                <div class="item-sku">SKU: KEY-K2-RED-US</div>
+              </div>
+            </div>
+            <div class="item-price">৳8,500</div>
+            <div class="item-quantity">
+              <button class="qty-btn"><i class="fa fa-minus"></i></button>
+              <span class="qty-value">2</span>
+              <button class="qty-btn"><i class="fa fa-plus"></i></button>
+            </div>
+            <div class="item-subtotal">৳17,000</div>
+            <button class="item-remove"><i class="fa fa-trash"></i></button>
+          </div>
+          
+          <!-- Item 3 -->
+          <div class="cart-item">
+            <div class="item-product">
+              <div class="item-image">
+                <i class="fa fa-usb"></i>
+              </div>
+              <div class="item-details">
+                <h4>Anker USB-C Hub 7-in-1</h4>
+                <div class="item-variant">Type: Space Gray</div>
+                <div class="item-sku">SKU: ANK-HUB7-GRY</div>
+              </div>
+            </div>
+            <div class="item-price">৳4,200</div>
+            <div class="item-quantity">
+              <button class="qty-btn"><i class="fa fa-minus"></i></button>
+              <span class="qty-value">1</span>
+              <button class="qty-btn"><i class="fa fa-plus"></i></button>
+            </div>
+            <div class="item-subtotal">৳4,200</div>
+            <button class="item-remove"><i class="fa fa-trash"></i></button>
+          </div>
+          
+          <!-- Cart Actions -->
+          <div class="cart-actions">
+            <a href="homepage.html" class="continue-shopping">
+              <i class="fa fa-arrow-left"></i> Continue Shopping
+            </a>
+            <button class="clear-cart">
+              <i class="fa fa-trash"></i> Clear Cart
+            </button>
+          </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="order-summary">
+          <h2 class="summary-title">Order Summary</h2>
+          
+          <!-- Applied Coupon -->
+          <div class="applied-coupon">
+            <span class="coupon-tag">
+              <i class="fa fa-tag"></i> SAVE10
+            </span>
+            <button class="coupon-remove"><i class="fa fa-times"></i></button>
+          </div>
+          
+          <!-- Summary Rows -->
+          <div class="summary-row">
+            <span class="summary-label">Subtotal (4 items)</span>
+            <span class="summary-value">৳64,190</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Discount (10%)</span>
+            <span class="summary-value discount">-৳6,419</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">VAT (7.5%)</span>
+            <span class="summary-value">৳4,333</span>
+          </div>
+          
+          <!-- Shipping Estimate -->
+          <div class="shipping-estimate">
+            <div class="estimate-title">Shipping Method</div>
+            <div class="estimate-options">
+              <label>
+                <input type="radio" name="shipping" checked>
+                <div class="shipping-info">
+                  <div>
+                    <div class="shipping-name">Standard Delivery</div>
+                    <div class="shipping-time">5-7 business days</div>
+                  </div>
+                  <span class="shipping-price">৳120</span>
+                </div>
+              </label>
+              <label>
+                <input type="radio" name="shipping">
+                <div class="shipping-info">
+                  <div>
+                    <div class="shipping-name">Express Delivery</div>
+                    <div class="shipping-time">1-2 business days</div>
+                  </div>
+                  <span class="shipping-price">৳350</span>
+                </div>
+              </label>
+              <label>
+                <input type="radio" name="shipping">
+                <div class="shipping-info">
+                  <div>
+                    <div class="shipping-name">Inside Dhaka</div>
+                    <div class="shipping-time">Same day delivery</div>
+                  </div>
+                  <span class="shipping-price">৳80</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="summary-row">
+            <span class="summary-label">Shipping</span>
+            <span class="summary-value">৳120</span>
+          </div>
+          
+          <div class="summary-row total">
+            <span>Total</span>
+            <span>৳62,224</span>
+          </div>
+          
+          <!-- Coupon Input -->
+          <div class="coupon-form">
+            <input type="text" class="coupon-input" placeholder="Enter coupon code">
+            <button class="coupon-btn">Apply</button>
+          </div>
+          
+          <!-- Checkout Button -->
+          <button class="checkout-btn" onclick="window.location.href='checkout.html'">
+            <i class="fa fa-lock"></i> Proceed to Checkout
+          </button>
+          
+          <!-- Payment Methods -->
+          <div class="payment-methods">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='28' viewBox='0 0 40 28'%3E%3Crect fill='%23E91E63' width='40' height='28' rx='4'/%3E%3Ctext x='20' y='18' text-anchor='middle' fill='white' font-size='10' font-weight='bold'%3EbKash%3C/text%3E%3C/svg%3E" alt="bKash" class="payment-icon">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='28' viewBox='0 0 40 28'%3E%3Crect fill='%23FF6F00' width='40' height='28' rx='4'/%3E%3Ctext x='20' y='18' text-anchor='middle' fill='white' font-size='10' font-weight='bold'%3ENagad%3C/text%3E%3C/svg%3E" alt="Nagad" class="payment-icon">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='28' viewBox='0 0 40 28'%3E%3Crect fill='%231A1F71' width='40' height='28' rx='4'/%3E%3Ctext x='20' y='18' text-anchor='middle' fill='white' font-size='10' font-weight='bold'%3EVISA%3C/text%3E%3C/svg%3E" alt="Visa" class="payment-icon">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='28' viewBox='0 0 40 28'%3E%3Crect fill='%23EB001B' width='40' height='28' rx='4'/%3E%3Ctext x='20' y='18' text-anchor='middle' fill='white' font-size='10' font-weight='bold'%3EMC%3C/text%3E%3C/svg%3E" alt="Mastercard" class="payment-icon">
+          </div>
+          
+          <!-- Trust Badges -->
+          <div class="trust-badges">
+            <div class="trust-badge">
+              <i class="fa fa-shield-halved"></i>
+              <span>Secure Checkout</span>
+            </div>
+            <div class="trust-badge">
+              <i class="fa fa-rotate-left"></i>
+              <span>7-Day Returns</span>
+            </div>
+            <div class="trust-badge">
+              <i class="fa fa-truck"></i>
+              <span>Free Shipping 5K+</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="store-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        © 2026 NEXUS Store. All rights reserved.
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

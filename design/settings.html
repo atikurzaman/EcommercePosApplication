@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — NEXUS Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/nexus-design-system.css">
+  <style>
+    .settings-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px;
+      background: var(--nx-bg-secondary);
+      border-radius: var(--nx-radius-lg);
+      border: 1px solid var(--nx-border-subtle);
+      min-width: 220px;
+    }
+    
+    .settings-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--nx-radius-md);
+      color: var(--nx-text-secondary);
+      cursor: pointer;
+      transition: all var(--nx-transition-fast);
+    }
+    
+    .settings-nav-item:hover {
+      background: var(--nx-bg-tertiary);
+      color: var(--nx-text-primary);
+    }
+    
+    .settings-nav-item.active {
+      background: var(--nx-accent-bg);
+      color: var(--nx-accent-primary);
+    }
+    
+    .settings-nav-item i {
+      width: 18px;
+      text-align: center;
+    }
+    
+    .settings-content {
+      flex: 1;
+    }
+    
+    .settings-section {
+      margin-bottom: 32px;
+    }
+    
+    .settings-section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--nx-text-primary);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--nx-border-subtle);
+    }
+    
+    .settings-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--nx-border-subtle);
+    }
+    
+    .settings-row:last-child {
+      border-bottom: none;
+    }
+    
+    .settings-label {
+      flex: 1;
+    }
+    
+    .settings-label h4 {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--nx-text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .settings-label p {
+      font-size: 12px;
+      color: var(--nx-text-secondary);
+    }
+    
+    .settings-control {
+      width: 280px;
+      flex-shrink: 0;
+    }
+    
+    /* Toggle Switch */
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: var(--nx-bg-tertiary);
+      border-radius: 12px;
+      transition: var(--nx-transition-fast);
+    }
+    
+    .toggle-slider:before {
+      content: '';
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: var(--nx-transition-fast);
+    }
+    
+    input:checked + .toggle-slider {
+      background: var(--nx-accent-primary);
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+    
+    /* Payment Method Cards */
+    .payment-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .payment-method {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-lg);
+      border: 1px solid var(--nx-border-subtle);
+    }
+    
+    .payment-method-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--nx-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+    }
+    
+    .payment-method-icon.bkash { background: #e2136e; color: white; }
+    .payment-method-icon.nagad { background: #f5721b; color: white; }
+    .payment-method-icon.card { background: #1a1f71; color: white; }
+    .payment-method-icon.cod { background: var(--nx-success); color: white; }
+    
+    .payment-method-info {
+      flex: 1;
+    }
+    
+    .payment-method-info h5 {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--nx-text-primary);
+    }
+    
+    .payment-method-info span {
+      font-size: 11px;
+      color: var(--nx-text-secondary);
+    }
+    
+    /* Store Info Grid */
+    .store-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .store-info-grid .nx-form-group.full {
+      grid-column: 1 / -1;
+    }
+    
+    /* Currency Display */
+    .currency-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-md);
+      margin-top: 12px;
+    }
+    
+    .currency-preview .sample {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--nx-text-primary);
+    }
+    
+    .currency-preview .label {
+      font-size: 11px;
+      color: var(--nx-text-secondary);
+    }
+    
+    /* Tax Settings */
+    .tax-rates-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .tax-rates-table th,
+    .tax-rates-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--nx-border-subtle);
+    }
+    
+    .tax-rates-table th {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--nx-text-secondary);
+    }
+    
+    .tax-rates-table td {
+      font-size: 13px;
+    }
+    
+    /* Email Template Card */
+    .email-template {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--nx-bg-tertiary);
+      border-radius: var(--nx-radius-lg);
+      border: 1px solid var(--nx-border-subtle);
+      margin-bottom: 12px;
+    }
+    
+    .email-template-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--nx-accent-bg);
+      border-radius: var(--nx-radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--nx-accent-primary);
+    }
+    
+    .email-template-info {
+      flex: 1;
+    }
+    
+    .email-template-info h5 {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--nx-text-primary);
+      margin-bottom: 2px;
+    }
+    
+    .email-template-info span {
+      font-size: 11px;
+      color: var(--nx-text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="nx-shell">
+    <!-- Sidebar -->
+    <aside class="nx-sidebar">
+      <div class="nx-sidebar-header">
+        <div class="nx-logo">
+          <div class="nx-logo-icon">
+            <i class="fa fa-bolt"></i>
+          </div>
+          <span class="nx-logo-text">NEXUS</span>
+        </div>
+      </div>
+      
+      <nav class="nx-sidebar-nav">
+        <a href="dashboard.html" class="nx-nav-item">
+          <i class="fa fa-grid-2"></i>
+          <span>Dashboard</span>
+        </a>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-title">Catalog</div>
+          <a href="products.html" class="nx-nav-item">
+            <i class="fa fa-box"></i>
+            <span>Products</span>
+          </a>
+          <a href="categories.html" class="nx-nav-item">
+            <i class="fa fa-folder-tree"></i>
+            <span>Categories</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-tags"></i>
+            <span>Brands</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-sliders"></i>
+            <span>Attributes</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-title">Sales</div>
+          <a href="orders.html" class="nx-nav-item">
+            <i class="fa fa-shopping-bag"></i>
+            <span>Orders</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-truck"></i>
+            <span>Shipments</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-rotate-left"></i>
+            <span>Returns</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-title">POS</div>
+          <a href="../pos/terminal.html" class="nx-nav-item">
+            <i class="fa fa-cash-register"></i>
+            <span>Terminal</span>
+          </a>
+          <a href="#" class="nx-nav-item">
+            <i class="fa fa-clock-rotate-left"></i>
+            <span>Shifts</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-title">Inventory</div>
+          <a href="inventory.html" class="nx-nav-item">
+            <i class="fa fa-warehouse"></i>
+            <span>Stock</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-title">Customers</div>
+          <a href="customers.html" class="nx-nav-item">
+            <i class="fa fa-users"></i>
+            <span>Customers</span>
+          </a>
+        </div>
+        
+        <div class="nx-nav-group">
+          <div class="nx-nav-group-title">System</div>
+          <a href="settings.html" class="nx-nav-item active">
+            <i class="fa fa-gear"></i>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="nx-main">
+      <!-- Topbar -->
+      <header class="nx-topbar">
+        <div class="nx-topbar-left">
+          <button class="nx-btn nx-btn-icon nx-btn-ghost nx-sidebar-toggle">
+            <i class="fa fa-bars"></i>
+          </button>
+          <nav class="nx-breadcrumb">
+            <a href="dashboard.html">Home</a>
+            <i class="fa fa-chevron-right"></i>
+            <span>Settings</span>
+          </nav>
+        </div>
+        
+        <div class="nx-topbar-right">
+          <button class="nx-btn nx-btn-icon nx-btn-ghost">
+            <i class="fa fa-bell"></i>
+          </button>
+          <div class="nx-avatar">
+            <span>JD</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Page Content -->
+      <div class="nx-content">
+        <!-- Page Header -->
+        <div class="nx-page-header">
+          <div>
+            <h1 class="nx-page-title">Settings</h1>
+            <p class="nx-page-subtitle">Manage your store configuration</p>
+          </div>
+        </div>
+        
+        <!-- Settings Layout -->
+        <div style="display: flex; gap: 24px;">
+          <!-- Settings Navigation -->
+          <div class="settings-nav">
+            <div class="settings-nav-item active">
+              <i class="fa fa-store"></i>
+              <span>Store Info</span>
+            </div>
+            <div class="settings-nav-item">
+              <i class="fa fa-credit-card"></i>
+              <span>Payments</span>
+            </div>
+            <div class="settings-nav-item">
+              <i class="fa fa-truck"></i>
+              <span>Shipping</span>
+            </div>
+            <div class="settings-nav-item">
+              <i class="fa fa-percent"></i>
+              <span>Taxes</span>
+            </div>
+            <div class="settings-nav-item">
+              <i class="fa fa-money-bill"></i>
+              <span>Currency</span>
+            </div>
+            <div class="settings-nav-item">
+              <i class="fa fa-envelope"></i>
+              <span>Notifications</span>
+            </div>
+            <div class="settings-nav-item">
+              <i class="fa fa-cash-register"></i>
+              <span>POS Settings</span>
+            </div>
+            <div class="settings-nav-item">
+              <i class="fa fa-star"></i>
+              <span>Loyalty Program</span>
+            </div>
+            <div class="settings-nav-item">
+              <i class="fa fa-shield-halved"></i>
+              <span>Security</span>
+            </div>
+          </div>
+          
+          <!-- Settings Content -->
+          <div class="settings-content">
+            <!-- Store Information -->
+            <div class="nx-card">
+              <div class="nx-card-header">
+                <span class="nx-card-title">
+                  <i class="fa fa-store" style="margin-right: 8px; color: var(--nx-accent-primary);"></i>
+                  Store Information
+                </span>
+              </div>
+              <div class="nx-card-body">
+                <div class="store-info-grid">
+                  <div class="nx-form-group full">
+                    <label class="nx-form-label required">Store Name</label>
+                    <input type="text" class="nx-input" value="NEXUS Electronics">
+                  </div>
+                  <div class="nx-form-group">
+                    <label class="nx-form-label required">Phone</label>
+                    <input type="text" class="nx-input" value="+880 1712-345678">
+                  </div>
+                  <div class="nx-form-group">
+                    <label class="nx-form-label required">Email</label>
+                    <input type="email" class="nx-input" value="contact@nexus.com.bd">
+                  </div>
+                  <div class="nx-form-group full">
+                    <label class="nx-form-label">Address</label>
+                    <textarea class="nx-input nx-textarea" rows="2">House 45, Road 12, Block F, Banani, Dhaka 1213</textarea>
+                  </div>
+                  <div class="nx-form-group">
+                    <label class="nx-form-label">Trade License</label>
+                    <input type="text" class="nx-input" value="TRAD-2024-DHK-00123">
+                  </div>
+                  <div class="nx-form-group">
+                    <label class="nx-form-label">TIN Number</label>
+                    <input type="text" class="nx-input" value="987654321098">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Payment Methods -->
+            <div class="nx-card" style="margin-top: 24px;">
+              <div class="nx-card-header">
+                <span class="nx-card-title">
+                  <i class="fa fa-credit-card" style="margin-right: 8px; color: var(--nx-accent-primary);"></i>
+                  Payment Methods
+                </span>
+                <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                  <i class="fa fa-plus"></i> Add Method
+                </button>
+              </div>
+              <div class="nx-card-body">
+                <div class="payment-methods">
+                  <!-- bKash -->
+                  <div class="payment-method">
+                    <div class="payment-method-icon bkash">bK</div>
+                    <div class="payment-method-info">
+                      <h5>bKash</h5>
+                      <span>Merchant: 01712345678</span>
+                    </div>
+                    <span class="nx-badge nx-badge-success">Active</span>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                      <i class="fa fa-gear"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- Nagad -->
+                  <div class="payment-method">
+                    <div class="payment-method-icon nagad">N</div>
+                    <div class="payment-method-info">
+                      <h5>Nagad</h5>
+                      <span>Merchant: 01898765432</span>
+                    </div>
+                    <span class="nx-badge nx-badge-success">Active</span>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                      <i class="fa fa-gear"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- Card -->
+                  <div class="payment-method">
+                    <div class="payment-method-icon card"><i class="fa fa-credit-card"></i></div>
+                    <div class="payment-method-info">
+                      <h5>Card (Visa/Mastercard)</h5>
+                      <span>Gateway: SSLCommerz</span>
+                    </div>
+                    <span class="nx-badge nx-badge-success">Active</span>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                      <i class="fa fa-gear"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- COD -->
+                  <div class="payment-method">
+                    <div class="payment-method-icon cod"><i class="fa fa-money-bill"></i></div>
+                    <div class="payment-method-info">
+                      <h5>Cash on Delivery</h5>
+                      <span>Max order: ৳50,000</span>
+                    </div>
+                    <span class="nx-badge nx-badge-success">Active</span>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">
+                      <i class="fa fa-gear"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tax Settings -->
+            <div class="nx-card" style="margin-top: 24px;">
+              <div class="nx-card-header">
+                <span class="nx-card-title">
+                  <i class="fa fa-percent" style="margin-right: 8px; color: var(--nx-accent-primary);"></i>
+                  Tax Configuration
+                </span>
+                <button class="nx-btn nx-btn-sm nx-btn-secondary">
+                  <i class="fa fa-plus"></i> Add Tax Rate
+                </button>
+              </div>
+              <div class="nx-card-body">
+                <div class="settings-row">
+                  <div class="settings-label">
+                    <h4>Prices include tax</h4>
+                    <p>Product prices are entered with tax already included</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                
+                <table class="tax-rates-table" style="margin-top: 16px;">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Rate</th>
+                      <th>Applies To</th>
+                      <th>Status</th>
+                      <th style="width: 80px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>VAT</td>
+                      <td>15%</td>
+                      <td>All Products</td>
+                      <td><span class="nx-badge nx-badge-success">Active</span></td>
+                      <td>
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-trash"></i></button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Supplementary Duty</td>
+                      <td>20%</td>
+                      <td>Electronics</td>
+                      <td><span class="nx-badge nx-badge-success">Active</span></td>
+                      <td>
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-edit"></i></button>
+                        <button class="nx-btn nx-btn-icon nx-btn-sm nx-btn-ghost"><i class="fa fa-trash"></i></button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- Notification Settings -->
+            <div class="nx-card" style="margin-top: 24px;">
+              <div class="nx-card-header">
+                <span class="nx-card-title">
+                  <i class="fa fa-envelope" style="margin-right: 8px; color: var(--nx-accent-primary);"></i>
+                  Email Notifications
+                </span>
+              </div>
+              <div class="nx-card-body">
+                <div class="settings-section">
+                  <div class="settings-section-title">Customer Notifications</div>
+                  
+                  <div class="settings-row">
+                    <div class="settings-label">
+                      <h4>Order Confirmation</h4>
+                      <p>Send email when order is placed</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  
+                  <div class="settings-row">
+                    <div class="settings-label">
+                      <h4>Shipment Update</h4>
+                      <p>Send email when order ships</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  
+                  <div class="settings-row">
+                    <div class="settings-label">
+                      <h4>Delivery Confirmation</h4>
+                      <p>Send email when order is delivered</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+                
+                <div class="settings-section">
+                  <div class="settings-section-title">Admin Notifications</div>
+                  
+                  <div class="settings-row">
+                    <div class="settings-label">
+                      <h4>New Order Alert</h4>
+                      <p>Receive email for new orders</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  
+                  <div class="settings-row">
+                    <div class="settings-label">
+                      <h4>Low Stock Alert</h4>
+                      <p>Alert when stock falls below threshold</p>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked>
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+                
+                <!-- Email Templates -->
+                <div class="settings-section">
+                  <div class="settings-section-title">Email Templates</div>
+                  
+                  <div class="email-template">
+                    <div class="email-template-icon">
+                      <i class="fa fa-check"></i>
+                    </div>
+                    <div class="email-template-info">
+                      <h5>Order Confirmation</h5>
+                      <span>Sent when order is placed</span>
+                    </div>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">Preview</button>
+                    <button class="nx-btn nx-btn-sm nx-btn-secondary">Edit</button>
+                  </div>
+                  
+                  <div class="email-template">
+                    <div class="email-template-icon">
+                      <i class="fa fa-truck"></i>
+                    </div>
+                    <div class="email-template-info">
+                      <h5>Shipping Notification</h5>
+                      <span>Sent when order ships</span>
+                    </div>
+                    <button class="nx-btn nx-btn-sm nx-btn-ghost">Preview</button>
+                    <button class="nx-btn nx-btn-sm nx-btn-secondary">Edit</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- POS Settings -->
+            <div class="nx-card" style="margin-top: 24px;">
+              <div class="nx-card-header">
+                <span class="nx-card-title">
+                  <i class="fa fa-cash-register" style="margin-right: 8px; color: var(--nx-accent-primary);"></i>
+                  POS Configuration
+                </span>
+              </div>
+              <div class="nx-card-body">
+                <div class="settings-row">
+                  <div class="settings-label">
+                    <h4>Require Customer</h4>
+                    <p>Require customer selection for each sale</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                
+                <div class="settings-row">
+                  <div class="settings-label">
+                    <h4>Auto-print Receipt</h4>
+                    <p>Automatically print receipt after sale</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                
+                <div class="settings-row">
+                  <div class="settings-label">
+                    <h4>Open Cash Drawer</h4>
+                    <p>Open cash drawer on cash payment</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                
+                <div class="settings-row">
+                  <div class="settings-label">
+                    <h4>Default Counter</h4>
+                    <p>Select the default POS counter</p>
+                  </div>
+                  <div class="settings-control">
+                    <select class="nx-input nx-select">
+                      <option>Counter 1 - Main</option>
+                      <option>Counter 2 - Electronics</option>
+                      <option>Counter 3 - Checkout</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="settings-row">
+                  <div class="settings-label">
+                    <h4>Receipt Printer</h4>
+                    <p>Connected thermal printer</p>
+                  </div>
+                  <div class="settings-control">
+                    <select class="nx-input nx-select">
+                      <option>Epson TM-T88VI</option>
+                      <option>Star TSP143III</option>
+                      <option>None (PDF)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Loyalty Program -->
+            <div class="nx-card" style="margin-top: 24px;">
+              <div class="nx-card-header">
+                <span class="nx-card-title">
+                  <i class="fa fa-star" style="margin-right: 8px; color: var(--nx-warning);"></i>
+                  Loyalty Program
+                </span>
+              </div>
+              <div class="nx-card-body">
+                <div class="settings-row">
+                  <div class="settings-label">
+                    <h4>Enable Loyalty Program</h4>
+                    <p>Allow customers to earn and redeem points</p>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                
+                <div class="settings-row">
+                  <div class="settings-label">
+                    <h4>Points per ৳100 spent</h4>
+                    <p>Base points earned per 100 BDT</p>
+                  </div>
+                  <div class="settings-control">
+                    <input type="number" class="nx-input" value="1" style="width: 100px;">
+                  </div>
+                </div>
+                
+                <div class="settings-row">
+                  <div class="settings-label">
+                    <h4>Point Value</h4>
+                    <p>BDT value per loyalty point</p>
+                  </div>
+                  <div class="settings-control">
+                    <input type="number" class="nx-input" value="0.50" style="width: 100px;">
+                    <span style="color: var(--nx-text-secondary); font-size: 12px; margin-left: 8px;">৳ per point</span>
+                  </div>
+                </div>
+                
+                <div class="settings-row">
+                  <div class="settings-label">
+                    <h4>Minimum Redemption</h4>
+                    <p>Minimum points required to redeem</p>
+                  </div>
+                  <div class="settings-control">
+                    <input type="number" class="nx-input" value="100" style="width: 100px;">
+                    <span style="color: var(--nx-text-secondary); font-size: 12px; margin-left: 8px;">points</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Save Actions -->
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-bottom: 40px;">
+              <button class="nx-btn nx-btn-secondary">Cancel</button>
+              <button class="nx-btn nx-btn-primary">
+                <i class="fa fa-save"></i> Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

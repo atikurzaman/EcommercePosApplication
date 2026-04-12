@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Application.Features.Customer.Commands;
-using EcommercePos.Application.Features.Customer.Queries;
+using EcommercePos.Application.Features.Customer;
 using EcommercePos.Persistence.Data;
 
 namespace EcommercePos.Tests.Customer;
@@ -87,22 +86,22 @@ public class CreateCustomerTests : IDisposable
     public async Task Handle_ValidRequest_CreatesCustomer()
     {
         var handler = new CreateCustomer.Handler(_context);
-        var command = new CreateCustomer.Command("CUS-001", "Retail", "+8801711000000", null, "john@example.com", null, "Male", "John Doe", null, "Dhaka", null, "Bangladesh", 0, null, true);
+        var command = new CreateCustomer.Command("+8801711000000", "Retail", null, "john@example.com", null, "Male", "John Doe", null, "Dhaka", null, "Bangladesh", null);
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        Assert.Equal("John Doe", result.Value!.CompanyName);
+        Assert.Equal("+8801711000000", result.Value!.Phone);
     }
 
     [Fact]
-    public async Task Handle_DuplicateCustomerCode_ReturnsConflict()
+    public async Task Handle_DuplicatePhone_ReturnsConflict()
     {
-        _context.Customers.Add(new Customers { Id = Guid.NewGuid(), CustomerCode = "CUS-001", CompanyName = "Existing", Country = "Bangladesh", CustomerType = "Retail", IsDeleted = false });
+        _context.Customers.Add(new Customers { Id = Guid.NewGuid(), CustomerCode = "CUS-001", CompanyName = "Existing", Phone = "+8801711000000", Country = "Bangladesh", CustomerType = "Retail", IsDeleted = false });
         await _context.SaveChangesAsync();
 
         var handler = new CreateCustomer.Handler(_context);
-        var command = new CreateCustomer.Command("CUS-001", "Retail", "+8801711000000", null, "john@example.com", null, "Male", "John Doe", null, "Dhaka", null, "Bangladesh", 0, null, true);
+        var command = new CreateCustomer.Command("+8801711000000", "Retail", null, "john@example.com", null, "Male", "John Doe", null, "Dhaka", null, "Bangladesh", null);
         var result = await handler.Handle(command, CancellationToken.None);
 
         Assert.False(result.IsSuccess);
