@@ -1,0 +1,11 @@
+﻿src/pages/customer/Account.tsx(33,23): error TS2551: Property 'role' does not exist on type 'User'. Did you mean 'roles'?
+src/pages/customer/Account.tsx(43,19): error TS2339: Property 'phone' does not exist on type 'User'.
+src/pages/customer/Account.tsx(46,29): error TS2339: Property 'phone' does not exist on type 'User'.
+src/pages/customer/Account.tsx(49,19): error TS2339: Property 'address' does not exist on type 'User'.
+src/pages/customer/Account.tsx(52,29): error TS2339: Property 'address' does not exist on type 'User'.
+src/test/pages/Login.test.tsx(13,5): error TS2698: Spread types may only be created from object types.
+src/test/pages/Login.test.tsx(15,10): error TS18046: 'actual' is of type 'unknown'.
+src/test/pages/Wishlist.test.tsx(13,5): error TS2698: Spread types may only be created from object types.
+src/test/pages/Wishlist.test.tsx(15,10): error TS18046: 'actual' is of type 'unknown'.
+src/test/services/productService.test.ts(64,57): error TS2345: Argument of type '{ name: string; price: number; categoryId: number; }' is not assignable to parameter of type 'CreateProductRequest'.
+  Type '{ name: string; price: number; categoryId: number; }' is missing the following properties from type 'CreateProductRequest': costPrice, isFeatured, isBestSeller, isNewArrival, and 3 more.

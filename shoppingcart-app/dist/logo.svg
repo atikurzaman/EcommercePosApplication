@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 49" fill="none">
+  <rect width="144" height="49" rx="8" fill="white"/>
+  <path d="M12 24V14L20 24V14L28 24" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M36 14H44C47.3137 14 50 16.6863 50 20C50 23.3137 47.3137 26 44 26H36V14Z" fill="#3B82F6"/>
+  <circle cx="40" cy="33" r="5" fill="#3B82F6"/>
+  <path d="M50 26H58L66 14H74L82 26H90L82 14L74 26L82 38L74 26H66L58 38L50 26H58" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="50" cy="38" r="5" fill="#3B82F6"/>
+  <circle cx="66" cy="33" r="5" fill="#3B82F6"/>
+  <circle cx="82" cy="38" r="5" fill="#3B82F6"/>
+  <circle cx="98" cy="33" r="5" fill="#3B82F6"/>
+  <path d="M98 14H106V38H98V14Z" fill="#3B82F6"/>
+  <text x="112" y="28" font-family="Arial" font-size="14" font-weight="bold" fill="#1F2937">Shop</text>
+  <text x="112" y="42" font-family="Arial" font-size="10" fill="#6B7280">Cart</text>
+</svg>
