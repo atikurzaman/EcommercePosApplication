@@ -1,0 +1,17 @@
+{
+  "name": "ecommercepos-selenium-tests",
+  "version": "1.0.0",
+  "description": "Selenium E2E tests for EcommercePos AdminPortal",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "test:auth": "node tests/auth.test.js",
+    "test:catalog": "node tests/catalog.test.js",
+    "test:rbac": "node tests/rbac.test.js",
+    "test:customers": "node tests/customers.test.js",
+    "test:pos": "node tests/pos.test.js",
+    "test:lookups": "node tests/lookups.test.js"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.27.0"
+  }
+}
