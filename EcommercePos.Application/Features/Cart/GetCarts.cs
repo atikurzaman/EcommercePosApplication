@@ -1,23 +1,48 @@
-using EcommercePos.Application.Services;
+using Microsoft.EntityFrameworkCore;
 using EcommercePos.Persistence.Data;
 using EcommercePos.Shared.Common;
-using MediatR;
 
 namespace EcommercePos.Application.Features.Cart;
 
-public record GetCartsQuery : IRequest<Result<List<Carts>>>;
-
-public class GetCartsHandler : IRequestHandler<GetCartsQuery, Result<List<Carts>>>
+public static class GetCarts
 {
-    private readonly ICartService _cartService;
+    public sealed record Query(int PageIndex = 0, int PageSize = 10, Guid? CustomerId = null, Guid? UserId = null);
 
-    public GetCartsHandler(ICartService cartService)
-    {
-        _cartService = cartService;
-    }
+    public sealed record Response(
+        Guid Id, Guid? CustomerId, Guid? UserId, string? SessionId,
+        decimal SubTotal, decimal DiscountAmount, decimal Total,
+        string? CouponCode, int ItemCount, DateTime CreatedAt);
 
-    public async Task<Result<List<Carts>>> Handle(GetCartsQuery request, CancellationToken ct)
+    public sealed class Handler
     {
-        return await _cartService.GetCartsAsync(ct);
+        private readonly ApplicationDbContext _context;
+        public Handler(ApplicationDbContext context) => _context = context;
+
+        public async Task<Result<PagedResult<Response>>> Handle(Query query, CancellationToken ct)
+        {
+            var dbQuery = _context.Carts.Where(c => !c.IsDeleted).AsNoTracking();
+
+            if (query.CustomerId.HasValue)
+                dbQuery = dbQuery.Where(c => c.CustomerId == query.CustomerId);
+
+            if (query.UserId.HasValue)
+                dbQuery = dbQuery.Where(c => c.UserId == query.UserId);
+
+            var totalCount = await dbQuery.CountAsync(ct);
+            var items = await dbQuery
+                .OrderByDescending(c => c.CreatedAt)
+                .Skip(query.PageIndex * query.PageSize)
+                .Take(query.PageSize)
+                .Select(c => new Response(
+                    c.Id, c.CustomerId, c.UserId, c.SessionId,
+                    c.SubTotal, c.DiscountAmount, c.Total,
+                    c.CouponCode,
+                    c.CartItems.Count(i => !i.IsDeleted),
+                    c.CreatedAt))
+                .ToListAsync(ct);
+
+            return Result<PagedResult<Response>>.Success(
+                new PagedResult<Response>(items, totalCount, query.PageIndex, query.PageSize));
+        }
     }
 }

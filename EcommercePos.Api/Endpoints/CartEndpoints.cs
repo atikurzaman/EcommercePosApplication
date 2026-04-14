@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using EcommercePos.Application.Features.Cart;
 using EcommercePos.Api.Extensions;
-using EcommercePos.Shared.Common;
-using MediatR;
 
 namespace EcommercePos.Api.Endpoints;
 
@@ -10,62 +8,63 @@ public static class CartEndpoints
 {
     public static void MapCartEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/carts").WithTags("Cart");
+        var group = app.MapGroup("/api/carts").WithTags("Carts");
 
         group.MapGet("/", async (
-            [FromServices] IMediator mediator,
+            [AsParameters] GetCarts.Query query,
+            GetCarts.Handler handler,
             CancellationToken ct) =>
-            (await mediator.Send(new GetCartsQuery(), ct)).ToHttpResult())
-        .WithName("GetCarts")
-        .WithSummary("Get all carts");
+            (await handler.Handle(query, ct)).ToPagedResult())
+            .WithName("GetCarts")
+            .WithSummary("Get paginated carts");
 
         group.MapGet("/{id:guid}", async (
             Guid id,
-            [FromServices] IMediator mediator,
+            GetCartById.Handler handler,
             CancellationToken ct) =>
-            (await mediator.Send(new GetCartByIdQuery(id), ct)).ToHttpResult())
-        .WithName("GetCartById")
-        .WithSummary("Get cart by id");
+            (await handler.Handle(new GetCartById.Query(id), ct)).ToHttpResult())
+            .WithName("GetCartById")
+            .WithSummary("Get cart by id");
 
         group.MapPost("/", async (
-            [FromBody] CreateCartCommand command,
-            [FromServices] IMediator mediator,
+            [FromBody] CreateCart.Command command,
+            CreateCart.Handler handler,
             CancellationToken ct) =>
-            (await mediator.Send(command, ct)).ToCreatedResult("/api/carts"))
-        .WithName("CreateCart")
-        .WithSummary("Create a new cart");
+            (await handler.Handle(command, ct)).ToCreatedResult("/api/carts"))
+            .WithName("CreateCart")
+            .WithSummary("Create a new cart");
 
         group.MapPost("/items", async (
-            [FromBody] AddCartItemCommand command,
-            [FromServices] IMediator mediator,
+            [FromBody] AddCartItem.Command command,
+            AddCartItem.Handler handler,
             CancellationToken ct) =>
-            (await mediator.Send(command, ct)).ToHttpResult())
-        .WithName("AddCartItem")
-        .WithSummary("Add item to cart");
+            (await handler.Handle(command, ct)).ToCreatedResult("/api/carts/items"))
+            .WithName("AddCartItem")
+            .WithSummary("Add item to cart");
 
         group.MapPut("/items/{itemId:guid}", async (
             Guid itemId,
-            [FromBody] decimal quantity,
-            [FromServices] IMediator mediator,
+            [FromBody] UpdateCartItem.Command body,
+            UpdateCartItem.Handler handler,
             CancellationToken ct) =>
-            (await mediator.Send(new UpdateCartItemCommand(itemId, quantity), ct)).ToHttpResult())
-        .WithName("UpdateCartItem")
-        .WithSummary("Update cart item quantity");
+            (await handler.Handle(body with { ItemId = itemId }, ct)).ToHttpResult())
+            .WithName("UpdateCartItem")
+            .WithSummary("Update cart item quantity");
 
         group.MapDelete("/items/{itemId:guid}", async (
             Guid itemId,
-            [FromServices] IMediator mediator,
+            RemoveCartItem.Handler handler,
             CancellationToken ct) =>
-            (await mediator.Send(new RemoveCartItemCommand(itemId), ct)).ToNoContentResult())
-        .WithName("RemoveCartItem")
-        .WithSummary("Remove item from cart");
+            (await handler.Handle(new RemoveCartItem.Command(itemId), ct)).ToNoContentResult())
+            .WithName("RemoveCartItem")
+            .WithSummary("Remove item from cart");
 
         group.MapPost("/apply-coupon", async (
-            [FromBody] ApplyCouponCommand command,
-            [FromServices] IMediator mediator,
+            [FromBody] ApplyCoupon.Command command,
+            ApplyCoupon.Handler handler,
             CancellationToken ct) =>
-            (await mediator.Send(command, ct)).ToHttpResult())
-        .WithName("ApplyCoupon")
-        .WithSummary("Apply coupon to cart");
+            (await handler.Handle(command, ct)).ToHttpResult())
+            .WithName("ApplyCoupon")
+            .WithSummary("Apply coupon to cart");
     }
 }

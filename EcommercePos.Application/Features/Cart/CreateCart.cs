@@ -1,28 +1,53 @@
-using EcommercePos.Application.Services;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using EcommercePos.Persistence.Data;
 using EcommercePos.Shared.Common;
-using MediatR;
 
 namespace EcommercePos.Application.Features.Cart;
 
-public record CreateCartCommand(Guid? CustomerId, Guid? UserId, string? SessionId) 
-    : IRequest<Result<Carts>>;
-
-public class CreateCartHandler : IRequestHandler<CreateCartCommand, Result<Carts>>
+public static class CreateCart
 {
-    private readonly ICartService _cartService;
+    public sealed record Command(Guid? CustomerId, Guid? UserId, string? SessionId);
 
-    public CreateCartHandler(ICartService cartService)
+    public sealed record Response(
+        Guid Id, Guid? CustomerId, Guid? UserId, string? SessionId,
+        decimal SubTotal, decimal DiscountAmount, decimal Total);
+
+    public sealed class Validator : AbstractValidator<Command>
     {
-        _cartService = cartService;
+        public Validator()
+        {
+            RuleFor(x => x).Must(c => c.CustomerId.HasValue || c.UserId.HasValue || !string.IsNullOrWhiteSpace(c.SessionId))
+                .WithMessage("At least one of CustomerId, UserId, or SessionId must be provided.");
+        }
     }
 
-    public async Task<Result<Carts>> Handle(CreateCartCommand request, CancellationToken ct)
+    public sealed class Handler
     {
-        return await _cartService.CreateCartAsync(
-            request.CustomerId,
-            request.UserId,
-            request.SessionId ?? Guid.NewGuid().ToString(),
-            ct);
+        private readonly ApplicationDbContext _context;
+        public Handler(ApplicationDbContext context) => _context = context;
+
+        public async Task<Result<Response>> Handle(Command command, CancellationToken ct)
+        {
+            var cart = new Carts
+            {
+                Id = Guid.NewGuid(),
+                CustomerId = command.CustomerId,
+                UserId = command.UserId,
+                SessionId = command.SessionId ?? Guid.NewGuid().ToString(),
+                SubTotal = 0m,
+                DiscountAmount = 0m,
+                Total = 0m,
+                CreatedAt = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
+            _context.Carts.Add(cart);
+            await _context.SaveChangesAsync(ct);
+
+            return Result<Response>.Success(new Response(
+                cart.Id, cart.CustomerId, cart.UserId, cart.SessionId,
+                cart.SubTotal, cart.DiscountAmount, cart.Total));
+        }
     }
 }

@@ -12,6 +12,7 @@ using EcommercePos.Shared.Cryptography;
 using EcommercePos.Persistence.Interceptors;
 using EcommercePos.Api.Authorization;
 using EcommercePos.Api.Endpoints;
+using EcommercePos.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using StackExchange.Redis;
@@ -122,7 +123,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapCashShiftEndpoints();
-app.MapCashDrawerEventEndpoints();
+app.MapAllEndpoints();
 
 app.Run();
