@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Domain.Entities;
+using EcommercePos.Application.Common;
 using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Application.Features.Lookup;
@@ -23,8 +24,8 @@ public static class UpdateCurrency
 
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
 
         public async Task<Result<GetCurrencyByCode.Response>> Handle(Command command, CancellationToken ct)
         {

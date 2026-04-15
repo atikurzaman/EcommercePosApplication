@@ -4,7 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Domain.Entities;
+using EcommercePos.Application.Common;
 using EcommercePos.Shared.Common;
 using EcommercePos.Shared.Cryptography;
 using Microsoft.Extensions.Configuration;
@@ -20,11 +21,11 @@ public static class LoginUser
     public sealed class Validator : AbstractValidator<Request> { public Validator() { RuleFor(x => x.Email).NotEmpty().EmailAddress(); RuleFor(x => x.Password).NotEmpty(); } }
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly IPasswordService _passwordService;
 
-        public Handler(ApplicationDbContext context, IConfiguration configuration, IPasswordService passwordService)
+        public Handler(IApplicationDbContext context, IConfiguration configuration, IPasswordService passwordService)
         {
             _context = context;
             _configuration = configuration;

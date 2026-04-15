@@ -2,7 +2,6 @@
   <Project Path="EcommercePos.Api/EcommercePos.Api.csproj" />
   <Project Path="EcommercePos.Application/EcommercePos.Application.csproj" />
   <Project Path="EcommercePos.Domain/EcommercePos.Domain.csproj" />
-  <Project Path="EcommercePos.Infrastructure/EcommercePos.Infrastructure.csproj" />
   <Project Path="EcommercePos.Persistence/EcommercePos.Persistence.csproj" />
   <Project Path="EcommercePos.Portal/ecommercepos.portal.esproj">
     <Build />

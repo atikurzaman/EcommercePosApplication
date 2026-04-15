@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Domain.Entities;
+using EcommercePos.Application.Common;
 using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Application.Features.Pos;
@@ -66,9 +67,9 @@ public static class GetPosTransactionById
 
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
 
-        public Handler(ApplicationDbContext context)
+        public Handler(IApplicationDbContext context)
         {
             _context = context;
         }

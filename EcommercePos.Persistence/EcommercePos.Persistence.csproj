@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\EcommercePos.Domain\EcommercePos.Domain.csproj" />
     <ProjectReference Include="..\EcommercePos.Shared\EcommercePos.Shared.csproj" />
+    <ProjectReference Include="..\EcommercePos.Application\EcommercePos.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

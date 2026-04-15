@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Domain.Entities;
+using EcommercePos.Application.Common;
 using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Application.Features.Order;
@@ -23,8 +24,8 @@ public static class GetOrders
 
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
 
         public async Task<Result<PagedResult<Response>>> Handle(Query query, CancellationToken ct)
         {
@@ -102,8 +103,8 @@ public static class GetOrderById
 
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
 
         public async Task<Result<Response>> Handle(Query query, CancellationToken ct)
         {
@@ -161,8 +162,8 @@ public static class UpdateOrderStatusById
 
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
 
         public async Task<Result<Response>> Handle(Command command, CancellationToken ct)
         {
@@ -194,8 +195,8 @@ public static class CancelOrder
 
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
 
         public async Task<Result<Response>> Handle(Command command, CancellationToken ct)
         {
@@ -266,8 +267,8 @@ public static class GetOrderStats
 
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
 
         public async Task<Result<Response>> Handle(CancellationToken ct)
         {

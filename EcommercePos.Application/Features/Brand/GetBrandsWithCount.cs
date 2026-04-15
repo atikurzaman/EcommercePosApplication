@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Domain.Entities;
+using EcommercePos.Application.Common;
 using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Application.Features.Brand;
@@ -12,8 +13,8 @@ public static class GetBrandsWithCount
         string? LogoUrl, string? Website, bool IsFeatured, bool IsActive, int ProductCount);
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
         public async Task<Result<List<Response>>> Handle(Query query, CancellationToken ct)
         {
             var brands = await _context.Brands

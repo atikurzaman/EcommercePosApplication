@@ -6,6 +6,7 @@ using EcommercePos.Persistence.Data;
 using EcommercePos.Persistence.Seeding;
 using EcommercePos.Api.Middleware;
 using EcommercePos.Api.Services;
+using EcommercePos.Application.Common;
 using EcommercePos.Application.DependencyInjection;
 using EcommercePos.Shared.Common;
 using EcommercePos.Shared.Cryptography;
@@ -45,6 +46,7 @@ builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
     }
 });
 
+builder.Services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
 builder.Services.AddApplicationServices();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();

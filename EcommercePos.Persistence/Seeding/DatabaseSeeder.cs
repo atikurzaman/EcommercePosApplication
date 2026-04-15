@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using EcommercePos.Persistence.Data;
+using EcommercePos.Domain.Entities;
 
 namespace EcommercePos.Persistence.Seeding;
 

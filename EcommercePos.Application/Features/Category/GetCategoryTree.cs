@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Domain.Entities;
+using EcommercePos.Application.Common;
 using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Application.Features.Category;
@@ -12,8 +13,8 @@ public static class GetCategoryTree
         int DisplayOrder, bool IsActive, string? ImageUrl, List<Response>? Children);
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
         public async Task<Result<List<Response>>> Handle(Query query, CancellationToken ct)
         {
             var categories = await _context.Categories

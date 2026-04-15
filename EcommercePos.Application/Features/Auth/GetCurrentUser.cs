@@ -4,7 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Domain.Entities;
+using EcommercePos.Application.Common;
 using EcommercePos.Shared.Common;
 using Microsoft.Extensions.Configuration;
 using FluentValidation;
@@ -17,8 +18,8 @@ public static class GetCurrentUser
     public sealed record Response(Guid Id, string Email, string FirstName, string LastName, string? PhoneNumber, string? AvatarUrl, List<string> Roles);
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) { _context = context; }
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) { _context = context; }
         public async Task<Result<Response>> Handle(Query query, ClaimsPrincipal claims, CancellationToken ct)
         {
             var userId = claims.FindFirst(ClaimTypes.NameIdentifier)?.Value;

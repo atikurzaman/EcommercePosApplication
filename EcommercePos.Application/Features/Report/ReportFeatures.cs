@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using EcommercePos.Persistence.Data;
+using EcommercePos.Domain.Entities;
+using EcommercePos.Application.Common;
 using EcommercePos.Shared.Common;
 
 namespace EcommercePos.Application.Features.Report;
@@ -31,8 +32,8 @@ public static class GetDashboardReport
 
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
 
         public async Task<Result<Response>> Handle(CancellationToken ct)
         {
@@ -101,8 +102,8 @@ public static class GetSalesReport
 
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
 
         public async Task<Result<Response>> Handle(Query query, CancellationToken ct)
         {
@@ -159,8 +160,8 @@ public static class GetInventoryReport
 
     public sealed class Handler
     {
-        private readonly ApplicationDbContext _context;
-        public Handler(ApplicationDbContext context) => _context = context;
+        private readonly IApplicationDbContext _context;
+        public Handler(IApplicationDbContext context) => _context = context;
 
         public async Task<Result<Response>> Handle(Query query, CancellationToken ct)
         {
