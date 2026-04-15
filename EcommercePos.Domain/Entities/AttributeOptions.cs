@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class AttributeOptions
+public partial class AttributeOptions : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid AttributeTypeId { get; set; }
 
     public Guid? ColorId { get; set; }
@@ -18,19 +17,6 @@ public partial class AttributeOptions
     public int SortOrder { get; set; }
 
     public bool IsActive { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual ICollection<AttributeOptionMedia> AttributeOptionMedia { get; set; } = new List<AttributeOptionMedia>();
 
     public virtual AttributeTypes AttributeType { get; set; } = null!;

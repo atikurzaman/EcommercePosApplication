@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class Blogs
+public partial class Blogs : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid CategoryId { get; set; }
 
     public Guid? AuthorId { get; set; }
@@ -32,19 +31,6 @@ public partial class Blogs
     public string? MetaTitle { get; set; }
 
     public string? MetaDescription { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? Author { get; set; }
 
     public virtual ICollection<BlogComments> BlogComments { get; set; } = new List<BlogComments>();

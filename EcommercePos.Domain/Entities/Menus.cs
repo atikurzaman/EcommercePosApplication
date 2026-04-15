@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class Menus
+public partial class Menus : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid? ParentMenuId { get; set; }
 
     public string MenuCode { get; set; } = null!;
@@ -34,19 +33,6 @@ public partial class Menus
     public bool OpenInNewTab { get; set; }
 
     public string? Description { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual ICollection<Menus> InverseParentMenu { get; set; } = new List<Menus>();

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class LoyaltyTransactions
+public partial class LoyaltyTransactions : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid CustomerId { get; set; }
 
     public Guid? OrderId { get; set; }
@@ -24,19 +23,6 @@ public partial class LoyaltyTransactions
     public DateTime? ExpiryDate { get; set; }
 
     public bool IsUsed { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual Customers Customer { get; set; } = null!;

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class CartItems
+public partial class CartItems : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid CartId { get; set; }
 
     public Guid ProductId { get; set; }
@@ -22,19 +21,6 @@ public partial class CartItems
     public decimal TotalPrice { get; set; }
 
     public DateTime AddedAt { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual ProductBatches? Batch { get; set; }
 
     public virtual Carts Cart { get; set; } = null!;

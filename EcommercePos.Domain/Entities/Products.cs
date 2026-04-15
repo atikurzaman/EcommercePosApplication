@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class Products
+public partial class Products : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid CategoryId { get; set; }
 
     public Guid? BrandId { get; set; }
@@ -78,19 +77,6 @@ public partial class Products
     public string? MetaTitle { get; set; }
 
     public string? MetaDescription { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual ICollection<AttributeOptionMedia> AttributeOptionMedia { get; set; } = new List<AttributeOptionMedia>();
 
     public virtual Brands? Brand { get; set; }

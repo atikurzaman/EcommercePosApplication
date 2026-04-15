@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class Shipments
+public partial class Shipments : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid OrderId { get; set; }
 
     public Guid? ShippingMethodId { get; set; }
@@ -32,19 +31,6 @@ public partial class Shipments
     public decimal WeightKg { get; set; }
 
     public string? DeliveryNotes { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual ShippingCarriers? Carrier { get; set; }
 
     public virtual Users? CreatedByNavigation { get; set; }

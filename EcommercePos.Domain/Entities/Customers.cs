@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class Customers
+public partial class Customers : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid? UserId { get; set; }
 
     public string CustomerCode { get; set; } = null!;
@@ -52,19 +51,6 @@ public partial class Customers
     public bool IsActive { get; set; }
 
     public string? Notes { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual ICollection<Carts> Carts { get; set; } = new List<Carts>();
 
     public virtual Users? CreatedByNavigation { get; set; }

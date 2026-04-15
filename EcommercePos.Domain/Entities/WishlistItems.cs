@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class WishlistItems
+public partial class WishlistItems : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid WishlistId { get; set; }
 
     public Guid ProductId { get; set; }
@@ -18,19 +17,6 @@ public partial class WishlistItems
     public int Priority { get; set; }
 
     public DateTime AddedAt { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual Products Product { get; set; } = null!;

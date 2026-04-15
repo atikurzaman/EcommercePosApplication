@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class TaxRates
+public partial class TaxRates : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string TaxCode { get; set; } = null!;
 
     public string TaxName { get; set; } = null!;
@@ -34,19 +33,6 @@ public partial class TaxRates
     public DateTime? EffectiveFrom { get; set; }
 
     public DateTime? EffectiveTo { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual ICollection<OrderItemTaxes> OrderItemTaxes { get; set; } = new List<OrderItemTaxes>();

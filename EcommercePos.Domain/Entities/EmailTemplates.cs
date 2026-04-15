@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class EmailTemplates
+public partial class EmailTemplates : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string Name { get; set; } = null!;
 
     public string Subject { get; set; } = null!;
@@ -16,19 +15,6 @@ public partial class EmailTemplates
     public string TemplateType { get; set; } = null!;
 
     public bool IsActive { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual Users? UpdatedByNavigation { get; set; }

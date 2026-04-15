@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class ShippingMethods
+public partial class ShippingMethods : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string Name { get; set; } = null!;
 
     public string? Description { get; set; }
@@ -28,19 +27,6 @@ public partial class ShippingMethods
     public decimal? FreeShippingThreshold { get; set; }
 
     public int DisplayOrder { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual ICollection<Shipments> Shipments { get; set; } = new List<Shipments>();

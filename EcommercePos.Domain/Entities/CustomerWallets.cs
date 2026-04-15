@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class CustomerWallets
+public partial class CustomerWallets : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid CustomerId { get; set; }
 
     public string CurrencyCode { get; set; } = null!;
@@ -14,19 +13,6 @@ public partial class CustomerWallets
     public decimal Balance { get; set; }
 
     public bool IsActive { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual Currencies CurrencyCodeNavigation { get; set; } = null!;

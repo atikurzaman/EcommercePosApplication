@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class StaticPages
+public partial class StaticPages : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string Title { get; set; } = null!;
 
     public string Slug { get; set; } = null!;
@@ -18,19 +17,6 @@ public partial class StaticPages
     public string? MetaTitle { get; set; }
 
     public string? MetaDescription { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual Users? UpdatedByNavigation { get; set; }

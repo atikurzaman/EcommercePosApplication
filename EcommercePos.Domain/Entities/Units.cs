@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class Units
+public partial class Units : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string Name { get; set; } = null!;
 
     public string ShortName { get; set; } = null!;
@@ -18,19 +17,6 @@ public partial class Units
     public decimal? ConversionFactor { get; set; }
 
     public bool IsActive { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Units? BaseUnit { get; set; }
 
     public virtual Users? CreatedByNavigation { get; set; }

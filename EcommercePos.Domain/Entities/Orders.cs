@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class Orders
+public partial class Orders : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string OrderNumber { get; set; } = null!;
 
     public Guid CustomerId { get; set; }
@@ -52,19 +51,6 @@ public partial class Orders
     public string? CustomerNote { get; set; }
 
     public string? AdminNote { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Discounts? AppliedDiscount { get; set; }
 
     public virtual CustomerAddresses? BillingAddress { get; set; }

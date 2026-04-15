@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class PosTransactions
+public partial class PosTransactions : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string ReceiptNumber { get; set; } = null!;
 
     public Guid CashShiftId { get; set; }
@@ -68,19 +67,6 @@ public partial class PosTransactions
     public DateTime? VoidedAt { get; set; }
 
     public string? Notes { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Discounts? AppliedDiscount { get; set; }
 
     public virtual ICollection<CashDrawerEvents> CashDrawerEvents { get; set; } = new List<CashDrawerEvents>();

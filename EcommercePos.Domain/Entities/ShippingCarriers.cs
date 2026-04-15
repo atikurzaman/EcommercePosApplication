@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class ShippingCarriers
+public partial class ShippingCarriers : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string Name { get; set; } = null!;
 
     public string? LogoUrl { get; set; }
@@ -16,19 +15,6 @@ public partial class ShippingCarriers
     public bool IsActive { get; set; }
 
     public decimal BaseCost { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual ICollection<Shipments> Shipments { get; set; } = new List<Shipments>();

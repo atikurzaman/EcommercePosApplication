@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class RoleMenus
+public partial class RoleMenus : BaseEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid RoleId { get; set; }
 
     public Guid MenuId { get; set; }
@@ -20,15 +19,6 @@ public partial class RoleMenus
     public bool CanDelete { get; set; }
 
     public bool CanApprove { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual Menus Menu { get; set; } = null!;

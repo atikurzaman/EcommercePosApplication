@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class DayEndSummaries
+public partial class DayEndSummaries : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public DateOnly SummaryDate { get; set; }
 
     public Guid WarehouseId { get; set; }
@@ -58,19 +57,6 @@ public partial class DayEndSummaries
     public DateTime? ClosedAt { get; set; }
 
     public Guid? ClosedByUserId { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual CashShifts? CashShift { get; set; }
 
     public virtual Users? ClosedByUser { get; set; }

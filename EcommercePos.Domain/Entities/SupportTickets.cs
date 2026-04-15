@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class SupportTickets
+public partial class SupportTickets : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string TicketNumber { get; set; } = null!;
 
     public Guid? UserId { get; set; }
@@ -30,19 +29,6 @@ public partial class SupportTickets
     public DateTime? ResolvedAt { get; set; }
 
     public DateTime? ClosedAt { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? AssignedTo { get; set; }
 
     public virtual Users? CreatedByNavigation { get; set; }

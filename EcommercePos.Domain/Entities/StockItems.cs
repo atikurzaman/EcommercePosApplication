@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class StockItems
+public partial class StockItems : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid ProductId { get; set; }
 
     public Guid? VariantId { get; set; }
@@ -28,19 +27,6 @@ public partial class StockItems
     public Guid? CountedByUserId { get; set; }
 
     public DateTime LastUpdatedAt { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual ProductBatches? Batch { get; set; }
 
     public virtual Users? CountedByUser { get; set; }

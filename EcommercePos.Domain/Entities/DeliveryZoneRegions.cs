@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class DeliveryZoneRegions
+public partial class DeliveryZoneRegions : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public Guid DeliveryZoneId { get; set; }
 
     public string Country { get; set; } = null!;
@@ -18,19 +17,6 @@ public partial class DeliveryZoneRegions
     public string? Area { get; set; }
 
     public string? PostalCode { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual DeliveryZones DeliveryZone { get; set; } = null!;

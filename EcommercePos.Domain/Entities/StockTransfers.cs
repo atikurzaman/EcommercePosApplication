@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class StockTransfers
+public partial class StockTransfers : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string TransferNo { get; set; } = null!;
 
     public Guid FromWarehouseId { get; set; }
@@ -20,19 +19,6 @@ public partial class StockTransfers
     public string? Notes { get; set; }
 
     public Guid? CreatedByUserId { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual Users? CreatedByUser { get; set; }

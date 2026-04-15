@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using EcommercePos.Domain.Common;
 
 namespace EcommercePos.Domain.Entities;
 
-public partial class MediaAssets
+public partial class MediaAssets : AuditableEntity<Guid>
 {
-    public Guid Id { get; set; }
-
     public string FileName { get; set; } = null!;
 
     public string FilePath { get; set; } = null!;
@@ -28,19 +27,6 @@ public partial class MediaAssets
     public string StorageProvider { get; set; } = null!;
 
     public Guid? UploadedBy { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public Guid? CreatedBy { get; set; }
-
-    public DateTime? UpdatedAt { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
-
-    public byte[]? RowVersion { get; set; }
-
     public virtual Users? CreatedByNavigation { get; set; }
 
     public virtual Users? UpdatedByNavigation { get; set; }
