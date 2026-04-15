@@ -303,7 +303,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<ActivityLogs>(entity =>
         {
-            entity.HasIndex(e => new { e.UserId, e.OccurredAt }, "IX_ActivityLog_User")
+            entity.HasIndex(e => new { e.UserId, e.OccurredAt })
                 .IsDescending(false, true)
                 .HasFilter("([IsDeleted]=(0))");
 
@@ -318,13 +318,12 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UserAgent).HasMaxLength(500);
 
             entity.HasOne(d => d.User).WithMany(p => p.ActivityLogs)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__ActivityL__UserI__6F8A7843");
+                .HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<AppSettings>(entity =>
         {
-            entity.HasIndex(e => e.Key, "UX_AppSettings_Key").IsUnique();
+            entity.HasIndex(e => e.Key).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.Category).HasMaxLength(60);
@@ -338,12 +337,10 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.AppSettingsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__AppSettin__Creat__3EE740E8");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.AppSettingsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__AppSettin__Updat__3FDB6521");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<AttributeOptionMedia>(entity =>
@@ -362,20 +359,16 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.AttributeOptionMediaCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Attribute__Creat__119F9925");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Option).WithMany(p => p.AttributeOptionMedia)
-                .HasForeignKey(d => d.OptionId)
-                .HasConstraintName("FK__Attribute__Optio__0CDAE408");
+                .HasForeignKey(d => d.OptionId);
 
             entity.HasOne(d => d.Product).WithMany(p => p.AttributeOptionMedia)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__Attribute__Produ__0DCF0841");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.AttributeOptionMediaUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Attribute__Updat__1293BD5E");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<AttributeOptionMediaBlob>(entity =>
@@ -385,13 +378,12 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.MediaId).ValueGeneratedNever();
 
             entity.HasOne(d => d.Media).WithOne(p => p.AttributeOptionMediaBlob)
-                .HasForeignKey<AttributeOptionMediaBlob>(d => d.MediaId)
-                .HasConstraintName("FK_AttributeOptionMediaBlob");
+                .HasForeignKey<AttributeOptionMediaBlob>(d => d.MediaId);
         });
 
         modelBuilder.Entity<AttributeOptions>(entity =>
         {
-            entity.HasIndex(e => new { e.AttributeTypeId, e.Value }, "UX_AttributeOptions").IsUnique();
+            entity.HasIndex(e => new { e.AttributeTypeId, e.Value }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -403,27 +395,23 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Value).HasMaxLength(120);
 
             entity.HasOne(d => d.AttributeType).WithMany(p => p.AttributeOptions)
-                .HasForeignKey(d => d.AttributeTypeId)
-                .HasConstraintName("FK__Attribute__Attri__54CB950F");
+                .HasForeignKey(d => d.AttributeTypeId);
 
             entity.HasOne(d => d.Color).WithMany(p => p.AttributeOptions)
-                .HasForeignKey(d => d.ColorId)
-                .HasConstraintName("FK__Attribute__Color__55BFB948");
+                .HasForeignKey(d => d.ColorId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.AttributeOptionsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Attribute__Creat__59904A2C");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.AttributeOptionsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Attribute__Updat__5A846E65");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<AttributeTypes>(entity =>
         {
-            entity.HasIndex(e => e.Name, "UX_AttributeTypes_Name").IsUnique();
+            entity.HasIndex(e => e.Name).IsUnique();
 
-            entity.HasIndex(e => e.Slug, "UX_AttributeTypes_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AffectsSku).HasDefaultValue(true);
@@ -440,21 +428,19 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .HasDefaultValue("Dropdown");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.AttributeTypesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Attribute__Creat__4E1E9780");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.AttributeTypesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Attribute__Updat__4F12BBB9");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<AuditLogs>(entity =>
         {
-            entity.HasIndex(e => e.OccurredAt, "IX_AuditLog_Date").IsDescending();
+            entity.HasIndex(e => e.OccurredAt).IsDescending();
 
-            entity.HasIndex(e => new { e.EntityName, e.EntityId }, "IX_AuditLog_Entity");
+            entity.HasIndex(e => new { e.EntityName, e.EntityId });
 
-            entity.HasIndex(e => new { e.UserId, e.OccurredAt }, "IX_AuditLog_User").IsDescending(false, true);
+            entity.HasIndex(e => new { e.UserId, e.OccurredAt }).IsDescending(false, true);
 
             entity.Property(e => e.Action).HasMaxLength(120);
             entity.Property(e => e.Details).HasMaxLength(1000);
@@ -466,13 +452,12 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.AuditLogs)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK__AuditLogs__UserI__744F2D60");
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<BlogCategories>(entity =>
         {
-            entity.HasIndex(e => e.Slug, "UX_BlogCats_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -483,12 +468,10 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Slug).HasMaxLength(100);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BlogCategoriesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__BlogCateg__Creat__0A7378A9");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.BlogCategoriesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__BlogCateg__Updat__0B679CE2");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<BlogComments>(entity =>
@@ -502,29 +485,24 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.Blog).WithMany(p => p.BlogComments)
-                .HasForeignKey(d => d.BlogId)
-                .HasConstraintName("FK__BlogComme__BlogI__261B931E");
+                .HasForeignKey(d => d.BlogId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BlogCommentsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__BlogComme__Creat__2AE0483B");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.ParentComment).WithMany(p => p.InverseParentComment)
-                .HasForeignKey(d => d.ParentCommentId)
-                .HasConstraintName("FK__BlogComme__Paren__2803DB90");
+                .HasForeignKey(d => d.ParentCommentId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.BlogCommentsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__BlogComme__Updat__2BD46C74");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.User).WithMany(p => p.BlogCommentsUser)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__BlogComme__UserI__270FB757");
+                .HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<BlogTags>(entity =>
         {
-            entity.HasIndex(e => e.Slug, "UX_BlogTags_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -535,13 +513,12 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Slug).HasMaxLength(80);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BlogTags)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__BlogTags__Create__1D864D1D");
+                .HasForeignKey(d => d.CreatedBy);
         });
 
         modelBuilder.Entity<Blogs>(entity =>
         {
-            entity.HasIndex(e => e.Slug, "UX_Blogs_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -554,30 +531,24 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Title).HasMaxLength(300);
 
             entity.HasOne(d => d.Author).WithMany(p => p.BlogsAuthor)
-                .HasForeignKey(d => d.AuthorId)
-                .HasConstraintName("FK__Blogs__AuthorId__12149A71");
+                .HasForeignKey(d => d.AuthorId);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Blogs)
-                .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK__Blogs__CategoryI__11207638");
+                .HasForeignKey(d => d.CategoryId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BlogsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Blogs__CreatedBy__15E52B55");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.BlogsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Blogs__UpdatedBy__16D94F8E");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasMany(d => d.BlogTag).WithMany(p => p.Blog)
                 .UsingEntity<Dictionary<string, object>>(
                     "BlogPostTags",
                     r => r.HasOne<BlogTags>().WithMany()
-                        .HasForeignKey("BlogTagId")
-                        .HasConstraintName("FK__BlogPostT__BlogT__224B023A"),
+                        .HasForeignKey("BlogTagId"),
                     l => l.HasOne<Blogs>().WithMany()
-                        .HasForeignKey("BlogId")
-                        .HasConstraintName("FK__BlogPostT__BlogI__2156DE01"),
+                        .HasForeignKey("BlogId"),
                     j =>
                     {
                         j.HasKey("BlogId", "BlogTagId");
@@ -586,7 +557,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<Brands>(entity =>
         {
-            entity.HasIndex(e => e.Slug, "UX_Brands_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CountryOfOrigin)
@@ -604,22 +575,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Website).HasMaxLength(200);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BrandsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Brands__CreatedB__690797E6");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.BrandsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Brands__UpdatedB__69FBBC1F");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasMany(d => d.Category).WithMany(p => p.Brand)
                 .UsingEntity<Dictionary<string, object>>(
                     "BrandCategories",
                     r => r.HasOne<Categories>().WithMany()
-                        .HasForeignKey("CategoryId")
-                        .HasConstraintName("FK__BrandCate__Categ__1E6F845E"),
+                        .HasForeignKey("CategoryId"),
                     l => l.HasOne<Brands>().WithMany()
-                        .HasForeignKey("BrandId")
-                        .HasConstraintName("FK__BrandCate__Brand__1D7B6025"),
+                        .HasForeignKey("BrandId"),
                     j =>
                     {
                         j.HasKey("BrandId", "CategoryId");
@@ -628,7 +595,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<BundleComponents>(entity =>
         {
-            entity.HasIndex(e => new { e.BundleProductId, e.ComponentVariantId }, "UX_BundleComponents").IsUnique();
+            entity.HasIndex(e => new { e.BundleProductId, e.ComponentVariantId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -641,21 +608,17 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
             entity.HasOne(d => d.BundleProduct).WithMany(p => p.BundleComponents)
                 .HasForeignKey(d => d.BundleProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__BundleCom__Bundl__1B29035F");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.ComponentVariant).WithMany(p => p.BundleComponents)
                 .HasForeignKey(d => d.ComponentVariantId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__BundleCom__Compo__1C1D2798");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BundleComponentsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__BundleCom__Creat__21D600EE");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.BundleComponentsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__BundleCom__Updat__22CA2527");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<BundleOptionGroups>(entity =>
@@ -672,21 +635,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.BundleProduct).WithMany(p => p.BundleOptionGroups)
-                .HasForeignKey(d => d.BundleProductId)
-                .HasConstraintName("FK__BundleOpt__Bundl__278EDA44");
+                .HasForeignKey(d => d.BundleProductId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BundleOptionGroupsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__BundleOpt__Creat__2E3BD7D3");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.BundleOptionGroupsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__BundleOpt__Updat__2F2FFC0C");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<BundleOptionItems>(entity =>
         {
-            entity.HasIndex(e => new { e.GroupId, e.VariantId }, "UX_BundleOptionItems").IsUnique();
+            entity.HasIndex(e => new { e.GroupId, e.VariantId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -696,28 +656,24 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.BundleOptionItemsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__BundleOpt__Creat__3AA1AEB8");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Group).WithMany(p => p.BundleOptionItems)
-                .HasForeignKey(d => d.GroupId)
-                .HasConstraintName("FK__BundleOpt__Group__34E8D562");
+                .HasForeignKey(d => d.GroupId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.BundleOptionItemsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__BundleOpt__Updat__3B95D2F1");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.BundleOptionItems)
                 .HasForeignKey(d => d.VariantId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__BundleOpt__Varia__35DCF99B");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<CartItems>(entity =>
         {
-            entity.HasIndex(e => e.CartId, "IX_CartItems_Cart").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.CartId).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.ProductId, "IX_CartItems_Product").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.ProductId).HasFilter("([IsDeleted]=(0))");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AddedAt).HasDefaultValueSql("(getutcdate())");
@@ -730,29 +686,23 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Batch).WithMany(p => p.CartItems)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__CartItems__Batch__6CF8245B");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.Cart).WithMany(p => p.CartItems)
-                .HasForeignKey(d => d.CartId)
-                .HasConstraintName("FK__CartItems__CartI__6A1BB7B0");
+                .HasForeignKey(d => d.CartId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CartItemsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__CartItems__Creat__70C8B53F");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.CartItems)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CartItems__Produ__6B0FDBE9");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CartItemsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__CartItems__Updat__71BCD978");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.CartItems)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__CartItems__Varia__6C040022");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<Carts>(entity =>
@@ -769,25 +719,20 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Total).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.AppliedDiscount).WithMany(p => p.Carts)
-                .HasForeignKey(d => d.AppliedDiscountId)
-                .HasConstraintName("FK__Carts__AppliedDi__618671AF");
+                .HasForeignKey(d => d.AppliedDiscountId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CartsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Carts__CreatedBy__636EBA21");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.CustomerId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK__Carts__CustomerI__5CC1BC92");
+                .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CartsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Carts__UpdatedBy__6462DE5A");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.User).WithMany(p => p.CartsUser)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Carts__UserId__5DB5E0CB");
+                .HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<CashDrawerEvents>(entity =>
@@ -803,21 +748,17 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
             entity.HasOne(d => d.CashShift).WithMany(p => p.CashDrawerEvents)
                 .HasForeignKey(d => d.CashShiftId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CashDrawe__CashS__4B8221F7");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CashDrawerEventsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__CashDrawe__Creat__513AFB4D");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.PerformedByNavigation).WithMany(p => p.CashDrawerEventsPerformedByNavigation)
                 .HasForeignKey(d => d.PerformedBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CashDrawe__Perfo__4C764630");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Transaction).WithMany(p => p.CashDrawerEvents)
-                .HasForeignKey(d => d.TransactionId)
-                .HasConstraintName("FK__CashDrawe__Trans__4D6A6A69");
+                .HasForeignKey(d => d.TransactionId);
         });
 
         modelBuilder.Entity<CashShifts>(entity =>
@@ -839,49 +780,40 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TotalSalesAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.ClosedByEmployee).WithMany(p => p.CashShiftsClosedByEmployee)
-                .HasForeignKey(d => d.ClosedByEmployeeId)
-                .HasConstraintName("FK__CashShift__Close__76A18A26");
+                .HasForeignKey(d => d.ClosedByEmployeeId);
 
             entity.HasOne(d => d.ClosedByUser).WithMany(p => p.CashShiftsClosedByUser)
-                .HasForeignKey(d => d.ClosedByUserId)
-                .HasConstraintName("FK__CashShift__Close__7889D298");
+                .HasForeignKey(d => d.ClosedByUserId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CashShiftsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__CashShift__Creat__002AF460");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.OpenedByEmployee).WithMany(p => p.CashShiftsOpenedByEmployee)
-                .HasForeignKey(d => d.OpenedByEmployeeId)
-                .HasConstraintName("FK__CashShift__Opene__75AD65ED");
+                .HasForeignKey(d => d.OpenedByEmployeeId);
 
             entity.HasOne(d => d.OpenedByUser).WithMany(p => p.CashShiftsOpenedByUser)
-                .HasForeignKey(d => d.OpenedByUserId)
-                .HasConstraintName("FK__CashShift__Opene__7795AE5F");
+                .HasForeignKey(d => d.OpenedByUserId);
 
             entity.HasOne(d => d.PosCounter).WithMany(p => p.CashShifts)
                 .HasForeignKey(d => d.PosCounterId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CashShift__PosCo__73C51D7B");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.PosTerminal).WithMany(p => p.CashShifts)
-                .HasForeignKey(d => d.PosTerminalId)
-                .HasConstraintName("FK__CashShift__PosTe__74B941B4");
+                .HasForeignKey(d => d.PosTerminalId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CashShiftsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__CashShift__Updat__011F1899");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.CashShifts)
                 .HasForeignKey(d => d.WarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CashShift__Wareh__72D0F942");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<Categories>(entity =>
         {
-            entity.HasIndex(e => e.ParentCategoryId, "IX_Categories_Parent").HasFilter("([ParentCategoryId] IS NOT NULL)");
+            entity.HasIndex(e => e.ParentCategoryId).HasFilter("([ParentCategoryId] IS NOT NULL)");
 
-            entity.HasIndex(e => e.Slug, "UX_Categories_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -898,21 +830,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Slug).HasMaxLength(100);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CategoriesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Categorie__Creat__74794A92");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.ParentCategory).WithMany(p => p.InverseParentCategory)
-                .HasForeignKey(d => d.ParentCategoryId)
-                .HasConstraintName("FK__Categorie__Paren__6FB49575");
+                .HasForeignKey(d => d.ParentCategoryId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CategoriesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Categorie__Updat__756D6ECB");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<Colors>(entity =>
         {
-            entity.HasIndex(e => e.Name, "UX_Colors_Name").IsUnique();
+            entity.HasIndex(e => e.Name).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -926,12 +855,10 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ColorsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Colors__CreatedB__078C1F06");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ColorsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Colors__UpdatedB__0880433F");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<ContactMessages>(entity =>
@@ -946,8 +873,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Subject).HasMaxLength(200);
 
             entity.HasOne(d => d.RepliedByNavigation).WithMany(p => p.ContactMessages)
-                .HasForeignKey(d => d.RepliedBy)
-                .HasConstraintName("FK__ContactMe__Repli__4F1DA8B1");
+                .HasForeignKey(d => d.RepliedBy);
         });
 
         modelBuilder.Entity<Currencies>(entity =>
@@ -967,19 +893,17 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Symbol).HasMaxLength(5);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CurrenciesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Currencie__Creat__41EDCAC5");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CurrenciesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Currencie__Updat__42E1EEFE");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<CustomerAddresses>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Addresses");
 
-            entity.HasIndex(e => e.CustomerId, "IX_Addresses_Customer").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.CustomerId).HasFilter("([IsDeleted]=(0))");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AddressLine1).HasMaxLength(500);
@@ -1006,25 +930,21 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.State).HasMaxLength(100);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CustomerAddressesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__CustomerA__Creat__3F3159AB");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.CustomerAddresses)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__CustomerA__Custo__38845C1C");
+                .HasForeignKey(d => d.CustomerId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CustomerAddressesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__CustomerA__Updat__40257DE4");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.User).WithMany(p => p.CustomerAddressesUser)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__CustomerA__UserI__39788055");
+                .HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<CustomerProfiles>(entity =>
         {
-            entity.HasIndex(e => e.CustomerId, "UX_CustomerProfiles").IsUnique();
+            entity.HasIndex(e => e.CustomerId).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -1034,21 +954,17 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TierCode).HasMaxLength(20);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CustomerProfilesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__CustomerP__Creat__17236851");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithOne(p => p.CustomerProfiles)
-                .HasForeignKey<CustomerProfiles>(d => d.CustomerId)
-                .HasConstraintName("FK__CustomerP__Custo__125EB334");
+                .HasForeignKey<CustomerProfiles>(d => d.CustomerId);
 
             entity.HasOne(d => d.TierCodeNavigation).WithMany(p => p.CustomerProfiles)
                 .HasForeignKey(d => d.TierCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CustomerP__TierC__1352D76D");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CustomerProfilesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__CustomerP__Updat__18178C8A");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<CustomerTiers>(entity =>
@@ -1068,7 +984,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
         {
             entity.HasKey(e => e.Id).HasName("PK_Wallets");
 
-            entity.HasIndex(e => e.CustomerId, "UX_Wallets_Customer").IsUnique();
+            entity.HasIndex(e => e.CustomerId).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.Balance).HasColumnType("decimal(18, 2)");
@@ -1083,32 +999,28 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CustomerWalletsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__CustomerW__Creat__4C8B54C9");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.CurrencyCodeNavigation).WithMany(p => p.CustomerWallets)
                 .HasForeignKey(d => d.CurrencyCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__CustomerW__Curre__47C69FAC");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Customer).WithOne(p => p.CustomerWallets)
-                .HasForeignKey<CustomerWallets>(d => d.CustomerId)
-                .HasConstraintName("FK__CustomerW__Custo__45DE573A");
+                .HasForeignKey<CustomerWallets>(d => d.CustomerId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CustomerWalletsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__CustomerW__Updat__4D7F7902");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<Customers>(entity =>
         {
-            entity.HasIndex(e => e.CustomerCode, "UX_Customers_Code").IsUnique();
+            entity.HasIndex(e => e.CustomerCode).IsUnique();
 
-            entity.HasIndex(e => e.ReferralCode, "UX_Customers_ReferralCode")
+            entity.HasIndex(e => e.ReferralCode)
                 .IsUnique()
                 .HasFilter("([ReferralCode] IS NOT NULL)");
 
-            entity.HasIndex(e => e.UserId, "UX_Customers_UserId")
+            entity.HasIndex(e => e.UserId)
                 .IsUnique()
                 .HasFilter("([UserId] IS NOT NULL)");
 
@@ -1142,26 +1054,22 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TaxNumber).HasMaxLength(50);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CustomersCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Customers__Creat__0BB1B5A5");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.ReferredByCustomer).WithMany(p => p.InverseReferredByCustomer)
-                .HasForeignKey(d => d.ReferredByCustomerId)
-                .HasConstraintName("FK__Customers__Refer__07E124C1");
+                .HasForeignKey(d => d.ReferredByCustomerId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CustomersUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Customers__Updat__0CA5D9DE");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.User).WithOne(p => p.CustomersUser)
                 .HasForeignKey<Customers>(d => d.UserId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK__Customers__UserI__02284B6B");
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<DayEndSummaries>(entity =>
         {
-            entity.HasIndex(e => new { e.SummaryDate, e.WarehouseId }, "UX_DayEndSummaries").IsUnique();
+            entity.HasIndex(e => new { e.SummaryDate, e.WarehouseId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CashInHand).HasColumnType("decimal(18, 2)");
@@ -1187,24 +1095,19 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Variance).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.CashShift).WithMany(p => p.DayEndSummaries)
-                .HasForeignKey(d => d.CashShiftId)
-                .HasConstraintName("FK__DayEndSum__CashS__57E7F8DC");
+                .HasForeignKey(d => d.CashShiftId);
 
             entity.HasOne(d => d.ClosedByUser).WithMany(p => p.DayEndSummariesClosedByUser)
-                .HasForeignKey(d => d.ClosedByUserId)
-                .HasConstraintName("FK__DayEndSum__Close__6CE315C2");
+                .HasForeignKey(d => d.ClosedByUserId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.DayEndSummariesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__DayEndSum__Creat__6ECB5E34");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.DayEndSummariesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__DayEndSum__Updat__6FBF826D");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.DayEndSummaries)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("FK__DayEndSum__Wareh__56F3D4A3");
+                .HasForeignKey(d => d.WarehouseId);
         });
 
         modelBuilder.Entity<DeliveryZoneRegions>(entity =>
@@ -1224,16 +1127,13 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.State).HasMaxLength(100);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.DeliveryZoneRegionsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__DeliveryZ__Creat__0F183235");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.DeliveryZone).WithMany(p => p.DeliveryZoneRegions)
-                .HasForeignKey(d => d.DeliveryZoneId)
-                .HasConstraintName("FK__DeliveryZ__Deliv__0C3BC58A");
+                .HasForeignKey(d => d.DeliveryZoneId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.DeliveryZoneRegionsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__DeliveryZ__Updat__100C566E");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<DeliveryZones>(entity =>
@@ -1249,12 +1149,10 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.DeliveryZonesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__DeliveryZ__Creat__0682EC34");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.DeliveryZonesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__DeliveryZ__Updat__0777106D");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<DiscountApplicability>(entity =>
@@ -1262,17 +1160,14 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
 
             entity.HasOne(d => d.Category).WithMany(p => p.DiscountApplicability)
-                .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK__DiscountA__Categ__3552E9B6");
+                .HasForeignKey(d => d.CategoryId);
 
             entity.HasOne(d => d.Discount).WithMany(p => p.DiscountApplicability)
-                .HasForeignKey(d => d.DiscountId)
-                .HasConstraintName("FK__DiscountA__Disco__345EC57D");
+                .HasForeignKey(d => d.DiscountId);
 
             entity.HasOne(d => d.Product).WithMany(p => p.DiscountApplicability)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK_DiscountApplicability_Products");
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<DiscountTypes>(entity =>
@@ -1294,34 +1189,28 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UsedAt).HasDefaultValueSql("(getutcdate())");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.DiscountUsageLogCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__DiscountU__Creat__3DE82FB7");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.DiscountUsageLog)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK_DiscountUsageLog_Customers");
+                .HasForeignKey(d => d.CustomerId);
 
             entity.HasOne(d => d.Discount).WithMany(p => p.DiscountUsageLog)
-                .HasForeignKey(d => d.DiscountId)
-                .HasConstraintName("FK__DiscountU__Disco__3A179ED3");
+                .HasForeignKey(d => d.DiscountId);
 
             entity.HasOne(d => d.Order).WithMany(p => p.DiscountUsageLog)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK_DiscountUsageLog_Orders");
+                .HasForeignKey(d => d.OrderId);
 
             entity.HasOne(d => d.PosTransaction).WithMany(p => p.DiscountUsageLog)
-                .HasForeignKey(d => d.PosTransactionId)
-                .HasConstraintName("FK_DiscountUsageLog_Sales");
+                .HasForeignKey(d => d.PosTransactionId);
 
             entity.HasOne(d => d.User).WithMany(p => p.DiscountUsageLogUser)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__DiscountU__UserI__3B0BC30C");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<Discounts>(entity =>
         {
-            entity.HasIndex(e => e.Code, "UX_Discounts_Code").IsUnique();
+            entity.HasIndex(e => e.Code).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AppliesTo)
@@ -1342,26 +1231,22 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TierCode).HasMaxLength(20);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.DiscountsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Discounts__Creat__2DB1C7EE");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.DiscountTypeCodeNavigation).WithMany(p => p.Discounts)
                 .HasForeignKey(d => d.DiscountTypeCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Discounts__Disco__2334397B");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.TierCodeNavigation).WithMany(p => p.Discounts)
-                .HasForeignKey(d => d.TierCode)
-                .HasConstraintName("FK__Discounts__TierC__2704CA5F");
+                .HasForeignKey(d => d.TierCode);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.DiscountsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Discounts__Updat__2EA5EC27");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<EmailTemplates>(entity =>
         {
-            entity.HasIndex(e => e.TemplateType, "UX_Templates_Type").IsUnique();
+            entity.HasIndex(e => e.TemplateType).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -1374,17 +1259,15 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TemplateType).HasMaxLength(60);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.EmailTemplatesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__EmailTemp__Creat__477C86E9");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.EmailTemplatesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__EmailTemp__Updat__4870AB22");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<Employees>(entity =>
         {
-            entity.HasIndex(e => e.EmployeeCode, "UX_Employees_Code").IsUnique();
+            entity.HasIndex(e => e.EmployeeCode).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AddressLine1).HasMaxLength(200);
@@ -1413,20 +1296,16 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.ShiftPattern).HasMaxLength(50);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.EmployeesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Employees__Creat__5A054B78");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.EmployeesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Employees__Updat__5AF96FB1");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.User).WithMany(p => p.EmployeesUser)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Employees__UserI__5728DECD");
+                .HasForeignKey(d => d.UserId);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.Employees)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("FK__Employees__Wareh__5634BA94");
+                .HasForeignKey(d => d.WarehouseId);
         });
 
         modelBuilder.Entity<ExpenseCategories>(entity =>
@@ -1441,12 +1320,10 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ExpenseCategoriesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ExpenseCa__Creat__766C7FFC");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ExpenseCategoriesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ExpenseCa__Updat__7760A435");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<Expenses>(entity =>
@@ -1463,34 +1340,28 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ExpensesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Expenses__Create__02D256E1");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.ExpensesCreatedByUser)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__Expenses__Create__00EA0E6F");
+                .HasForeignKey(d => d.CreatedByUserId);
 
             entity.HasOne(d => d.ExpenseCategory).WithMany(p => p.Expenses)
-                .HasForeignKey(d => d.ExpenseCategoryId)
-                .HasConstraintName("FK__Expenses__Expens__7D197D8B");
+                .HasForeignKey(d => d.ExpenseCategoryId);
 
             entity.HasOne(d => d.MethodCodeNavigation).WithMany(p => p.Expenses)
-                .HasForeignKey(d => d.MethodCode)
-                .HasConstraintName("FK__Expenses__Method__7FF5EA36");
+                .HasForeignKey(d => d.MethodCode);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ExpensesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Expenses__Update__03C67B1A");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.Expenses)
                 .HasForeignKey(d => d.WarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Expenses__Wareho__7C255952");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<FlashDealProducts>(entity =>
         {
-            entity.HasIndex(e => new { e.FlashDealId, e.ProductId }, "UX_FlashDealProducts").IsUnique();
+            entity.HasIndex(e => new { e.FlashDealId, e.ProductId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -1502,20 +1373,16 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.FlashDealProductsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__FlashDeal__Creat__7B7B4DDC");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.FlashDeal).WithMany(p => p.FlashDealProducts)
-                .HasForeignKey(d => d.FlashDealId)
-                .HasConstraintName("FK__FlashDeal__Flash__73DA2C14");
+                .HasForeignKey(d => d.FlashDealId);
 
             entity.HasOne(d => d.Product).WithMany(p => p.FlashDealProducts)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__FlashDeal__Produ__74CE504D");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.FlashDealProductsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__FlashDeal__Updat__7C6F7215");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<FlashDeals>(entity =>
@@ -1532,12 +1399,10 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Title).HasMaxLength(200);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.FlashDealsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__FlashDeal__Creat__6C390A4C");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.FlashDealsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__FlashDeal__Updat__6D2D2E85");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<GoodsReceiptLines>(entity =>
@@ -1551,37 +1416,31 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UnitCost).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Batch).WithMany(p => p.GoodsReceiptLines)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__GoodsRece__Batch__62CF9BA3");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.GoodsReceiptLines)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__GoodsRece__Creat__65AC084E");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.GoodsReceipt).WithMany(p => p.GoodsReceiptLines)
-                .HasForeignKey(d => d.GoodsReceiptId)
-                .HasConstraintName("FK__GoodsRece__Goods__5EFF0ABF");
+                .HasForeignKey(d => d.GoodsReceiptId);
 
             entity.HasOne(d => d.Product).WithMany(p => p.GoodsReceiptLines)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__GoodsRece__Produ__60E75331");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.PurchaseOrderLine).WithMany(p => p.GoodsReceiptLines)
                 .HasForeignKey(d => d.PurchaseOrderLineId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__GoodsRece__Purch__5FF32EF8");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.GoodsReceiptLines)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__GoodsRece__Varia__61DB776A");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<GoodsReceipts>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Receipts");
 
-            entity.HasIndex(e => e.ReceiptNumber, "UX_Receipts_No").IsUnique();
+            entity.HasIndex(e => e.ReceiptNumber).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.Condition).HasMaxLength(50);
@@ -1592,27 +1451,22 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.GoodsReceiptsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__GoodsRece__Creat__59463169");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.PurchaseOrder).WithMany(p => p.GoodsReceipts)
                 .HasForeignKey(d => d.PurchaseOrderId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__GoodsRece__Purch__5575A085");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.ReceivedByUser).WithMany(p => p.GoodsReceiptsReceivedByUser)
                 .HasForeignKey(d => d.ReceivedByUserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__GoodsRece__Recei__575DE8F7");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.GoodsReceiptsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__GoodsRece__Updat__5A3A55A2");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.GoodsReceipts)
                 .HasForeignKey(d => d.WarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__GoodsRece__Wareh__5669C4BE");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<InventoryAdjustmentLines>(entity =>
@@ -1629,32 +1483,27 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UnitCost).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Batch).WithMany(p => p.InventoryAdjustmentLines)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__Inventory__Batch__5D4BCC77");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.InventoryAdjustmentLines)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Inventory__Creat__60283922");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.InventoryAdjustment).WithMany(p => p.InventoryAdjustmentLines)
-                .HasForeignKey(d => d.InventoryAdjustmentId)
-                .HasConstraintName("FK__Inventory__Inven__5A6F5FCC");
+                .HasForeignKey(d => d.InventoryAdjustmentId);
 
             entity.HasOne(d => d.Product).WithMany(p => p.InventoryAdjustmentLines)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Inventory__Produ__5B638405");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.InventoryAdjustmentLines)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__Inventory__Varia__5C57A83E");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<InventoryAdjustments>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Adjustments");
 
-            entity.HasIndex(e => e.AdjustmentNo, "UX_InventoryAdjustments").IsUnique();
+            entity.HasIndex(e => e.AdjustmentNo).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AdjustmentDate).HasDefaultValueSql("(getutcdate())");
@@ -1668,26 +1517,22 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.ApprovedByUser).WithMany(p => p.InventoryAdjustmentsApprovedByUser)
-                .HasForeignKey(d => d.ApprovedByUserId)
-                .HasConstraintName("FK__Inventory__Appro__52CE3E04");
+                .HasForeignKey(d => d.ApprovedByUserId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.InventoryAdjustmentsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Inventory__Creat__54B68676");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.InventoryAdjustmentsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Inventory__Updat__55AAAAAF");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.InventoryAdjustments)
                 .HasForeignKey(d => d.WarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Inventory__Wareh__4FF1D159");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<Invoices>(entity =>
         {
-            entity.HasIndex(e => e.InvoiceNumber, "UX_Invoices_Number").IsUnique();
+            entity.HasIndex(e => e.InvoiceNumber).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AmountDue).HasColumnType("decimal(18, 2)");
@@ -1703,21 +1548,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.InvoicesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Invoices__Create__511AFFBC");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Order).WithMany(p => p.Invoices)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__Invoices__OrderI__4F32B74A");
+                .HasForeignKey(d => d.OrderId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.InvoicesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Invoices__Update__520F23F5");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<LoyaltyTransactions>(entity =>
         {
-            entity.HasIndex(e => new { e.CustomerId, e.TransactionDate }, "IX_LoyaltyTransactions").IsDescending(false, true);
+            entity.HasIndex(e => new { e.CustomerId, e.TransactionDate }).IsDescending(false, true);
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -1728,24 +1570,19 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TransactionType).HasMaxLength(20);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.LoyaltyTransactionsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__LoyaltyTr__Creat__21A0F6C4");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.LoyaltyTransactions)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__LoyaltyTr__Custo__1CDC41A7");
+                .HasForeignKey(d => d.CustomerId);
 
             entity.HasOne(d => d.Order).WithMany(p => p.LoyaltyTransactions)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK_LoyaltyTransactions_Orders");
+                .HasForeignKey(d => d.OrderId);
 
             entity.HasOne(d => d.PosTrans).WithMany(p => p.LoyaltyTransactions)
-                .HasForeignKey(d => d.PosTransId)
-                .HasConstraintName("FK_LoyaltyTransactions_Sales");
+                .HasForeignKey(d => d.PosTransId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.LoyaltyTransactionsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__LoyaltyTr__Updat__22951AFD");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<MediaAssets>(entity =>
@@ -1764,21 +1601,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .HasDefaultValue("Local");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.MediaAssetsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__MediaAsse__Creat__740F363E");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.MediaAssetsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__MediaAsse__Updat__75035A77");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.UploadedByNavigation).WithMany(p => p.MediaAssetsUploadedByNavigation)
-                .HasForeignKey(d => d.UploadedBy)
-                .HasConstraintName("FK__MediaAsse__Uploa__7226EDCC");
+                .HasForeignKey(d => d.UploadedBy);
         });
 
         modelBuilder.Entity<Menus>(entity =>
         {
-            entity.HasIndex(e => e.MenuCode, "UX_Menus_Code").IsUnique();
+            entity.HasIndex(e => e.MenuCode).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -1797,21 +1631,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.MenusCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Menus__CreatedBy__245D67DE");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.ParentMenu).WithMany(p => p.InverseParentMenu)
-                .HasForeignKey(d => d.ParentMenuId)
-                .HasConstraintName("FK__Menus__ParentMen__1CBC4616");
+                .HasForeignKey(d => d.ParentMenuId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.MenusUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Menus__UpdatedBy__25518C17");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<NewsletterSubscribers>(entity =>
         {
-            entity.HasIndex(e => e.Email, "UX_Subscribers_Email").IsUnique();
+            entity.HasIndex(e => e.Email).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -1823,13 +1654,12 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.SubscribedAt).HasDefaultValueSql("(getutcdate())");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.NewsletterSubscribers)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__Newslette__Custo__55CAA640");
+                .HasForeignKey(d => d.CustomerId);
         });
 
         modelBuilder.Entity<Notifications>(entity =>
         {
-            entity.HasIndex(e => e.UserId, "IX_Notifications_User").HasFilter("([IsDeleted]=(0) AND [IsRead]=(0))");
+            entity.HasIndex(e => e.UserId).HasFilter("([IsDeleted]=(0) AND [IsRead]=(0))");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -1844,13 +1674,11 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Type).HasMaxLength(50);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.NotificationsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Notificat__Creat__6AC5C326");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.User).WithMany(p => p.NotificationsUser)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK__Notificat__UserI__650CE9D0");
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<OrderBundleSelections>(entity =>
@@ -1864,22 +1692,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.OrderBundleSelections)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__OrderBund__Creat__4979DDF4");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Group).WithMany(p => p.OrderBundleSelections)
                 .HasForeignKey(d => d.GroupId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__OrderBund__Group__45A94D10");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.OrderItem).WithMany(p => p.OrderBundleSelections)
-                .HasForeignKey(d => d.OrderItemId)
-                .HasConstraintName("FK__OrderBund__Order__44B528D7");
+                .HasForeignKey(d => d.OrderItemId);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.OrderBundleSelections)
                 .HasForeignKey(d => d.VariantId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__OrderBund__Varia__469D7149");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<OrderItemTaxes>(entity =>
@@ -1894,24 +1718,21 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TaxRate).HasColumnType("decimal(9, 4)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.OrderItemTaxes)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__OrderItem__Creat__3FF073BA");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.OrderItem).WithMany(p => p.OrderItemTaxes)
-                .HasForeignKey(d => d.OrderItemId)
-                .HasConstraintName("FK__OrderItem__Order__3D14070F");
+                .HasForeignKey(d => d.OrderItemId);
 
             entity.HasOne(d => d.TaxRateNavigation).WithMany(p => p.OrderItemTaxes)
                 .HasForeignKey(d => d.TaxRateId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__OrderItem__TaxRa__3E082B48");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<OrderItems>(entity =>
         {
-            entity.HasIndex(e => e.OrderId, "IX_OrderItems_Order").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.OrderId).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.ProductId, "IX_OrderItems_Product").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.ProductId).HasFilter("([IsDeleted]=(0))");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -1934,33 +1755,26 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.VariantName).HasMaxLength(120);
 
             entity.HasOne(d => d.Batch).WithMany(p => p.OrderItems)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__OrderItem__Batch__2FBA0BF1");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.OrderItemsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__OrderItem__Creat__375B2DB9");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__OrderItem__Order__2BE97B0D");
+                .HasForeignKey(d => d.OrderId);
 
             entity.HasOne(d => d.Product).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__OrderItem__Produ__2CDD9F46");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Seller).WithMany(p => p.OrderItems)
-                .HasForeignKey(d => d.SellerId)
-                .HasConstraintName("FK__OrderItem__Selle__2EC5E7B8");
+                .HasForeignKey(d => d.SellerId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.OrderItemsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__OrderItem__Updat__384F51F2");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.OrderItems)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__OrderItem__Varia__2DD1C37F");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<OrderReturnItems>(entity =>
@@ -1977,21 +1791,17 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.OrderReturnItemsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__OrderRetu__Creat__7E77B618");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.OrderItem).WithMany(p => p.OrderReturnItems)
                 .HasForeignKey(d => d.OrderItemId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__OrderRetu__Order__79B300FB");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Return).WithMany(p => p.OrderReturnItems)
-                .HasForeignKey(d => d.ReturnId)
-                .HasConstraintName("FK__OrderRetu__Retur__78BEDCC2");
+                .HasForeignKey(d => d.ReturnId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.OrderReturnItemsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__OrderRetu__Updat__7F6BDA51");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<OrderStatuses>(entity =>
@@ -2005,13 +1815,13 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<Orders>(entity =>
         {
-            entity.HasIndex(e => new { e.CustomerId, e.OrderDate }, "IX_Orders_Customer")
+            entity.HasIndex(e => new { e.CustomerId, e.OrderDate })
                 .IsDescending(false, true)
                 .HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.StatusCode, "IX_Orders_Status").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.StatusCode).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.OrderNumber, "UX_Orders_Number").IsUnique();
+            entity.HasIndex(e => e.OrderNumber).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AdminNote).HasMaxLength(2000);
@@ -2035,43 +1845,34 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.AppliedDiscount).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.AppliedDiscountId)
-                .HasConstraintName("FK__Orders__AppliedD__19CACAD2");
+                .HasForeignKey(d => d.AppliedDiscountId);
 
             entity.HasOne(d => d.BillingAddress).WithMany(p => p.OrdersBillingAddress)
-                .HasForeignKey(d => d.BillingAddressId)
-                .HasConstraintName("FK__Orders__BillingA__18D6A699");
+                .HasForeignKey(d => d.BillingAddressId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.OrdersCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Orders__CreatedB__2354350C");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.CustomerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Orders__Customer__150615B5");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.ShippingAddress).WithMany(p => p.OrdersShippingAddress)
                 .HasForeignKey(d => d.ShippingAddressId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Orders__Shipping__17E28260");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.StatusCodeNavigation).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.StatusCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Orders__StatusCo__1BB31344");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.OrdersUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Orders__UpdatedB__24485945");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.User).WithMany(p => p.OrdersUser)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Orders__UserId__15FA39EE");
+                .HasForeignKey(d => d.UserId);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("FK__Orders__Warehous__16EE5E27");
+                .HasForeignKey(d => d.WarehouseId);
         });
 
         modelBuilder.Entity<PaymentGateways>(entity =>
@@ -2087,17 +1888,14 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PaymentGatewaysCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PaymentGa__Creat__5AA469F6");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.MethodCodeNavigation).WithMany(p => p.PaymentGateways)
                 .HasForeignKey(d => d.MethodCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PaymentGa__Metho__56D3D912");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PaymentGatewaysUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PaymentGa__Updat__5B988E2F");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<PaymentMethods>(entity =>
@@ -2120,9 +1918,9 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<Payments>(entity =>
         {
-            entity.HasIndex(e => e.OrderId, "IX_Payments_Order").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.OrderId).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.TransactionId, "UX_Payments_TransactionId")
+            entity.HasIndex(e => e.TransactionId)
                 .IsUnique()
                 .HasFilter("([TransactionId] IS NOT NULL)");
 
@@ -2149,36 +1947,30 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TransactionId).HasMaxLength(250);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PaymentsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Payments__Create__67FE6514");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.CurrencyCodeNavigation).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.CurrencyCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Payments__Curren__66161CA2");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.MethodCodeNavigation).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.MethodCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Payments__Method__61516785");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__Payments__OrderI__605D434C");
+                .HasForeignKey(d => d.OrderId);
 
             entity.HasOne(d => d.StatusCodeNavigation).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.StatusCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Payments__Status__6339AFF7");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PaymentsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Payments__Update__68F2894D");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<Permissions>(entity =>
         {
-            entity.HasIndex(e => e.PermissionCode, "UX_Permissions_Code").IsUnique();
+            entity.HasIndex(e => e.PermissionCode).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -2192,12 +1984,10 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PermissionsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Permissio__Creat__114A936A");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PermissionsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Permissio__Updat__123EB7A3");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<PickupPoints>(entity =>
@@ -2219,21 +2009,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PickupPointsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PickupPoi__Creat__17AD7836");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PickupPointsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PickupPoi__Updat__18A19C6F");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.PickupPoints)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("FK__PickupPoi__Wareh__14D10B8B");
+                .HasForeignKey(d => d.WarehouseId);
         });
 
         modelBuilder.Entity<PosCounters>(entity =>
         {
-            entity.HasIndex(e => new { e.WarehouseId, e.CounterCode }, "UX_PosCounters").IsUnique();
+            entity.HasIndex(e => new { e.WarehouseId, e.CounterCode }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CounterCode).HasMaxLength(50);
@@ -2245,17 +2032,14 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PosCountersCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PosCounte__Creat__638EB5B2");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PosCountersUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PosCounte__Updat__6482D9EB");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.PosCounters)
                 .HasForeignKey(d => d.WarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosCounte__Wareh__60B24907");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<PosPaymentTenders>(entity =>
@@ -2274,26 +2058,22 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TransactionNo).HasMaxLength(100);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PosPaymentTendersCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PosPaymen__Creat__3C3FDE67");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.MethodCodeNavigation).WithMany(p => p.PosPaymentTenders)
                 .HasForeignKey(d => d.MethodCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosPaymen__Metho__396371BC");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Transaction).WithMany(p => p.PosPaymentTenders)
-                .HasForeignKey(d => d.TransactionId)
-                .HasConstraintName("FK__PosPaymen__Trans__386F4D83");
+                .HasForeignKey(d => d.TransactionId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PosPaymentTendersUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PosPaymen__Updat__3D3402A0");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<PosTerminals>(entity =>
         {
-            entity.HasIndex(e => new { e.PosCounterId, e.TerminalCode }, "UX_PosTerminals").IsUnique();
+            entity.HasIndex(e => new { e.PosCounterId, e.TerminalCode }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -2310,17 +2090,14 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TerminalName).HasMaxLength(100);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PosTerminalsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PosTermin__Creat__6D181FEC");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.PosCounter).WithMany(p => p.PosTerminals)
                 .HasForeignKey(d => d.PosCounterId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTermin__PosCo__6A3BB341");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PosTerminalsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PosTermin__Updat__6E0C4425");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<PosTransactionBundleSelections>(entity =>
@@ -2334,22 +2111,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PosTransactionBundleSelections)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PosTransa__Creat__46BD6CDA");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Group).WithMany(p => p.PosTransactionBundleSelections)
                 .HasForeignKey(d => d.GroupId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTransa__Group__42ECDBF6");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.PosTransactionLine).WithMany(p => p.PosTransactionBundleSelections)
-                .HasForeignKey(d => d.PosTransactionLineId)
-                .HasConstraintName("FK__PosTransa__PosTr__41F8B7BD");
+                .HasForeignKey(d => d.PosTransactionLineId);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.PosTransactionBundleSelections)
                 .HasForeignKey(d => d.VariantId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTransa__Varia__43E1002F");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<PosTransactionLineTaxes>(entity =>
@@ -2364,17 +2137,14 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TaxRate).HasColumnType("decimal(9, 4)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PosTransactionLineTaxes)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PosTransa__Creat__33AA9866");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.PosTransactionLine).WithMany(p => p.PosTransactionLineTaxes)
-                .HasForeignKey(d => d.PosTransactionLineId)
-                .HasConstraintName("FK__PosTransa__PosTr__30CE2BBB");
+                .HasForeignKey(d => d.PosTransactionLineId);
 
             entity.HasOne(d => d.TaxRateNavigation).WithMany(p => p.PosTransactionLineTaxes)
                 .HasForeignKey(d => d.TaxRateId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTransa__TaxRa__31C24FF4");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<PosTransactionLines>(entity =>
@@ -2397,29 +2167,23 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Batch).WithMany(p => p.PosTransactionLines)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__PosTransa__Batch__255C790F");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PosTransactionLinesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PosTransa__Creat__2B155265");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.PosTransactionLines)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTransa__Produ__2374309D");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Transaction).WithMany(p => p.PosTransactionLines)
-                .HasForeignKey(d => d.TransactionId)
-                .HasConstraintName("FK__PosTransa__Trans__22800C64");
+                .HasForeignKey(d => d.TransactionId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PosTransactionLinesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PosTransa__Updat__2C09769E");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.PosTransactionLines)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__PosTransa__Varia__246854D6");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<PosTransactionReturnLines>(entity =>
@@ -2434,30 +2198,25 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Batch).WithMany(p => p.PosTransactionReturnLines)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__PosTransa__Batch__1372D2FE");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PosTransactionReturnLines)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PosTransa__Creat__164F3FA9");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.PosTransactionReturn).WithMany(p => p.PosTransactionReturnLines)
-                .HasForeignKey(d => d.PosTransactionReturnId)
-                .HasConstraintName("FK__PosTransa__PosTr__10966653");
+                .HasForeignKey(d => d.PosTransactionReturnId);
 
             entity.HasOne(d => d.Product).WithMany(p => p.PosTransactionReturnLines)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTransa__Produ__118A8A8C");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.PosTransactionReturnLines)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__PosTransa__Varia__127EAEC5");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<PosTransactionReturns>(entity =>
         {
-            entity.HasIndex(e => e.ReturnNo, "UX_PosReturns_No").IsUnique();
+            entity.HasIndex(e => e.ReturnNo).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -2470,46 +2229,40 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PosTransactionReturnsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PosTransa__Creat__0ADD8CFD");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.PosTransactionReturnsCreatedByUser)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__PosTransa__Creat__08F5448B");
+                .HasForeignKey(d => d.CreatedByUserId);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.PosTransactionReturns)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__PosTransa__Custo__070CFC19");
+                .HasForeignKey(d => d.CustomerId);
 
             entity.HasOne(d => d.Sale).WithMany(p => p.PosTransactionReturns)
-                .HasForeignKey(d => d.SaleId)
-                .HasConstraintName("FK_PosTransactionReturns_Sales");
+                .HasForeignKey(d => d.SaleId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PosTransactionReturnsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PosTransa__Updat__0BD1B136");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.PosTransactionReturns)
                 .HasForeignKey(d => d.WarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTransa__Wareh__0618D7E0");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<PosTransactions>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Sales");
 
-            entity.HasIndex(e => new { e.CashierId, e.SaleDate }, "IX_Sales_Cashier")
+            entity.HasIndex(e => new { e.CashierId, e.SaleDate })
                 .IsDescending(false, true)
                 .HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.CustomerId, "IX_Sales_Customer").HasFilter("([CustomerId] IS NOT NULL AND [IsDeleted]=(0))");
+            entity.HasIndex(e => e.CustomerId).HasFilter("([CustomerId] IS NOT NULL AND [IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.CashShiftId, "IX_Sales_Shift").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.CashShiftId).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => new { e.WarehouseId, e.SaleDate }, "IX_Sales_Warehouse").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => new { e.WarehouseId, e.SaleDate }).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.ReceiptNumber, "UX_Sales_Receipt").IsUnique();
+            entity.HasIndex(e => e.ReceiptNumber).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.ChangeAmount).HasColumnType("decimal(18, 2)");
@@ -2540,52 +2293,41 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.VoidReason).HasMaxLength(250);
 
             entity.HasOne(d => d.AppliedDiscount).WithMany(p => p.PosTransactions)
-                .HasForeignKey(d => d.AppliedDiscountId)
-                .HasConstraintName("FK__PosTransa__Appli__0D84EF7E");
+                .HasForeignKey(d => d.AppliedDiscountId);
 
             entity.HasOne(d => d.CashShift).WithMany(p => p.PosTransactions)
                 .HasForeignKey(d => d.CashShiftId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTransa__CashS__06D7F1EF");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.CashierEmployee).WithMany(p => p.PosTransactions)
-                .HasForeignKey(d => d.CashierEmployeeId)
-                .HasConstraintName("FK__PosTransa__Cashi__0AA882D3");
+                .HasForeignKey(d => d.CashierEmployeeId);
 
             entity.HasOne(d => d.Cashier).WithMany(p => p.PosTransactionsCashier)
                 .HasForeignKey(d => d.CashierId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTransa__Cashi__09B45E9A");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PosTransactionsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PosTransa__Creat__19EAC663");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.PosTransactions)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__PosTransa__Custo__0B9CA70C");
+                .HasForeignKey(d => d.CustomerId);
 
             entity.HasOne(d => d.PosCounter).WithMany(p => p.PosTransactions)
                 .HasForeignKey(d => d.PosCounterId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTransa__PosCo__07CC1628");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.PosTerminal).WithMany(p => p.PosTransactions)
-                .HasForeignKey(d => d.PosTerminalId)
-                .HasConstraintName("FK__PosTransa__PosTe__08C03A61");
+                .HasForeignKey(d => d.PosTerminalId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PosTransactionsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PosTransa__Updat__1ADEEA9C");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.VoidedByNavigation).WithMany(p => p.PosTransactionsVoidedByNavigation)
-                .HasForeignKey(d => d.VoidedBy)
-                .HasConstraintName("FK__PosTransa__Voide__18027DF1");
+                .HasForeignKey(d => d.VoidedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.PosTransactions)
                 .HasForeignKey(d => d.WarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PosTransa__Wareh__0C90CB45");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<PriceListItems>(entity =>
@@ -2601,24 +2343,19 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.SalePrice).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PriceListItemsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PriceList__Creat__63A3C44B");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.PriceList).WithMany(p => p.PriceListItems)
-                .HasForeignKey(d => d.PriceListId)
-                .HasConstraintName("FK__PriceList__Price__5EDF0F2E");
+                .HasForeignKey(d => d.PriceListId);
 
             entity.HasOne(d => d.Product).WithMany(p => p.PriceListItems)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__PriceList__Produ__5FD33367");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PriceListItemsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PriceList__Updat__6497E884");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.PriceListItems)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__PriceList__Varia__60C757A0");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<PriceLists>(entity =>
@@ -2636,21 +2373,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TierCode).HasMaxLength(20);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PriceListsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PriceList__Creat__592635D8");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.TierCodeNavigation).WithMany(p => p.PriceLists)
-                .HasForeignKey(d => d.TierCode)
-                .HasConstraintName("FK__PriceList__TierC__5649C92D");
+                .HasForeignKey(d => d.TierCode);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PriceListsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PriceList__Updat__5A1A5A11");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<ProductAttributeLinks>(entity =>
         {
-            entity.HasIndex(e => new { e.ProductId, e.AttributeTypeId }, "UX_ProductAttributeLinks").IsUnique();
+            entity.HasIndex(e => new { e.ProductId, e.AttributeTypeId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -2661,21 +2395,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
             entity.HasOne(d => d.AttributeType).WithMany(p => p.ProductAttributeLinks)
                 .HasForeignKey(d => d.AttributeTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ProductAt__Attri__27C3E46E");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductAttributeLinks)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductAt__Creat__2B947552");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductAttributeLinks)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__ProductAt__Produ__26CFC035");
+                .HasForeignKey(d => d.ProductId);
         });
 
         modelBuilder.Entity<ProductBatches>(entity =>
         {
-            entity.HasIndex(e => new { e.ProductId, e.BatchNo }, "UX_ProductBatches").IsUnique();
+            entity.HasIndex(e => new { e.ProductId, e.BatchNo }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.BatchNo).HasMaxLength(100);
@@ -2687,22 +2418,19 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.SalePrice).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductBatchesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductBa__Creat__13BCEBC1");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductBatches)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ProductBa__Produ__0FEC5ADD");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ProductBatchesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ProductBa__Updat__14B10FFA");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<ProductCollectionItems>(entity =>
         {
-            entity.HasIndex(e => new { e.ProductCollectionId, e.ProductId }, "UX_ProductCollectionItems").IsUnique();
+            entity.HasIndex(e => new { e.ProductCollectionId, e.ProductId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -2711,23 +2439,20 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductCollectionItems)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductCo__Creat__4F9CCB9E");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.ProductCollection).WithMany(p => p.ProductCollectionItems)
-                .HasForeignKey(d => d.ProductCollectionId)
-                .HasConstraintName("FK__ProductCo__Produ__4BCC3ABA");
+                .HasForeignKey(d => d.ProductCollectionId);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductCollectionItems)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__ProductCo__Produ__4CC05EF3");
+                .HasForeignKey(d => d.ProductId);
         });
 
         modelBuilder.Entity<ProductCollections>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Collections");
 
-            entity.HasIndex(e => e.Slug, "UX_Collections_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -2739,12 +2464,10 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Slug).HasMaxLength(150);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductCollectionsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductCo__Creat__451F3D2B");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ProductCollectionsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ProductCo__Updat__46136164");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<ProductConditions>(entity =>
@@ -2757,7 +2480,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<ProductImages>(entity =>
         {
-            entity.HasIndex(e => e.ProductId, "IX_ProductImages_Product").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.ProductId).HasFilter("([IsDeleted]=(0))");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AltText).HasMaxLength(200);
@@ -2768,27 +2491,23 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductImagesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductIm__Creat__58671BC9");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductImages)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__ProductIm__Produ__53A266AC");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ProductImagesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ProductIm__Updat__595B4002");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.ProductImages)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__ProductIm__Varia__54968AE5");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<ProductMedia>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Media");
 
-            entity.HasIndex(e => new { e.ProductId, e.Scope, e.SortOrder }, "IX_Media").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => new { e.ProductId, e.Scope, e.SortOrder }).HasFilter("([IsDeleted]=(0))");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AltText).HasMaxLength(200);
@@ -2810,24 +2529,19 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .HasDefaultValue("Product");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductMediaCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductMe__Creat__04459E07");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductMedia)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__ProductMe__Produ__79C80F94");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ProductMediaUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ProductMe__Updat__0539C240");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.UploadedByNavigation).WithMany(p => p.ProductMediaUploadedByNavigation)
-                .HasForeignKey(d => d.UploadedBy)
-                .HasConstraintName("FK__ProductMe__Uploa__025D5595");
+                .HasForeignKey(d => d.UploadedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.ProductMedia)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__ProductMe__Varia__7ABC33CD");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<ProductMediaBlob>(entity =>
@@ -2837,13 +2551,12 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.MediaId).ValueGeneratedNever();
 
             entity.HasOne(d => d.Media).WithOne(p => p.ProductMediaBlob)
-                .HasForeignKey<ProductMediaBlob>(d => d.MediaId)
-                .HasConstraintName("FK_ProductMediaBlob");
+                .HasForeignKey<ProductMediaBlob>(d => d.MediaId);
         });
 
         modelBuilder.Entity<ProductPriceHistories>(entity =>
         {
-            entity.HasIndex(e => new { e.ProductId, e.EffectiveFrom }, "IX_ProductPriceHistories").IsDescending(false, true);
+            entity.HasIndex(e => new { e.ProductId, e.EffectiveFrom }).IsDescending(false, true);
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -2859,17 +2572,14 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
             entity.HasOne(d => d.ChangedByUser).WithMany(p => p.ProductPriceHistoriesChangedByUser)
                 .HasForeignKey(d => d.ChangedByUserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ProductPr__Chang__075714DC");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductPriceHistoriesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductPr__Creat__0A338187");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductPriceHistories)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ProductPr__Produ__0662F0A3");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<ProductSpecificationValues>(entity =>
@@ -2881,31 +2591,26 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductSpecificationValuesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductSp__Creat__4DE98D56");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductSpecificationValues)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__ProductSp__Produ__4A18FC72");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.Spec).WithMany(p => p.ProductSpecificationValues)
-                .HasForeignKey(d => d.SpecId)
-                .HasConstraintName("FK__ProductSp__SpecI__4C0144E4");
+                .HasForeignKey(d => d.SpecId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ProductSpecificationValuesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ProductSp__Updat__4EDDB18F");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.ProductSpecificationValues)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__ProductSp__Varia__4B0D20AB");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<ProductSpecifications>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Specs");
 
-            entity.HasIndex(e => e.SpecName, "UX_ProductSpecifications").IsUnique();
+            entity.HasIndex(e => e.SpecName).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -2915,15 +2620,14 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.SpecName).HasMaxLength(100);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductSpecifications)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductSp__Creat__45544755");
+                .HasForeignKey(d => d.CreatedBy);
         });
 
         modelBuilder.Entity<ProductSupplierLinks>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_ProductSuppliers");
 
-            entity.HasIndex(e => new { e.ProductId, e.SupplierId }, "UX_ProductSupplierLinks").IsUnique();
+            entity.HasIndex(e => new { e.ProductId, e.SupplierId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -2937,20 +2641,16 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UnitCost).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductSupplierLinksCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductSu__Creat__00AA174D");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductSupplierLinks)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__ProductSu__Produ__7BE56230");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.Supplier).WithMany(p => p.ProductSupplierLinks)
-                .HasForeignKey(d => d.SupplierId)
-                .HasConstraintName("FK__ProductSu__Suppl__7CD98669");
+                .HasForeignKey(d => d.SupplierId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ProductSupplierLinksUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ProductSu__Updat__019E3B86");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<ProductTags>(entity =>
@@ -2960,23 +2660,20 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductTags)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductTa__Creat__6A85CC04");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductTags)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__ProductTa__Produ__67A95F59");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.Tag).WithMany(p => p.ProductTags)
-                .HasForeignKey(d => d.TagId)
-                .HasConstraintName("FK__ProductTa__TagId__689D8392");
+                .HasForeignKey(d => d.TagId);
         });
 
         modelBuilder.Entity<ProductTaxRates>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_ProductTax");
 
-            entity.HasIndex(e => new { e.ProductId, e.TaxRateId }, "UX_ProductTaxes").IsUnique();
+            entity.HasIndex(e => new { e.ProductId, e.TaxRateId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -2986,32 +2683,28 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductTaxRatesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductTa__Creat__62E4AA3C");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductTaxRates)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__ProductTa__Produ__5F141958");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.TaxRate).WithMany(p => p.ProductTaxRates)
                 .HasForeignKey(d => d.TaxRateId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ProductTa__TaxRa__60083D91");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ProductTaxRatesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ProductTa__Updat__63D8CE75");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<ProductVariants>(entity =>
         {
-            entity.HasIndex(e => e.ProductId, "IX_Variants_Product").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.ProductId).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.Barcode, "UX_ProductVariants_Barcode")
+            entity.HasIndex(e => e.Barcode)
                 .IsUnique()
                 .HasFilter("([Barcode] IS NOT NULL AND [IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.Sku, "UX_ProductVariants_SKU")
+            entity.HasIndex(e => e.Sku)
                 .IsUnique()
                 .HasFilter("([SKU] IS NOT NULL AND [IsDeleted]=(0))");
 
@@ -3033,35 +2726,32 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.WeightKg).HasColumnType("decimal(8, 3)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductVariantsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ProductVa__Creat__2022C2A6");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductVariants)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__ProductVa__Produ__1975C517");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ProductVariantsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ProductVa__Updat__2116E6DF");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<Products>(entity =>
         {
-            entity.HasIndex(e => new { e.IsActive, e.ProductType }, "IX_Products_Active").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => new { e.IsActive, e.ProductType }).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.BrandId, "IX_Products_Brand").HasFilter("([BrandId] IS NOT NULL AND [IsDeleted]=(0))");
+            entity.HasIndex(e => e.BrandId).HasFilter("([BrandId] IS NOT NULL AND [IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.CategoryId, "IX_Products_Category").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.CategoryId).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.Barcode, "UX_Products_Barcode")
+            entity.HasIndex(e => e.Barcode)
                 .IsUnique()
                 .HasFilter("([Barcode] IS NOT NULL AND [IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.Sku, "UX_Products_SKU")
+            entity.HasIndex(e => e.Sku)
                 .IsUnique()
                 .HasFilter("([SKU] IS NOT NULL AND [IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.Slug, "UX_Products_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.Barcode).HasMaxLength(100);
@@ -3098,42 +2788,33 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
             entity.HasOne(d => d.Brand).WithMany(p => p.Products)
                 .HasForeignKey(d => d.BrandId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK__Products__BrandI__61316BF4");
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Products__Catego__603D47BB");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Color).WithMany(p => p.Products)
-                .HasForeignKey(d => d.ColorId)
-                .HasConstraintName("FK__Products__ColorI__6225902D");
+                .HasForeignKey(d => d.ColorId);
 
             entity.HasOne(d => d.ConditionCodeNavigation).WithMany(p => p.Products)
-                .HasForeignKey(d => d.ConditionCode)
-                .HasConstraintName("FK__Products__Condit__6501FCD8");
+                .HasForeignKey(d => d.ConditionCode);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ProductsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Products__Create__753864A1");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Seller).WithMany(p => p.Products)
                 .HasForeignKey(d => d.SellerId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_Products_Sellers");
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasOne(d => d.TaxRate).WithMany(p => p.Products)
-                .HasForeignKey(d => d.TaxRateId)
-                .HasConstraintName("FK__Products__TaxRat__640DD89F");
+                .HasForeignKey(d => d.TaxRateId);
 
             entity.HasOne(d => d.Unit).WithMany(p => p.Products)
-                .HasForeignKey(d => d.UnitId)
-                .HasConstraintName("FK__Products__UnitId__6319B466");
+                .HasForeignKey(d => d.UnitId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ProductsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Products__Update__762C88DA");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<PurchaseOrderLineTaxes>(entity =>
@@ -3148,17 +2829,14 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TaxRate).HasColumnType("decimal(9, 4)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PurchaseOrderLineTaxes)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PurchaseO__Creat__33208881");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.PurchaseOrderLine).WithMany(p => p.PurchaseOrderLineTaxes)
-                .HasForeignKey(d => d.PurchaseOrderLineId)
-                .HasConstraintName("FK__PurchaseO__Purch__30441BD6");
+                .HasForeignKey(d => d.PurchaseOrderLineId);
 
             entity.HasOne(d => d.TaxRateNavigation).WithMany(p => p.PurchaseOrderLineTaxes)
                 .HasForeignKey(d => d.TaxRateId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PurchaseO__TaxRa__3138400F");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<PurchaseOrderLines>(entity =>
@@ -3183,34 +2861,28 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Batch).WithMany(p => p.PurchaseOrderLines)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__PurchaseO__Batch__23DE44F1");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PurchaseOrderLinesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PurchaseO__Creat__2A8B4280");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.PurchaseOrderLines)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PurchaseO__Produ__21F5FC7F");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.PurchaseOrder).WithMany(p => p.PurchaseOrderLines)
-                .HasForeignKey(d => d.PurchaseOrderId)
-                .HasConstraintName("FK__PurchaseO__Purch__2101D846");
+                .HasForeignKey(d => d.PurchaseOrderId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PurchaseOrderLinesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PurchaseO__Updat__2B7F66B9");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.PurchaseOrderLines)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__PurchaseO__Varia__22EA20B8");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<PurchaseOrders>(entity =>
         {
-            entity.HasIndex(e => e.OrderNumber, "UX_PurchaseOrders_No").IsUnique();
+            entity.HasIndex(e => e.OrderNumber).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -3235,30 +2907,24 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TransportCost).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.ApprovedByUser).WithMany(p => p.PurchaseOrdersApprovedByUser)
-                .HasForeignKey(d => d.ApprovedByUserId)
-                .HasConstraintName("FK__PurchaseO__Appro__0CFADF99");
+                .HasForeignKey(d => d.ApprovedByUserId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PurchaseOrdersCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PurchaseO__Creat__1B48FEF0");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.PurchaseOrdersCreatedByUser)
                 .HasForeignKey(d => d.CreatedByUserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PurchaseO__Creat__0C06BB60");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Supplier).WithMany(p => p.PurchaseOrders)
                 .HasForeignKey(d => d.SupplierId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PurchaseO__Suppl__0A1E72EE");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PurchaseOrdersUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PurchaseO__Updat__1C3D2329");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.PurchaseOrders)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("FK__PurchaseO__Wareh__0B129727");
+                .HasForeignKey(d => d.WarehouseId);
         });
 
         modelBuilder.Entity<PurchaseReturnLines>(entity =>
@@ -3276,30 +2942,25 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Batch).WithMany(p => p.PurchaseReturnLines)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__PurchaseR__Batch__4AF81212");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PurchaseReturnLines)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PurchaseR__Creat__4FBCC72F");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.PurchaseReturnLines)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PurchaseR__Produ__490FC9A0");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.PurchaseReturn).WithMany(p => p.PurchaseReturnLines)
-                .HasForeignKey(d => d.PurchaseReturnId)
-                .HasConstraintName("FK__PurchaseR__Purch__481BA567");
+                .HasForeignKey(d => d.PurchaseReturnId);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.PurchaseReturnLines)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__PurchaseR__Varia__4A03EDD9");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<PurchaseReturns>(entity =>
         {
-            entity.HasIndex(e => e.ReturnNo, "UX_PurchReturns_No").IsUnique();
+            entity.HasIndex(e => e.ReturnNo).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -3315,31 +2976,25 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TaxAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PurchaseReturnsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__PurchaseR__Creat__4262CC11");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.PurchaseReturnsCreatedByUser)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__PurchaseR__Creat__407A839F");
+                .HasForeignKey(d => d.CreatedByUserId);
 
             entity.HasOne(d => d.PurchaseOrder).WithMany(p => p.PurchaseReturns)
                 .HasForeignKey(d => d.PurchaseOrderId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PurchaseR__Purch__38D961D7");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Supplier).WithMany(p => p.PurchaseReturns)
                 .HasForeignKey(d => d.SupplierId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PurchaseR__Suppl__3AC1AA49");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.PurchaseReturnsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__PurchaseR__Updat__4356F04A");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.PurchaseReturns)
                 .HasForeignKey(d => d.WarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__PurchaseR__Wareh__3BB5CE82");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<QuoteItems>(entity =>
@@ -3357,29 +3012,24 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.QuoteItemsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__QuoteItem__Creat__0E591826");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.QuoteItems)
-                .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("FK__QuoteItem__Produ__07AC1A97");
+                .HasForeignKey(d => d.ProductId);
 
             entity.HasOne(d => d.Quote).WithMany(p => p.QuoteItems)
-                .HasForeignKey(d => d.QuoteId)
-                .HasConstraintName("FK__QuoteItem__Quote__06B7F65E");
+                .HasForeignKey(d => d.QuoteId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.QuoteItemsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__QuoteItem__Updat__0F4D3C5F");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.QuoteItems)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__QuoteItem__Varia__08A03ED0");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<Quotes>(entity =>
         {
-            entity.HasIndex(e => e.QuoteNo, "UX_Quotes_No").IsUnique();
+            entity.HasIndex(e => e.QuoteNo).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -3397,25 +3047,20 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TaxAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.QuotesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Quotes__CreatedB__00FF1D08");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Quotes)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__Quotes__Customer__7775B2CE");
+                .HasForeignKey(d => d.CustomerId);
 
             entity.HasOne(d => d.Order).WithMany(p => p.Quotes)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK_Quotes_Orders");
+                .HasForeignKey(d => d.OrderId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.QuotesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Quotes__UpdatedB__01F34141");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.Quotes)
                 .HasForeignKey(d => d.WarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Quotes__Warehous__7869D707");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<RefundRequests>(entity =>
@@ -3433,29 +3078,23 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .HasDefaultValue("Requested");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.RefundRequestsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__RefundReq__Creat__21C0F255");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.RefundRequests)
-                .HasForeignKey(d => d.CustomerId)
-                .HasConstraintName("FK__RefundReq__Custo__1C0818FF");
+                .HasForeignKey(d => d.CustomerId);
 
             entity.HasOne(d => d.Order).WithMany(p => p.RefundRequests)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__RefundReq__Order__1B13F4C6");
+                .HasForeignKey(d => d.OrderId);
 
             entity.HasOne(d => d.Return).WithMany(p => p.RefundRequests)
-                .HasForeignKey(d => d.ReturnId)
-                .HasConstraintName("FK__RefundReq__Retur__1CFC3D38");
+                .HasForeignKey(d => d.ReturnId);
 
             entity.HasOne(d => d.StatusCodeNavigation).WithMany(p => p.RefundRequests)
                 .HasForeignKey(d => d.StatusCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__RefundReq__Statu__1EE485AA");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.RefundRequestsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__RefundReq__Updat__22B5168E");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<ReorderRules>(entity =>
@@ -3470,34 +3109,27 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ReorderRulesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ReorderRu__Creat__0371755F");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.NotifyUser).WithMany(p => p.ReorderRulesNotifyUser)
-                .HasForeignKey(d => d.NotifyUserId)
-                .HasConstraintName("FK__ReorderRu__Notif__009508B4");
+                .HasForeignKey(d => d.NotifyUserId);
 
             entity.HasOne(d => d.PreferredSupplier).WithMany(p => p.ReorderRules)
                 .HasForeignKey(d => d.PreferredSupplierId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK__ReorderRu__Prefe__7FA0E47B");
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ReorderRules)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ReorderRu__Produ__7CC477D0");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ReorderRulesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ReorderRu__Updat__04659998");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.ReorderRules)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__ReorderRu__Varia__7DB89C09");
+                .HasForeignKey(d => d.VariantId);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.ReorderRules)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("FK__ReorderRu__Wareh__7EACC042");
+                .HasForeignKey(d => d.WarehouseId);
         });
 
         modelBuilder.Entity<ReturnStatuses>(entity =>
@@ -3510,7 +3142,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<Returns>(entity =>
         {
-            entity.HasIndex(e => e.ReturnNumber, "UX_Returns_Number").IsUnique();
+            entity.HasIndex(e => e.ReturnNumber).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -3528,30 +3160,24 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .HasDefaultValue("Requested");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ReturnsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Returns__Created__7306036C");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Order).WithMany(p => p.Returns)
                 .HasForeignKey(d => d.OrderId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Returns__OrderId__6B64E1A4");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.ProcessedByUser).WithMany(p => p.ReturnsProcessedByUser)
-                .HasForeignKey(d => d.ProcessedByUserId)
-                .HasConstraintName("FK__Returns__Process__6C5905DD");
+                .HasForeignKey(d => d.ProcessedByUserId);
 
             entity.HasOne(d => d.RefundMethodCodeNavigation).WithMany(p => p.Returns)
-                .HasForeignKey(d => d.RefundMethodCode)
-                .HasConstraintName("FK__Returns__RefundM__711DBAFA");
+                .HasForeignKey(d => d.RefundMethodCode);
 
             entity.HasOne(d => d.StatusCodeNavigation).WithMany(p => p.Returns)
                 .HasForeignKey(d => d.StatusCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Returns__StatusC__6F357288");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ReturnsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Returns__Updated__73FA27A5");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<ReviewHelpfulness>(entity =>
@@ -3561,20 +3187,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
 
             entity.HasOne(d => d.Review).WithMany(p => p.ReviewHelpfulness)
-                .HasForeignKey(d => d.ReviewId)
-                .HasConstraintName("FK__ReviewHel__Revie__36BC0F3B");
+                .HasForeignKey(d => d.ReviewId);
 
             entity.HasOne(d => d.User).WithMany(p => p.ReviewHelpfulness)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__ReviewHel__UserI__37B03374");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<Reviews>(entity =>
         {
-            entity.HasIndex(e => e.ProductId, "IX_Reviews_Product").HasFilter("([IsDeleted]=(0) AND [IsApproved]=(1))");
+            entity.HasIndex(e => e.ProductId).HasFilter("([IsDeleted]=(0) AND [IsApproved]=(1))");
 
-            entity.HasIndex(e => new { e.CustomerId, e.ProductId }, "UX_Reviews_CustomerProduct").IsUnique();
+            entity.HasIndex(e => new { e.CustomerId, e.ProductId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -3584,26 +3208,21 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Title).HasMaxLength(200);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ReviewsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Reviews__Created__31F75A1E");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Reviews)
                 .HasForeignKey(d => d.CustomerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Reviews__Custome__2962141D");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Order).WithMany(p => p.Reviews)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__Reviews__OrderId__2A563856");
+                .HasForeignKey(d => d.OrderId);
 
             entity.HasOne(d => d.Product).WithMany(p => p.Reviews)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Reviews__Product__286DEFE4");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ReviewsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Reviews__Updated__32EB7E57");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<RoleClaims>(entity =>
@@ -3611,33 +3230,28 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
 
             entity.HasOne(d => d.Role).WithMany(p => p.RoleClaims)
-                .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK__RoleClaim__RoleI__01142BA1");
+                .HasForeignKey(d => d.RoleId);
         });
 
         modelBuilder.Entity<RoleMenus>(entity =>
         {
-            entity.HasIndex(e => new { e.RoleId, e.MenuId }, "UX_RoleMenus").IsUnique();
+            entity.HasIndex(e => new { e.RoleId, e.MenuId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CanView).HasDefaultValue(true);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.RoleMenusCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__RoleMenus__Creat__32AB8735");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Menu).WithMany(p => p.RoleMenus)
-                .HasForeignKey(d => d.MenuId)
-                .HasConstraintName("FK__RoleMenus__MenuI__2BFE89A6");
+                .HasForeignKey(d => d.MenuId);
 
             entity.HasOne(d => d.Role).WithMany(p => p.RoleMenus)
-                .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK__RoleMenus__RoleI__2B0A656D");
+                .HasForeignKey(d => d.RoleId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.RoleMenusUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__RoleMenus__Updat__339FAB6E");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<RolePermissions>(entity =>
@@ -3647,17 +3261,15 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.IsGranted).HasDefaultValue(true);
 
             entity.HasOne(d => d.Permission).WithMany(p => p.RolePermissions)
-                .HasForeignKey(d => d.PermissionId)
-                .HasConstraintName("FK__RolePermi__Permi__17036CC0");
+                .HasForeignKey(d => d.PermissionId);
 
             entity.HasOne(d => d.Role).WithMany(p => p.RolePermissions)
-                .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK__RolePermi__RoleI__160F4887");
+                .HasForeignKey(d => d.RoleId);
         });
 
         modelBuilder.Entity<Roles>(entity =>
         {
-            entity.HasIndex(e => e.NormalizedName, "UX_Roles_Name")
+            entity.HasIndex(e => e.NormalizedName)
                 .IsUnique()
                 .HasFilter("([NormalizedName] IS NOT NULL)");
 
@@ -3670,7 +3282,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<SearchKeywords>(entity =>
         {
-            entity.HasIndex(e => e.Keyword, "UX_Searches_Keyword").IsUnique();
+            entity.HasIndex(e => e.Keyword).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -3684,9 +3296,9 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<Sellers>(entity =>
         {
-            entity.HasIndex(e => e.Slug, "UX_Sellers_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
-            entity.HasIndex(e => e.UserId, "UX_Sellers_UserId").IsUnique();
+            entity.HasIndex(e => e.UserId).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AddressLine1).HasMaxLength(200);
@@ -3710,20 +3322,16 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.StoreName).HasMaxLength(200);
 
             entity.HasOne(d => d.ApprovedByUser).WithMany(p => p.SellersApprovedByUser)
-                .HasForeignKey(d => d.ApprovedByUserId)
-                .HasConstraintName("FK__Sellers__Approve__2E06CDA9");
+                .HasForeignKey(d => d.ApprovedByUserId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.SellersCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Sellers__Created__30E33A54");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.SellersUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Sellers__Updated__31D75E8D");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.User).WithOne(p => p.SellersUser)
-                .HasForeignKey<Sellers>(d => d.UserId)
-                .HasConstraintName("FK__Sellers__UserId__2942188C");
+                .HasForeignKey<Sellers>(d => d.UserId);
         });
 
         modelBuilder.Entity<ShipmentStatuses>(entity =>
@@ -3736,7 +3344,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<Shipments>(entity =>
         {
-            entity.HasIndex(e => e.OrderId, "IX_Shipments_Order").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.OrderId).HasFilter("([IsDeleted]=(0))");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -3753,33 +3361,26 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.WeightKg).HasColumnType("decimal(8, 3)");
 
             entity.HasOne(d => d.Carrier).WithMany(p => p.Shipments)
-                .HasForeignKey(d => d.CarrierId)
-                .HasConstraintName("FK__Shipments__Carri__1F4E99FE");
+                .HasForeignKey(d => d.CarrierId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ShipmentsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Shipments__Creat__25FB978D");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Order).WithMany(p => p.Shipments)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__Shipments__Order__1D66518C");
+                .HasForeignKey(d => d.OrderId);
 
             entity.HasOne(d => d.ShippingMethod).WithMany(p => p.Shipments)
-                .HasForeignKey(d => d.ShippingMethodId)
-                .HasConstraintName("FK__Shipments__Shipp__1E5A75C5");
+                .HasForeignKey(d => d.ShippingMethodId);
 
             entity.HasOne(d => d.StatusCodeNavigation).WithMany(p => p.Shipments)
                 .HasForeignKey(d => d.StatusCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Shipments__Statu__222B06A9");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ShipmentsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Shipments__Updat__26EFBBC6");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.Shipments)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("FK__Shipments__Wareh__2042BE37");
+                .HasForeignKey(d => d.WarehouseId);
         });
 
         modelBuilder.Entity<ShippingCarriers>(entity =>
@@ -3794,12 +3395,10 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ShippingCarriersCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ShippingC__Creat__7DEDA633");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ShippingCarriersUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ShippingC__Updat__7EE1CA6C");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<ShippingMethods>(entity =>
@@ -3819,19 +3418,17 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ShippingMethodsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__ShippingM__Creat__75586032");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.ShippingMethodsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__ShippingM__Updat__764C846B");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<StaticPages>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Pages");
 
-            entity.HasIndex(e => e.Slug, "UX_Pages_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -3845,23 +3442,21 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Title).HasMaxLength(200);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.StaticPagesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__StaticPag__Creat__33758E3C");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.StaticPagesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__StaticPag__Updat__3469B275");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<StockItems>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Stock");
 
-            entity.HasIndex(e => new { e.ProductId, e.WarehouseId }, "IX_Stock_Product").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => new { e.ProductId, e.WarehouseId }).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => e.WarehouseId, "IX_Stock_Warehouse").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.WarehouseId).HasFilter("([IsDeleted]=(0))");
 
-            entity.HasIndex(e => new { e.ProductId, e.VariantId, e.BatchId, e.WarehouseId }, "UX_Stock").IsUnique();
+            entity.HasIndex(e => new { e.ProductId, e.VariantId, e.BatchId, e.WarehouseId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AverageCostPrice).HasColumnType("decimal(18, 4)");
@@ -3875,34 +3470,27 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.Batch).WithMany(p => p.StockItems)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__StockItem__Batch__2E90DD8E");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.CountedByUser).WithMany(p => p.StockItemsCountedByUser)
-                .HasForeignKey(d => d.CountedByUserId)
-                .HasConstraintName("FK__StockItem__Count__353DDB1D");
+                .HasForeignKey(d => d.CountedByUserId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.StockItemsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__StockItem__Creat__381A47C8");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.StockItems)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__StockItem__Produ__2CA8951C");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.StockItemsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__StockItem__Updat__390E6C01");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.StockItems)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__StockItem__Varia__2D9CB955");
+                .HasForeignKey(d => d.VariantId);
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.StockItems)
                 .HasForeignKey(d => d.WarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__StockItem__Wareh__2F8501C7");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         modelBuilder.Entity<StockMovementTypes>(entity =>
@@ -3916,7 +3504,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<StockMovements>(entity =>
         {
-            entity.HasIndex(e => new { e.ProductId, e.OccurredAt }, "IX_StockMovements")
+            entity.HasIndex(e => new { e.ProductId, e.OccurredAt })
                 .IsDescending(false, true)
                 .HasFilter("([IsDeleted]=(0))");
 
@@ -3936,38 +3524,30 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.UnitCost).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Batch).WithMany(p => p.StockMovements)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__StockMove__Batch__40AF8DC9");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.StockMovements)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__StockMove__Creat__4944D3CA");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.FromWarehouse).WithMany(p => p.StockMovementsFromWarehouse)
-                .HasForeignKey(d => d.FromWarehouseId)
-                .HasConstraintName("FK__StockMove__FromW__4297D63B");
+                .HasForeignKey(d => d.FromWarehouseId);
 
             entity.HasOne(d => d.MovementTypeCodeNavigation).WithMany(p => p.StockMovements)
                 .HasForeignKey(d => d.MovementTypeCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__StockMove__Movem__44801EAD");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Product).WithMany(p => p.StockMovements)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__StockMove__Produ__3EC74557");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.StockItem).WithMany(p => p.StockMovements)
-                .HasForeignKey(d => d.StockItemId)
-                .HasConstraintName("FK__StockMove__Stock__41A3B202");
+                .HasForeignKey(d => d.StockItemId);
 
             entity.HasOne(d => d.ToWarehouse).WithMany(p => p.StockMovementsToWarehouse)
-                .HasForeignKey(d => d.ToWarehouseId)
-                .HasConstraintName("FK__StockMove__ToWar__438BFA74");
+                .HasForeignKey(d => d.ToWarehouseId);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.StockMovements)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__StockMove__Varia__3FBB6990");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<StockTransferLines>(entity =>
@@ -3980,32 +3560,27 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.Batch).WithMany(p => p.StockTransferLines)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("FK__StockTran__Batch__75235608");
+                .HasForeignKey(d => d.BatchId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.StockTransferLines)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__StockTran__Creat__77FFC2B3");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.StockTransferLines)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__StockTran__Produ__733B0D96");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Transfer).WithMany(p => p.StockTransferLines)
-                .HasForeignKey(d => d.TransferId)
-                .HasConstraintName("FK__StockTran__Trans__7246E95D");
+                .HasForeignKey(d => d.TransferId);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.StockTransferLines)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__StockTran__Varia__742F31CF");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<StockTransfers>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Transfers");
 
-            entity.HasIndex(e => e.TransferNo, "UX_Transfers_No").IsUnique();
+            entity.HasIndex(e => e.TransferNo).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -4020,31 +3595,26 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TransferNo).HasMaxLength(50);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.StockTransfersCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__StockTran__Creat__6C8E1007");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.CreatedByUser).WithMany(p => p.StockTransfersCreatedByUser)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK__StockTran__Creat__6AA5C795");
+                .HasForeignKey(d => d.CreatedByUserId);
 
             entity.HasOne(d => d.FromWarehouse).WithMany(p => p.StockTransfersFromWarehouse)
                 .HasForeignKey(d => d.FromWarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__StockTran__FromW__65E11278");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.ToWarehouse).WithMany(p => p.StockTransfersToWarehouse)
                 .HasForeignKey(d => d.ToWarehouseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__StockTran__ToWar__66D536B1");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.StockTransfersUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__StockTran__Updat__6D823440");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<Suppliers>(entity =>
         {
-            entity.HasIndex(e => e.SupplierCode, "UX_Suppliers_Code").IsUnique();
+            entity.HasIndex(e => e.SupplierCode).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AddressLine1).HasMaxLength(200);
@@ -4075,12 +3645,10 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TaxRegistrationNo).HasMaxLength(100);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.SuppliersCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Suppliers__Creat__7EF6D905");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.SuppliersUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Suppliers__Updat__7FEAFD3E");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<SupportTicketMessages>(entity =>
@@ -4093,23 +3661,20 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.SupportTicketMessagesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__SupportTi__Creat__0B3292B8");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Sender).WithMany(p => p.SupportTicketMessagesSender)
-                .HasForeignKey(d => d.SenderId)
-                .HasConstraintName("FK__SupportTi__Sende__0856260D");
+                .HasForeignKey(d => d.SenderId);
 
             entity.HasOne(d => d.SupportTicket).WithMany(p => p.SupportTicketMessages)
-                .HasForeignKey(d => d.SupportTicketId)
-                .HasConstraintName("FK__SupportTi__Suppo__076201D4");
+                .HasForeignKey(d => d.SupportTicketId);
         });
 
         modelBuilder.Entity<SupportTickets>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Tickets");
 
-            entity.HasIndex(e => e.TicketNumber, "UX_Tickets_No").IsUnique();
+            entity.HasIndex(e => e.TicketNumber).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.Category).HasMaxLength(50);
@@ -4127,29 +3692,24 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TicketNumber).HasMaxLength(30);
 
             entity.HasOne(d => d.AssignedTo).WithMany(p => p.SupportTicketsAssignedTo)
-                .HasForeignKey(d => d.AssignedToId)
-                .HasConstraintName("FK__SupportTi__Assig__7AFC2AEF");
+                .HasForeignKey(d => d.AssignedToId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.SupportTicketsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__SupportTi__Creat__01A9287E");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Order).WithMany(p => p.SupportTickets)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK__SupportTi__Order__7BF04F28");
+                .HasForeignKey(d => d.OrderId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.SupportTicketsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__SupportTi__Updat__029D4CB7");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.User).WithMany(p => p.SupportTicketsUser)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__SupportTi__UserI__7A0806B6");
+                .HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<Tags>(entity =>
         {
-            entity.HasIndex(e => e.Slug, "UX_Tags_Slug").IsUnique();
+            entity.HasIndex(e => e.Slug).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -4160,17 +3720,15 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Slug).HasMaxLength(50);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TagsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Tags__CreatedBy__18B6AB08");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.TagsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Tags__UpdatedBy__19AACF41");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<TaxRates>(entity =>
         {
-            entity.HasIndex(e => e.TaxCode, "UX_TaxRates_Code").IsUnique();
+            entity.HasIndex(e => e.TaxCode).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.Country)
@@ -4191,17 +3749,15 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .HasDefaultValue("Percentage");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.TaxRatesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__TaxRates__Create__5224328E");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.TaxRatesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__TaxRates__Update__531856C7");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<Units>(entity =>
         {
-            entity.HasIndex(e => e.Name, "UX_Units_Name").IsUnique();
+            entity.HasIndex(e => e.Name).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.ConversionFactor).HasColumnType("decimal(18, 6)");
@@ -4215,16 +3771,13 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.ShortName).HasMaxLength(20);
 
             entity.HasOne(d => d.BaseUnit).WithMany(p => p.InverseBaseUnit)
-                .HasForeignKey(d => d.BaseUnitId)
-                .HasConstraintName("FK__Units__BaseUnitI__0E391C95");
+                .HasForeignKey(d => d.BaseUnitId);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.UnitsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Units__CreatedBy__11158940");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.UnitsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Units__UpdatedBy__1209AD79");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<UserClaims>(entity =>
@@ -4232,26 +3785,24 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
 
             entity.HasOne(d => d.User).WithMany(p => p.UserClaims)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__UserClaim__UserI__7D439ABD");
+                .HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<UserLogins>(entity =>
         {
-            entity.HasIndex(e => new { e.LoginProvider, e.ProviderKey }, "UX_UserLogins_Provider").IsUnique();
+            entity.HasIndex(e => new { e.LoginProvider, e.ProviderKey }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.LoginProvider).HasMaxLength(128);
             entity.Property(e => e.ProviderKey).HasMaxLength(128);
 
             entity.HasOne(d => d.User).WithMany(p => p.UserLogins)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__UserLogin__UserI__05D8E0BE");
+                .HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<UserRefreshTokens>(entity =>
         {
-            entity.HasIndex(e => e.UserId, "IX_RefreshTokens_User").HasFilter("([IsDeleted]=(0))");
+            entity.HasIndex(e => e.UserId).HasFilter("([IsDeleted]=(0))");
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -4264,25 +3815,22 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.Token).HasMaxLength(500);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.UserRefreshTokensCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__UserRefre__Creat__395884C4");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.User).WithMany(p => p.UserRefreshTokensUser)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__UserRefre__UserI__37703C52");
+                .HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<UserTokens>(entity =>
         {
-            entity.HasIndex(e => new { e.UserId, e.LoginProvider, e.Name }, "UX_UserTokens").IsUnique();
+            entity.HasIndex(e => new { e.UserId, e.LoginProvider, e.Name }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.LoginProvider).HasMaxLength(128);
             entity.Property(e => e.Name).HasMaxLength(128);
 
             entity.HasOne(d => d.User).WithMany(p => p.UserTokens)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__UserToken__UserI__0A9D95DB");
+                .HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<UserRoles>(entity =>
@@ -4291,22 +3839,20 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
             entity.HasOne(d => d.User)
                 .WithMany()
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__UserRoles__UserI__787EE5A0");
+                .HasForeignKey(d => d.UserId);
 
             entity.HasOne(d => d.Role)
                 .WithMany()
-                .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK__UserRoles__RoleI__797309D9");
+                .HasForeignKey(d => d.RoleId);
         });
 
         modelBuilder.Entity<Users>(entity =>
         {
-            entity.HasIndex(e => e.NormalizedEmail, "UX_Users_Email")
+            entity.HasIndex(e => e.NormalizedEmail)
                 .IsUnique()
                 .HasFilter("([NormalizedEmail] IS NOT NULL)");
 
-            entity.HasIndex(e => e.NormalizedUserName, "UX_Users_UserName")
+            entity.HasIndex(e => e.NormalizedUserName)
                 .IsUnique()
                 .HasFilter("([NormalizedUserName] IS NOT NULL)");
 
@@ -4333,7 +3879,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<VariantAttributeMatrix>(entity =>
         {
-            entity.HasIndex(e => new { e.ProductId, e.VariantId }, "UX_VariantAttributeMatrix").IsUnique();
+            entity.HasIndex(e => new { e.ProductId, e.VariantId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -4343,22 +3889,19 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.VariantAttributeMatrix)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__VariantAt__Creat__3DB3258D");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.VariantAttributeMatrix)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__VariantAt__Produ__39E294A9");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.VariantAttributeMatrix)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__VariantAt__Varia__3AD6B8E2");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<VariantAttributeOptions>(entity =>
         {
-            entity.HasIndex(e => new { e.VariantId, e.OptionId }, "UX_VariantAttributeOptions").IsUnique();
+            entity.HasIndex(e => new { e.VariantId, e.OptionId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -4367,17 +3910,14 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.VariantAttributeOptions)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__VariantAt__Creat__3429BB53");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Option).WithMany(p => p.VariantAttributeOptions)
                 .HasForeignKey(d => d.OptionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__VariantAt__Optio__324172E1");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.VariantAttributeOptions)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__VariantAt__Varia__314D4EA8");
+                .HasForeignKey(d => d.VariantId);
         });
 
         modelBuilder.Entity<VwCustomerLoyaltyBalance>(entity =>
@@ -4425,7 +3965,7 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
 
         modelBuilder.Entity<WalletTransactions>(entity =>
         {
-            entity.HasIndex(e => new { e.WalletId, e.CreatedAt }, "IX_WalletTransactions").IsDescending(false, true);
+            entity.HasIndex(e => new { e.WalletId, e.CreatedAt }).IsDescending(false, true);
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
@@ -4441,21 +3981,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TransactionType).HasMaxLength(30);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.WalletTransactionsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__WalletTra__Creat__5708E33C");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.WalletTransactionsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__WalletTra__Updat__57FD0775");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Wallet).WithMany(p => p.WalletTransactions)
-                .HasForeignKey(d => d.WalletId)
-                .HasConstraintName("FK__WalletTra__Walle__52442E1F");
+                .HasForeignKey(d => d.WalletId);
         });
 
         modelBuilder.Entity<Warehouses>(entity =>
         {
-            entity.HasIndex(e => e.Code, "UX_Warehouses_Code").IsUnique();
+            entity.HasIndex(e => e.Code).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AddressLine1).HasMaxLength(200);
@@ -4489,21 +4026,18 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
             entity.Property(e => e.TaxNumber).HasMaxLength(50);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.WarehousesCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Warehouse__Creat__5F7E2DAC");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Parent).WithMany(p => p.InverseParent)
-                .HasForeignKey(d => d.ParentId)
-                .HasConstraintName("FK__Warehouse__Paren__5AB9788F");
+                .HasForeignKey(d => d.ParentId);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.WarehousesUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Warehouse__Updat__607251E5");
+                .HasForeignKey(d => d.UpdatedBy);
         });
 
         modelBuilder.Entity<WishlistItems>(entity =>
         {
-            entity.HasIndex(e => new { e.WishlistId, e.ProductId, e.VariantId }, "UX_WishlistItems").IsUnique();
+            entity.HasIndex(e => new { e.WishlistId, e.ProductId, e.VariantId }).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
             entity.Property(e => e.AddedAt).HasDefaultValueSql("(getutcdate())");
@@ -4514,25 +4048,20 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsConcurrencyToken();
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.WishlistItemsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__WishlistI__Creat__4F87BD05");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Product).WithMany(p => p.WishlistItems)
                 .HasForeignKey(d => d.ProductId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__WishlistI__Produ__4AC307E8");
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.WishlistItemsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__WishlistI__Updat__507BE13E");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.Variant).WithMany(p => p.WishlistItems)
-                .HasForeignKey(d => d.VariantId)
-                .HasConstraintName("FK__WishlistI__Varia__4BB72C21");
+                .HasForeignKey(d => d.VariantId);
 
             entity.HasOne(d => d.Wishlist).WithMany(p => p.WishlistItems)
-                .HasForeignKey(d => d.WishlistId)
-                .HasConstraintName("FK__WishlistI__Wishl__49CEE3AF");
+                .HasForeignKey(d => d.WishlistId);
         });
 
         modelBuilder.Entity<WishlistTypes>(entity =>
@@ -4559,26 +4088,21 @@ public partial class ApplicationDbContext : DbContext, IApplicationDbContext
                 .HasDefaultValue("Personal");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.WishlistsCreatedByNavigation)
-                .HasForeignKey(d => d.CreatedBy)
-                .HasConstraintName("FK__Wishlists__Creat__4321E620");
+                .HasForeignKey(d => d.CreatedBy);
 
             entity.HasOne(d => d.Customer).WithMany(p => p.Wishlists)
                 .HasForeignKey(d => d.CustomerId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("FK__Wishlists__Custo__3C74E891");
+                .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.WishlistsUpdatedByNavigation)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__Wishlists__Updat__44160A59");
+                .HasForeignKey(d => d.UpdatedBy);
 
             entity.HasOne(d => d.User).WithMany(p => p.WishlistsUser)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Wishlists__UserI__3D690CCA");
+                .HasForeignKey(d => d.UserId);
 
             entity.HasOne(d => d.WishlistTypeCodeNavigation).WithMany(p => p.Wishlists)
                 .HasForeignKey(d => d.WishlistTypeCode)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Wishlists__Wishl__3F51553C");
+                .OnDelete(DeleteBehavior.ClientSetNull);
         });
 
         OnModelCreatingPartial(modelBuilder);
